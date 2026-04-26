@@ -42,7 +42,7 @@ public class ObjectOpitimizer : MonoBehaviour
 
     void Start()
 	{
-        player = GameObject.FindWithTag("Player").GetComponent<Player>();
+        player = LevelManager.Instance.player;
         player.OnPlayerRespawn += Refresh;
         player.OnPlayerTeleported += Refresh;
 

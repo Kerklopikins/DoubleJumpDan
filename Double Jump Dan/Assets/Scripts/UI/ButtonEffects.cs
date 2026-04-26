@@ -8,12 +8,14 @@ public class ButtonEffects : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
     public Color textStartingColor = Color.black;
     public Color disabledColor = Color.black;
     [SerializeField] bool dontChangeText;
-
+    [SerializeField] EventSystem eventSystem;
+    
     Text text;
     Button button;
     bool isPointerOver;
     bool isPointerDown;
-
+    bool discontinueInput;
+    
     void Start()
     {
         if(!dontChangeText)
@@ -32,6 +34,19 @@ public class ButtonEffects : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
 
     void Update()
     {
+        if(discontinueInput)
+            return;
+
+        if(eventSystem != null)
+        {
+            if(eventSystem.gameObject.activeSelf == false)
+            {
+                button.enabled = false;
+                SetNormal();
+                return;
+            }
+        }
+
         if(!button.interactable)
         {
             SetDisabled();
@@ -72,27 +87,32 @@ public class ButtonEffects : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
         isPointerDown = true;
     }
 
-    void SetNormal()
+    public void SetNormal()
     {
         if(!dontChangeText && text != null)
             text.color = textStartingColor;
     }
 
-    void SetHighlighted()
+    public void SetHighlighted()
     {
         if(!dontChangeText && text != null)
             text.color = Color.white;
     }
 
-    void SetPressed()
+    public void SetPressed()
     {
         if(!dontChangeText && text != null)
             text.color = Color.white;
     }
 
-    void SetDisabled()
+    public void SetDisabled()
     {
         if(!dontChangeText && text != null)
             text.color = disabledColor;
+    }
+
+    public void DiscontinueInput(bool _discontinueInput)
+    {
+        discontinueInput = _discontinueInput;
     }
 }

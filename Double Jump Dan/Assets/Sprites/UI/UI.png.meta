@@ -1951,6 +1951,27 @@ TextureImporter:
       indices: 
       edges: []
       weights: []
+    - serializedVersion: 2
+      name: UI Slider Background Disabled
+      rect:
+        serializedVersion: 2
+        x: 45
+        y: 450
+        width: 5
+        height: 5
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 2, y: 2, z: 2, w: 2}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: b7e207d6fc25dcd41b7fb14e81c0575f
+      internalID: -1257746027
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
     outline: []
     physicsShape: []
     bones: []
@@ -2013,6 +2034,7 @@ TextureImporter:
       Shadow Dan: 21300170
       Shop Background: -1014530495
       Smartphone Zombie Dan: 21300162
+      Toggle Selected: 1372044642
       UI Background: 21300014
       UI Background FB: 21300060
       UI Background FL: 21300084
@@ -2036,6 +2058,7 @@ TextureImporter:
       UI Gems 9: 1030265515
       UI Outline: 21300166
       UI Slider Background Black: 21300122
+      UI Slider Background Disabled: -1257746027
       UI Slider Background White: 21300124
       UI Small Gems 1: 2033021274
       UI Small Gems 2: -1663142089

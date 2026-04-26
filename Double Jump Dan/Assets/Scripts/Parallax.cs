@@ -15,7 +15,7 @@ public class Parallax : MonoBehaviour
 
     void Start()
     {
-        _camera = Camera.main;
+        _camera = LevelManager.Instance.mainCamera;
         cameraHolder = _camera.transform.parent;
         
         if(resizeSprite)

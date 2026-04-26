@@ -22,7 +22,7 @@ public class GiveDamage : MonoBehaviour
 
     void Start()
     {
-        player = GameObject.FindWithTag("Player").GetComponent<Player>();
+        player = LevelManager.Instance.player;
     }
     void OnCollisionStay2D(Collision2D other)
     {

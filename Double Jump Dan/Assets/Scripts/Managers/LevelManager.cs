@@ -13,7 +13,6 @@ public class LevelManager : MonoBehaviour
     
     [SerializeField] Transform levelStart;
     [SerializeField] Transform levelFinish;
-    [SerializeField] Player player;
 
     [Header("Finish Level")]
     [SerializeField] float maxDetectionHeight;
@@ -26,6 +25,11 @@ public class LevelManager : MonoBehaviour
     [Header("Random Object Placement")]
     [SerializeField] List<SpawnType> spawnTypes = new List<SpawnType>();
 
+    public Player player { get; private set; }
+    public BoxCollider2D levelBounds { get; private set; }
+    public Transform levelObjects { get; private set; }
+    public LocalWorldManager localWorldManager { get; private set; }
+    public Camera mainCamera { get; private set; }
     public int gems { get; set; }
     public Vector2 currentSpawnPoint { get; private set; }
     bool playerEntered;
@@ -33,10 +37,8 @@ public class LevelManager : MonoBehaviour
     GameManager gameManager;
     int currentScene;
     bool finishedLevel;
-    LocalWorldManager localWorldManager;
     int objectSpawnProbability;
     int randomObjectIndex;
-    Camera _camera;
     float _checkTimer;
 
     void Awake()
@@ -49,8 +51,11 @@ public class LevelManager : MonoBehaviour
             currentSpawnPoint = player.transform.position;
 
         localWorldManager = GetComponent<LocalWorldManager>();
-        _camera = Camera.main;
-
+        levelBounds = GameObject.FindWithTag("Bounds").GetComponent<BoxCollider2D>();
+        levelObjects = GameObject.FindWithTag("Level Objects").transform;
+        player = GameObject.FindWithTag("Player").GetComponent<Player>();
+        mainCamera = Camera.main;
+        
         Respawn();
     }
 
@@ -145,7 +150,7 @@ public class LevelManager : MonoBehaviour
 
     bool CameraInZone(Vector2 position, Vector2 zoneSize)
     {
-        if(Mathf.Abs(_camera.transform.position.x - position.x) <= (CameraWidth() / 2 + zoneSize.x / 2 + extraZoneBuffer) && Mathf.Abs(_camera.transform.position.y - position.y) <= (CameraHeight() / 2 + zoneSize.y / 2 + extraZoneBuffer))
+        if(Mathf.Abs(mainCamera.transform.position.x - position.x) <= (CameraWidth() / 2 + zoneSize.x / 2 + extraZoneBuffer) && Mathf.Abs(mainCamera.transform.position.y - position.y) <= (CameraHeight() / 2 + zoneSize.y / 2 + extraZoneBuffer))
             return true;
         else
             return false;
@@ -153,12 +158,12 @@ public class LevelManager : MonoBehaviour
 
     float CameraHeight()
     {
-        return _camera.orthographicSize * 2;
+        return mainCamera.orthographicSize * 2;
     }
 
     float CameraWidth()
     {
-        return CameraHeight() * _camera.aspect;
+        return CameraHeight() * mainCamera.aspect;
     }
 
     public void AddGems(int gemsToGive)
@@ -253,7 +258,7 @@ public class LevelManager : MonoBehaviour
                 largeStyle.fontStyle = FontStyle.Bold;
                 Handles.Label(new Vector3(objectZones[i].position.x, objectZones[i].position.y + objectZones[i].size.y / 2 + 5, 0), "Zone " + (i + 1).ToString(), largeStyle);
                 
-                if(_camera != null && CameraInZone(objectZones[i].position, objectZones[i].size))
+                if(mainCamera != null && CameraInZone(objectZones[i].position, objectZones[i].size))
                     Gizmos.color = Color.green;
                 else
                     Gizmos.color = Color.cyan;

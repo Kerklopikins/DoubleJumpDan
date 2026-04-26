@@ -1,7 +1,9 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
-using System;
 using System.Collections;
+using UnityEngine.InputSystem;
+using UnityEngine.InputSystem.UI;
+using UnityEngine.InputSystem.LowLevel;
 
 public class MainMenuManager : MonoBehaviour
 {
@@ -17,13 +19,25 @@ public class MainMenuManager : MonoBehaviour
     [SerializeField] Image tamperedUserFileImage;
     [SerializeField] Text tamperedUserFileText;
 
+    [Header("Joystick")]
+    public RectTransform cursor;
+    [SerializeField] float cursorSpeed;
+    [SerializeField] Camera _camera;
+    public float scrollSpeed;
+
     ShopManager shopManager;
     UserMenu userMenu;
     UserStatsMenu userStatsMenu;
     LevelSelectMenu levelSelectMenu;
     SettingsManager settingsManager;
-
+    Canvas canvas;
+    Vector2 position;
+    Vector2 screenPosition;
+    Vector2 input;
     float startDelay = 1.35f;
+    GameInputManager gameInputManager;
+    float _cursorSpeed;
+    public float _scrollSpeed { get; set; }
 
     void Start()
     {
@@ -33,7 +47,8 @@ public class MainMenuManager : MonoBehaviour
         userStatsMenu = GetComponent<UserStatsMenu>();
         levelSelectMenu = GetComponent<LevelSelectMenu>();
         settingsManager = GetComponent<SettingsManager>();
-
+        gameInputManager = GameInputManager.Instance;
+        
         if(playButton == null || shopButton == null || userButton == null || statsButton == null || settingsButton == null)
             Debug.LogError("Main Menu button is null");
             
@@ -43,10 +58,60 @@ public class MainMenuManager : MonoBehaviour
         userButton.onClick.AddListener(userMenu.RefreshUserByteSizes);
         statsButton.onClick.AddListener(userStatsMenu.RefreshUserStats);
         settingsButton.onClick.AddListener(settingsManager.RefreshFullscreenToggle);
+        gameInputManager.OnControllerChanged += OnControllerChanged;
+
+        canvas = GetComponent<Canvas>();
+        _cursorSpeed = cursorSpeed;
+
+        if(gameInputManager.ControllerConnected())
+        {
+            position = new Vector2(Screen.width / 2, Screen.height / 1.5f);
+            
+            InputState.Change(Mouse.current.position, position);
+            InputState.Change(Mouse.current.delta, Vector2.zero);
+            
+            Cursor.visible = false;
+            cursor.gameObject.SetActive(true);
+        }
+    }
+
+    public void OnControllerChanged(bool enabled)
+    {
+        if(enabled)
+        {
+            Cursor.visible = false;
+            cursor.gameObject.SetActive(true);
+        }
+        else
+        {
+            Cursor.visible = true;
+            cursor.gameObject.SetActive(false);
+        }
     }
 
     void Update()
     {
+       if(gameInputManager.ControllerConnected())
+        {
+            input = gameInputManager.GetJoystickMovement();
+
+            if(gameInputManager.LeftTrigger())
+                _cursorSpeed = cursorSpeed * 2f;
+            else
+                _cursorSpeed = cursorSpeed;
+
+            position += input * _cursorSpeed * Time.unscaledDeltaTime;
+            position.x = Mathf.Clamp(position.x, 0, Screen.width);
+            position.y = Mathf.Clamp(position.y, 0, Screen.height);
+
+            InputState.Change(Mouse.current.position, position);
+            InputState.Change(Mouse.current.delta, Vector2.zero);
+
+            screenPosition = Mouse.current.position.ReadValue();
+            RectTransformUtility.ScreenPointToLocalPointInRectangle(canvas.transform as RectTransform, screenPosition, canvas.worldCamera, out Vector2 localPosition);
+            cursor.anchoredPosition = localPosition;
+        }
+
         if(startDelay > 0)
         {
             tutorialButton.interactable = false;

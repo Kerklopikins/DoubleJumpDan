@@ -29,12 +29,12 @@ public class D207: MonoBehaviour
     GameInputManager gameInputManager;
 	void Start()
 	{
-        laserParent = GameObject.FindWithTag("Level Objects").transform;
+        laserParent = LevelManager.Instance.levelObjects;
 
         laser.transform.parent = laserParent;
         laserHitEffect.transform.parent = laserParent;
 
-        player = GameObject.FindWithTag("Player").GetComponent<Player>();
+        player = LevelManager.Instance.player;
         player.spriteMaterials.Add(glowSprite);
         startingPosition = transform.localPosition;
         gameInputManager = GameInputManager.Instance;

@@ -11,7 +11,7 @@ public class RattlesnakeAI : MonoBehaviour
 	
 	void Start()
 	{
-		player = GameObject.FindWithTag("Player").GetComponent<Player>();
+		player = LevelManager.Instance.player;
         animator = GetComponent<Animator>();
 	}
 	

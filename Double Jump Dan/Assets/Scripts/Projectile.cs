@@ -134,7 +134,7 @@ public class Projectile : MonoBehaviour, IPoolable
         transformProperties.rotation = transform.rotation;
 
         if(!string.IsNullOrEmpty(destroyedEffectPool))
-            PoolManager.instance.ReuseObject(destroyedEffectPool, transformProperties);
+            PoolManager.Instance.ReuseObject(destroyedEffectPool, transformProperties);
 
         gameObject.SetActive(false);
     }

@@ -49,11 +49,11 @@ public class EnemyGun : MonoBehaviour
         if(flash != null)
             flash.SetActive(false);
 
-        PoolManager.instance.CreatePool(bullet.name, bullet, bulletsToSpawn);
+        PoolManager.Instance.CreatePool(bullet.name, bullet, bulletsToSpawn);
 
         if(destroyedEffect != null)
         {
-            PoolManager.instance.CreatePool(destroyedEffect.name, destroyedEffect.gameObject, bulletsToSpawn);
+            PoolManager.Instance.CreatePool(destroyedEffect.name, destroyedEffect.gameObject, bulletsToSpawn);
             destroyedEffectPool = destroyedEffect.name;
         }
     }
@@ -144,7 +144,7 @@ public class EnemyGun : MonoBehaviour
                             projectileProperties.direction = ray.direction;
                     }
 
-                   PoolManager.instance.ReuseObject(bullet.name, projectileProperties);
+                   PoolManager.Instance.ReuseObject(bullet.name, projectileProperties);
                 }
             }
 

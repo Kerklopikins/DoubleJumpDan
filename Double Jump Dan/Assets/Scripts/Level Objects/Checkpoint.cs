@@ -21,7 +21,7 @@ public class Checkpoint : MonoBehaviour
     
     void Start()
     {
-        player = GameObject.FindWithTag("Player").GetComponent<Player>();
+        player = LevelManager.Instance.player;
         beaconStartSize = beaconSprite.size.y;
         maxBeaconHeight = beaconStartSize + 1;
     }

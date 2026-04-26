@@ -156,6 +156,13 @@ MonoBehaviour:
   weeSprites:
   - {fileID: -2027503091, guid: a84efda117f28ec47ace744a727c2bed, type: 3}
   - {fileID: 565584017, guid: a84efda117f28ec47ace744a727c2bed, type: 3}
+  weeSound: {fileID: 8300000, guid: a99b10c695176f743a3f1637c38ad4db, type: 3}
+  lowHurtRumble: 0.15
+  highHurtRumble: 0.25
+  hurtRumbleDuration: 0.3
+  lowDeathRumble: 0.8
+  highDeathRumble: 1
+  deathRumbleDuration: 0.6
   doubleJumpParticles: {fileID: 41927958349923517}
   walkParticles: {fileID: 151519995566672819}
   landParticles: {fileID: 1874427554591454723}
@@ -929,7 +936,6 @@ GameObject:
   - component: {fileID: 3465221716506092512}
   - component: {fileID: 1874427554591454723}
   - component: {fileID: 267831126969907912}
-  - component: {fileID: 3330762398857987499}
   m_Layer: 0
   m_Name: Land Particles
   m_TagString: Untagged
@@ -5807,18 +5813,6 @@ ParticleSystemRenderer:
   m_MeshWeighting2: 1
   m_MeshWeighting3: 1
   m_MaskInteraction: 0
---- !u!114 &3330762398857987499
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1816475252332828024}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: cab16cadb4e17804097cbc8904170507, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &1833071494351706421
 GameObject:
   m_ObjectHideFlags: 0
@@ -5871,7 +5865,7 @@ SpriteRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: b6ef40862de0d27449b68980d08a532a, type: 2}
+  - {fileID: 2100000, guid: 0c75f55fbcf3b804d85cafae30546d4c, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -6122,7 +6116,6 @@ GameObject:
   - component: {fileID: 5845859257348388382}
   - component: {fileID: 151519995566672819}
   - component: {fileID: 5528795501435140280}
-  - component: {fileID: 7705252274196681635}
   m_Layer: 0
   m_Name: Walk Particle
   m_TagString: Untagged
@@ -10942,18 +10935,6 @@ ParticleSystemRenderer:
   m_MeshWeighting2: 1
   m_MeshWeighting3: 1
   m_MaskInteraction: 0
---- !u!114 &7705252274196681635
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4077014536572683097}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: cab16cadb4e17804097cbc8904170507, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &4192253468105104783
 GameObject:
   m_ObjectHideFlags: 0
@@ -11115,7 +11096,6 @@ GameObject:
   - component: {fileID: 3358599373383406065}
   - component: {fileID: 41927958349923517}
   - component: {fileID: 5254546927968298978}
-  - component: {fileID: 9129481971647177532}
   m_Layer: 0
   m_Name: Double Jump Particles
   m_TagString: Untagged
@@ -15993,18 +15973,6 @@ ParticleSystemRenderer:
   m_MeshWeighting2: 1
   m_MeshWeighting3: 1
   m_MaskInteraction: 0
---- !u!114 &9129481971647177532
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7904260762213484630}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: cab16cadb4e17804097cbc8904170507, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &8195257277049850670
 GameObject:
   m_ObjectHideFlags: 0

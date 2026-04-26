@@ -13,7 +13,7 @@ public class WatchOutTrigger : MonoBehaviour
 	void Start()
 	{
         lineSprite = GetComponent<SpriteRenderer>();
-        player = GameObject.FindWithTag("Player").GetComponent<Player>();
+        player = LevelManager.Instance.player;
 
         lineSprite.size = new Vector2(0, lineSprite.size.y);
         watchOutSquare.transform.position = transform.position;

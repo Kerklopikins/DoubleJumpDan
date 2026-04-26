@@ -29,7 +29,8 @@ public class UserMenu : MonoBehaviour
     [SerializeField] Animator mainMenu;
     public Color[] userColors;
     [SerializeField] EventSystem eventSystem;
-    
+    [SerializeField] ExitUIArea exitUIArea;
+
     public UserButton currentUserButton { get; set; }
     public UIScreenManager uiScreenManager { get; set; }
     public int previousUserColorIndex { get; set; }
@@ -98,7 +99,7 @@ public class UserMenu : MonoBehaviour
             {
                 confirmButton.interactable = true;
 
-                if(gameInputManager.ReturnButtonDown())
+                if(gameInputManager.ReturnButtonDown() && uiScreenManager.transitionTimer <= 0)
                 {
                     if(!createdNewUser)
                     {
@@ -129,7 +130,7 @@ public class UserMenu : MonoBehaviour
             {
                 confirmButton.interactable = true;
 
-                if(gameInputManager.ReturnButtonDown())
+                if(gameInputManager.ReturnButtonDown() && uiScreenManager.transitionTimer <= 0)
                 {
                     AudioManager.Instance.PlaySound2D(buttonClick);
                     RenameUser();
@@ -148,6 +149,12 @@ public class UserMenu : MonoBehaviour
             oneToTwentyCharsText.SetActive(false);
             cancelButton.interactable = true;
             confirmButton.interactable = true;
+
+            if(gameInputManager.ReturnButtonDown() && uiScreenManager.transitionTimer <= 0)
+            {
+                AudioManager.Instance.PlaySound2D(buttonClick);
+                ConfirmChangeColor();
+            }
         }
 
         if(editState == EditState.Normal)
@@ -165,8 +172,16 @@ public class UserMenu : MonoBehaviour
         }
 
         if(editState != EditState.Normal)
-            if(gameInputManager.EscapeButtonDown())
+        {
+            exitUIArea.enabled = false;
+
+            if(gameInputManager.EscapeButtonDown() && uiScreenManager.transitionTimer <= 0)
                 Cancel();
+        }
+        else
+        {
+            exitUIArea.enabled = true;
+        }
             
         if(gameManager.users.Count <= 1)
             deleteButton.interactable = false;
@@ -204,6 +219,7 @@ public class UserMenu : MonoBehaviour
     public void New()
     {
         AudioManager.Instance.PlaySound2D(buttonClick);
+        uiScreenManager.transitionTimer = 0.2f;
 
         userNameInputField.interactable = true;
         OnButtonsDisabled?.Invoke(false);
@@ -295,6 +311,7 @@ public class UserMenu : MonoBehaviour
     public void Rename()
     {
         AudioManager.Instance.PlaySound2D(buttonClick);
+        uiScreenManager.transitionTimer = 0.2f;
 
 		previousUserName = currentUserButton.userName;
 
@@ -333,6 +350,8 @@ public class UserMenu : MonoBehaviour
     public void ChangeColor()
     {
         AudioManager.Instance.PlaySound2D(buttonClick);
+        uiScreenManager.transitionTimer = 0.2f;
+
         colorSelectionIndex ++;
 
         if(colorSelectionIndex > userColors.Length - 1)
@@ -391,6 +410,8 @@ public class UserMenu : MonoBehaviour
 
     public void Confirm()
     {
+        uiScreenManager.transitionTimer = 0.2f;
+
         if(editState == EditState.New)
         {
             AudioManager.Instance.PlaySound2D(buttonClick);
@@ -413,6 +434,7 @@ public class UserMenu : MonoBehaviour
     public void Cancel()
     {
         AudioManager.Instance.PlaySound2D(buttonClick);
+        uiScreenManager.transitionTimer = 0.2f;
 
         if(editState == EditState.Rename)
         {

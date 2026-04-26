@@ -19,7 +19,7 @@ EditorBuildSettings:
     guid: e454a58821b2b40478f428bf1a5be8ad
   - enabled: 1
     path: Assets/Scenes/Desert/Level 2.unity
-    guid: f45ee16e4910f7b4986ef18280ddd33e
+    guid: ca688c86dd8c1d44ab7e2705e28bb23d
   - enabled: 1
     path: Assets/Scenes/Desert/Level 3.unity
     guid: c3afbcbe24bda7e4bbfc48352e91c373

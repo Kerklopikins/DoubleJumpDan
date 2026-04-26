@@ -19,7 +19,7 @@ public class Screenshot : MonoBehaviour
 
         animator = GetComponent<Animator>();
         gameHUD = GameHUD.Instance;
-        player = GameObject.FindWithTag("Player").GetComponent<Player>();
+        player = LevelManager.Instance.player;
         gameInputManager = GameInputManager.Instance;
     }
 
@@ -31,7 +31,7 @@ public class Screenshot : MonoBehaviour
             return;
         }
         
-        if(player.dead || !LevelLoadingManager.Instance.done || LevelManager.Instance.FinishedLevel() || gameHUD.paused)
+        if(player.dead || LevelLoadingManager.Instance.busy || LevelManager.Instance.FinishedLevel() || gameHUD.paused)
             return;
 
         if(gameInputManager.ScreenshotButtonDown())

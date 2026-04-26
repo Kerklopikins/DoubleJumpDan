@@ -2,9 +2,9 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using System.Collections;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+using UnityEngine.InputSystem;
+using UnityEngine.InputSystem.UI;
+using UnityEngine.InputSystem.LowLevel;
 
 public class GameHUD: MonoBehaviour
 {
@@ -30,6 +30,18 @@ public class GameHUD: MonoBehaviour
 
     [Header("Settings")]
     [SerializeField] GameObject settings;
+    
+    [Header("Controller")]
+    [SerializeField] RectTransform cursor;
+    [SerializeField] float cursorSpeed;
+
+    [Header("Player Crosshairs")]
+    public Transform crosshairsParent;
+    public Transform crosshairs;
+    [SerializeField] float maxCrosshairsRadius = 10;
+    [SerializeField] float crosshairsSmoothSpeed = 8;
+    [SerializeField] Sprite[] crosshairSprites;
+    [SerializeField] float crosshairAnimationSpeed = 0.1f;
 
     public bool paused { get; protected set; }
     public bool canPause { get; set; }
@@ -42,6 +54,17 @@ public class GameHUD: MonoBehaviour
     bool canToggleSettings;
     GunInfo gunInfo;
     GameInputManager gameInputManager;
+    Camera _camera;
+    Canvas canvas;
+    Vector2 position;
+    Vector2 screenPosition;
+    Vector2 input;
+    float currentAngle;
+    int crosshairAnimationIndex;
+    SpriteRenderer crosshairsSprite;
+    float crosshairAnimationTimer;
+    float _cursorSpeed;
+    bool finishedLevel;
 
     void Awake()
     {
@@ -52,17 +75,39 @@ public class GameHUD: MonoBehaviour
     void Start()
     {
         canPause = true;
-        player = GameObject.FindWithTag("Player").GetComponent<Player>();
+        player = LevelManager.Instance.player;
         levelNameText.text = SceneManager.GetActiveScene().name + " Completed";
         pauseButtonRect = pauseButton.GetComponent<RectTransform>();
         gameInputManager = GameInputManager.Instance;
 
         player.OnPlayerKilled += PlayerKilled;
         player.OnPlayerRespawn += PlayerRespawn;
+        gameInputManager.OnControllerChanged += OnControllerChanged;
 
         Time.timeScale = 1;
         pausedText.text = "Paused\n<size=25>" + SceneManager.GetActiveScene().name + "</size>";
-        localWorldManager = GameObject.FindWithTag("Level Managers").GetComponent<LocalWorldManager>();
+        localWorldManager = LevelManager.Instance.localWorldManager;
+        _camera = LevelManager.Instance.mainCamera;
+
+        cursor.transform.localScale = Vector3.zero;
+        _cursorSpeed = cursorSpeed;
+        canvas = GetComponent<Canvas>();
+
+        if(gameInputManager.ControllerConnected())
+        {
+            position = new Vector2(Screen.width / 2, Screen.height / 4);
+
+            InputState.Change(Mouse.current.position, position);
+            InputState.Change(Mouse.current.delta, Vector2.zero);
+            
+            Cursor.visible = false;
+
+            cursor.gameObject.SetActive(true);
+            crosshairsParent.gameObject.SetActive(true);
+        }
+
+        crosshairsSprite = crosshairs.GetComponent<SpriteRenderer>();
+        crosshairAnimationTimer = crosshairAnimationSpeed;
     }
     public void SubscribeToGun(GunInfo _gunInfo)
     {
@@ -71,14 +116,89 @@ public class GameHUD: MonoBehaviour
     
     bool CanPause()
     {
-        if(player.dead || !LevelLoadingManager.Instance.done || LevelManager.Instance.FinishedLevel() || screenshotScript.frozen || inSettings)
+        if(player.dead || LevelLoadingManager.Instance.busy || LevelManager.Instance.FinishedLevel() || screenshotScript.frozen || inSettings)
             return false;
         else
             return true;
     }
 
+    public void OnControllerChanged(bool enabled)
+    {
+        if(enabled)
+        {
+            Cursor.visible = false;
+            cursor.gameObject.SetActive(true);
+            crosshairsParent.gameObject.SetActive(true);
+        }
+        else
+        {
+            Cursor.visible = true;
+            cursor.gameObject.SetActive(false);
+            crosshairsParent.gameObject.SetActive(false);
+        }
+    }
+
+    void FixedUpdate()
+    {
+        crosshairsParent.position = player.transform.position;
+    }
+
     void Update()
     {
+        if(gameInputManager.ControllerConnected())
+        {
+            ///Main Cursor
+            if(paused || finishedLevel)
+            {
+                input = gameInputManager.GetJoystickMovement();
+
+                if(gameInputManager.LeftTrigger())
+                    _cursorSpeed = cursorSpeed * 2f;
+                else
+                    _cursorSpeed = cursorSpeed;
+
+                position += input * _cursorSpeed * Time.unscaledDeltaTime;
+
+                position.x = Mathf.Clamp(position.x, 0, Screen.width);
+                position.y = Mathf.Clamp(position.y, 0, Screen.height);
+
+                InputState.Change(Mouse.current.position, position);
+                InputState.Change(Mouse.current.delta, Vector2.zero);
+
+                screenPosition = Mouse.current.position.ReadValue();
+                RectTransformUtility.ScreenPointToLocalPointInRectangle(canvas.transform as RectTransform, screenPosition, canvas.worldCamera, out Vector2 localPosition);
+                cursor.anchoredPosition = localPosition;
+            }
+
+            ///Player Crosshairs
+            Vector2 aimInput = gameInputManager.AimDirection();
+            
+            if(aimInput.magnitude > 0.1f)
+            {
+                float targetAngle = Mathf.Atan2(aimInput.y, aimInput.x) * Mathf.Rad2Deg;
+                float rotationSpeed = crosshairsSmoothSpeed * aimInput.magnitude;
+                currentAngle = Mathf.LerpAngle(currentAngle, targetAngle, Time.deltaTime * rotationSpeed);
+            }
+            
+            float angleRad = currentAngle * Mathf.Deg2Rad;
+
+            Vector2 direction = new Vector2(Mathf.Cos(angleRad), Mathf.Sin(angleRad));
+            crosshairs.localPosition = direction * maxCrosshairsRadius;
+
+            crosshairAnimationTimer -= Time.deltaTime;
+
+            if(crosshairAnimationTimer <= 0)
+            {
+                crosshairAnimationIndex++;
+
+                if(crosshairAnimationIndex > crosshairSprites.Length - 1)
+                    crosshairAnimationIndex = 0;
+
+                crosshairsSprite.sprite = crosshairSprites[crosshairAnimationIndex];
+                crosshairAnimationTimer = crosshairAnimationSpeed;
+            }
+        }
+
         if(!LevelManager.Instance.FinishedLevel())
             gunInfo.CanShoot(!IsCursorOverPauseButton());
 
@@ -101,13 +221,13 @@ public class GameHUD: MonoBehaviour
             if(gameInputManager.PauseButtonDown())
                 TogglePause();
         
-        if(gameInputManager.PauseButtonDown())
+        if(gameInputManager.EscapeButtonDown())
             ToggleSettings(false);
     }
 
     public bool IsCursorOverPauseButton()
     {
-        return RectTransformUtility.RectangleContainsScreenPoint(pauseButtonRect, Input.mousePosition, Camera.main);
+        return RectTransformUtility.RectangleContainsScreenPoint(pauseButtonRect, Mouse.current.position.ReadValue(), _camera);
     }
 
     IEnumerator DelayPauseCo()
@@ -116,7 +236,13 @@ public class GameHUD: MonoBehaviour
         paused = true;
         referenceTime = 0;
         Time.timeScale = 0;
-        
+
+        position = new Vector2(Screen.width / 2, Screen.height / 4);
+        InputState.Change(Mouse.current.position, position);
+        InputState.Change(Mouse.current.delta, Vector2.zero);
+
+        StartCoroutine(ScaleCursor(Vector3.zero, Vector3.one));
+
         for(int i = 0; i < pauseMenuButtons.Length; i++)
             pauseMenuButtons[i].interactable = false;
 
@@ -137,6 +263,8 @@ public class GameHUD: MonoBehaviour
         canPause = false;
         canToggleSettings = false;
 
+        StartCoroutine(ScaleCursor(Vector3.one, Vector3.zero));
+
         for(int i = 0; i < pauseMenuButtons.Length; i++)
             pauseMenuButtons[i].interactable = false;
 
@@ -149,6 +277,24 @@ public class GameHUD: MonoBehaviour
         Time.timeScale = 1;
         paused = false;
         canPause = true;
+    }
+
+    IEnumerator ScaleCursor(Vector3 from, Vector3 to)
+    {
+        float inTime = 0;
+        float duration = 0.35f;
+
+        while(inTime < duration)
+        {
+            inTime += Time.unscaledDeltaTime;
+            
+            float t = inTime / duration;
+            cursor.localScale = Vector3.Lerp(from, to, t);   
+
+            yield return null;
+        }
+
+        cursor.localScale = to;
     }
 
     public void TogglePause()
@@ -168,9 +314,21 @@ public class GameHUD: MonoBehaviour
     public void FinishLevel()
     {
         if(localWorldManager.world != LocalWorldManager.World.Tutorial)
+        {
+            finishedLevel = true;
+
+            position = new Vector2(Screen.width / 2, Screen.height / 4);
+            InputState.Change(Mouse.current.position, position);
+            InputState.Change(Mouse.current.delta, Vector2.zero);
+
+            StartCoroutine(ScaleCursor(Vector3.zero, Vector3.one));
+
             levelCompleteUI.SetActive(true);
+        }
         else
+        {
             LoadMainMenu();
+        }
     }
 
     public void LoadScene(string sceneToLoad)
@@ -265,6 +423,7 @@ public class GameHUD: MonoBehaviour
 
     public void PlayerRespawn()
     {
+        currentAngle = 0;
         StartCoroutine(RespawnCo(1, 0, 0.45f));
     }
 

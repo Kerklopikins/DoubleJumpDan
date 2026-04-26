@@ -1,4 +1,5 @@
 using UnityEngine;
+using System.Collections.Generic;
 using System;
 
 public class WorldManager : MonoBehaviour
@@ -7,7 +8,7 @@ public class WorldManager : MonoBehaviour
 
     [Header("Time of Day")]
     public Material mainMaterial;
-    public Material mainMaterialStencil;
+    [SerializeField] List<Material> materials = new List<Material>();
     public SpriteRenderer sky;
     [SerializeField] GameObject sunGlow;
     [SerializeField] GameObject sunPivot;
@@ -39,6 +40,7 @@ public class WorldManager : MonoBehaviour
     LocalWorldManager localWorldManager;
     ScreenEffectsManager screenEffectsManager;
     MeshRenderer heatWaveMesh;
+    ParticleSystem snowParticles;
     bool inMainMenu;
 
     void Awake()
@@ -52,9 +54,13 @@ public class WorldManager : MonoBehaviour
 
     void Start()
     {
-        _camera = Camera.main;
+        if(!GameManager.Instance.InMainMenu())
+            _camera = LevelManager.Instance.mainCamera;
+        else
+            _camera = Camera.main;
+            
         screenEffectsManager = GetComponent<ScreenEffectsManager>();
-
+  
         if(localWorldManager.world != LocalWorldManager.World.Tutorial)
         {
             cloudEmissionOverTime = localWorldManager.cloudEmissionOverTime;
@@ -93,11 +99,12 @@ public class WorldManager : MonoBehaviour
                     localWorldManager.weatherType = LocalWorldManager.WeatherType.None;    
                     localWorldManager.distortionType = LocalWorldManager.DistortionType.None;
                 }
-
-                OnTimeOfDayChanged?.Invoke();
             }
 
-            ReloadSky();
+            if(snow != null)
+                snowParticles = snow.GetChild(1).GetComponent<ParticleSystem>();
+          
+            UpdatePositionAndScale();
     
             UpdateWeatherEffects(GameManager.Instance.weatherEffects);
             UpdateDistortionEffects(GameManager.Instance.distortionEffects);
@@ -110,6 +117,8 @@ public class WorldManager : MonoBehaviour
             
             SetSkyAndMaterialsColor(1, 1, 1, 0);
         }
+
+        OnTimeOfDayChanged?.Invoke();
     }
 
     Vector2 BackgroundWeatherScale()
@@ -138,7 +147,6 @@ public class WorldManager : MonoBehaviour
             clouds.gameObject.SetActive(true);
 
             cloudParticleSystem = clouds.GetComponent<ParticleSystem>();
-            clouds.localPosition = new Vector3(-CameraWidth(), clouds.localPosition.y, clouds.localPosition.z);
 
             ParticleSystem.EmissionModule emission = cloudParticleSystem.emission;
             emission.rateOverTime = cloudEmissionOverTime;
@@ -167,14 +175,7 @@ public class WorldManager : MonoBehaviour
             sun.SetActive(false);
             clouds.gameObject.SetActive(false);
 
-            snow.GetChild(0).transform.localScale = BackgroundWeatherScale();
-
-            ParticleSystem snowParticles = snow.GetChild(1).GetComponent<ParticleSystem>();
-            ParticleSystem.ShapeModule shapeModule = snowParticles.shape;
-            shapeModule.radius = CameraWidth() * 2 / 5;
-
             snowParticles.Stop();
-            snow.GetChild(1).transform.localPosition = new Vector3(-CameraWidth(), _camera.orthographicSize, 20);
             snowParticles.Play();
         }
         else
@@ -184,14 +185,9 @@ public class WorldManager : MonoBehaviour
         }
 
         if(localWorldManager.weatherType == LocalWorldManager.WeatherType.Dusting)
-        {
-            dust.transform.localScale = BackgroundWeatherScale();
             dust.gameObject.SetActive(true);
-        }
         else
-        {
             dust.gameObject.SetActive(false);
-        }
     }
 
     public void UpdateDistortionEffects(bool isOn)
@@ -205,9 +201,6 @@ public class WorldManager : MonoBehaviour
         if(localWorldManager.distortionType == LocalWorldManager.DistortionType.HeatWave)
         {
             heatWaveMesh = heatWave.GetComponent<MeshRenderer>();
-
-            if(!inMainMenu)
-                heatWave.transform.localScale = new Vector3(CameraWidth() / 5 + 0.2f, 1, _camera.orthographicSize / 5 + 0.2f);
             
             heatWave.SetActive(true);
             heatWaveMesh.material.SetFloat("Distortion", localWorldManager.heatWaveDistortionIntensity);
@@ -216,6 +209,34 @@ public class WorldManager : MonoBehaviour
         {
             heatWave.SetActive(false);
         }
+    }
+
+    public void UpdatePositionAndScale()
+    {
+        if(!inMainMenu)
+        {
+            sky.transform.localScale = new Vector2(CameraWidth() + 0.2f, _camera.orthographicSize / 17.1875f + 0.01f);
+            stars.size = new Vector2(CameraWidth() * 2 + 0.5f, _camera.orthographicSize * 2 + 0.5f);
+        }
+
+        if(localWorldManager.distortionType == LocalWorldManager.DistortionType.HeatWave)
+            heatWave.transform.localScale = new Vector3(CameraWidth() / 5 + 0.2f, 1, _camera.orthographicSize / 5 + 0.2f);
+
+        if(localWorldManager.weatherType == LocalWorldManager.WeatherType.Dusting)
+            dust.transform.localScale = BackgroundWeatherScale();
+
+        if(localWorldManager.weatherType == LocalWorldManager.WeatherType.Snowing)
+        {
+            snow.GetChild(0).transform.localScale = BackgroundWeatherScale();
+
+            ParticleSystem.ShapeModule shapeModule = snowParticles.shape;
+            shapeModule.radius = CameraWidth() * 2 / 5;
+
+            snow.GetChild(1).transform.localPosition = new Vector3(-CameraWidth(), _camera.orthographicSize, 20);
+        }
+
+        if(cloudEmissionOverTime > 0)
+            clouds.localPosition = new Vector3(-CameraWidth(), clouds.localPosition.y, clouds.localPosition.z);
     }
 
     float CameraWidth()
@@ -340,16 +361,9 @@ public class WorldManager : MonoBehaviour
                 mesh.material.color = new Color(mesh.material.color.r, mesh.material.color.g, mesh.material.color.b, localWorldManager.dustAlpha);
             
         mainMaterial.color = new Color(r, g, b, mainMaterial.color.a);
-        mainMaterialStencil.color = mainMaterial.color;
-    }
-
-    public void ReloadSky()
-    {
-        if(!inMainMenu)
-        {
-            sky.transform.localScale = new Vector2(CameraWidth() + 0.2f, _camera.orthographicSize / 17.1875f + 0.01f);
-            stars.size = new Vector2(CameraWidth() * 2 + 0.5f, _camera.orthographicSize * 2 + 0.5f);
-        }
+        
+        foreach(Material mat in materials)
+            mat.color = mainMaterial.color;
     }
 
     public bool UseWeatherEffects()
@@ -358,5 +372,13 @@ public class WorldManager : MonoBehaviour
             return true;
         else
             return false;
+    }
+
+    void OnApplicationQuit()
+    {                
+        mainMaterial.color = new Color(1, 1, 1, mainMaterial.color.a);
+        
+        foreach(Material mat in materials)
+            mat.color = mainMaterial.color;
     }
 }

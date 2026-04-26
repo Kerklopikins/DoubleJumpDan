@@ -2046,7 +2046,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 474472, guid: bea4aa69f6074d2428cb3d94757392ca, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 33
+      value: 32.875
       objectReference: {fileID: 0}
     - target: {fileID: 474472, guid: bea4aa69f6074d2428cb3d94757392ca, type: 3}
       propertyPath: m_LocalPosition.z
@@ -2545,14 +2545,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ec44d842953a49e42990ca8cc167e092, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  timeOfDay: 0
+  timeOfDay: 1
   world: 5
   weatherType: 0
   cloudEmissionOverTime: 0.03
   dustAlpha: 0.8
-  distortionType: 1
-  heatWaveDistortionIntensity: 12
-  dayTintColor: {r: 1, g: 0.7847298, b: 0.41000003, a: 0}
+  distortionType: 0
+  heatWaveDistortionIntensity: 5
+  dayTintColor: {r: 1, g: 0.87166667, b: 0.65, a: 0}
   sunsetTintColor: {r: 1, g: 0.76, b: 0.76, a: 0}
   nightTintColor: {r: 0.6666667, g: 0.7294118, b: 1, a: 0}
   sunriseTintColor: {r: 1, g: 0.7335, b: 0.59000003, a: 0}
@@ -2608,7 +2608,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   levelStart: {fileID: 7017246216975877971}
   levelFinish: {fileID: 454121634}
-  player: {fileID: 1799572680}
   maxDetectionHeight: 12
   checkFrequency: 0.1
   extraZoneBuffer: 8
@@ -4995,6 +4994,7 @@ MonoBehaviour:
   hurtSound: {fileID: 0}
   destroyedSound: {fileID: 0}
   destroyedEffect: {fileID: 186454, guid: 7891b436ddc1db4468c4b98b3041fe71, type: 3}
+  spriteMaterials: []
   gemsToGive: 15
   properties:
     angle: 0
@@ -5925,7 +5925,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 474472, guid: bea4aa69f6074d2428cb3d94757392ca, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 33
+      value: 32.875
       objectReference: {fileID: 0}
     - target: {fileID: 474472, guid: bea4aa69f6074d2428cb3d94757392ca, type: 3}
       propertyPath: m_LocalPosition.z
@@ -6168,18 +6168,6 @@ Transform:
   - {fileID: 985464831}
   m_Father: {fileID: 470}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1799572680 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 114675125695838776, guid: b31fd1ac2903f3a4ca19ebfb52565e47,
-    type: 3}
-  m_PrefabInstance: {fileID: 197862246}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4181f2d0d32011a4d87636b45ee7c1e3, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1001 &1810132085
 PrefabInstance:
   m_ObjectHideFlags: 0

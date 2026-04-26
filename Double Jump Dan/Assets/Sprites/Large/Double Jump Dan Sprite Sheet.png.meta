@@ -4472,7 +4472,7 @@ TextureImporter:
       name: Engine
       rect:
         serializedVersion: 2
-        x: 466
+        x: 465
         y: 338
         width: 20
         height: 13
@@ -4493,7 +4493,7 @@ TextureImporter:
       name: Engine Small
       rect:
         serializedVersion: 2
-        x: 487
+        x: 486
         y: 338
         width: 8
         height: 13
@@ -4514,7 +4514,7 @@ TextureImporter:
       name: Spike O Death Top
       rect:
         serializedVersion: 2
-        x: 496
+        x: 495
         y: 319
         width: 16
         height: 32
@@ -4535,8 +4535,8 @@ TextureImporter:
       name: Spike O Death Segmant
       rect:
         serializedVersion: 2
-        x: 496
-        y: 302
+        x: 495
+        y: 303
         width: 16
         height: 16
       alignment: 2
@@ -4556,7 +4556,7 @@ TextureImporter:
       name: Spikes
       rect:
         serializedVersion: 2
-        x: 479
+        x: 478
         y: 321
         width: 16
         height: 16
@@ -5879,7 +5879,7 @@ TextureImporter:
       name: Pendulum End
       rect:
         serializedVersion: 2
-        x: 407
+        x: 406
         y: 319
         width: 40
         height: 32
@@ -5900,7 +5900,7 @@ TextureImporter:
       name: Pendulum Segmant
       rect:
         serializedVersion: 2
-        x: 448
+        x: 447
         y: 319
         width: 16
         height: 32
@@ -5921,7 +5921,7 @@ TextureImporter:
       name: Pendulum Engine
       rect:
         serializedVersion: 2
-        x: 382
+        x: 381
         y: 338
         width: 24
         height: 13
@@ -6047,7 +6047,7 @@ TextureImporter:
       name: Crushing Spikes Single
       rect:
         serializedVersion: 2
-        x: 418
+        x: 417
         y: 288
         width: 30
         height: 30
@@ -6068,7 +6068,7 @@ TextureImporter:
       name: Crushing Spikes H
       rect:
         serializedVersion: 2
-        x: 449
+        x: 448
         y: 288
         width: 46
         height: 30
@@ -6089,7 +6089,7 @@ TextureImporter:
       name: Crushing Spikes V
       rect:
         serializedVersion: 2
-        x: 482
+        x: 481
         y: 241
         width: 30
         height: 46
@@ -6110,7 +6110,7 @@ TextureImporter:
       name: Spring Pad 4
       rect:
         serializedVersion: 2
-        x: 430
+        x: 429
         y: 271
         width: 16
         height: 10
@@ -6131,7 +6131,7 @@ TextureImporter:
       name: Spring Pad 3
       rect:
         serializedVersion: 2
-        x: 413
+        x: 412
         y: 271
         width: 16
         height: 8
@@ -6152,7 +6152,7 @@ TextureImporter:
       name: Spring Pad 2
       rect:
         serializedVersion: 2
-        x: 396
+        x: 395
         y: 271
         width: 16
         height: 6
@@ -6173,7 +6173,7 @@ TextureImporter:
       name: Spring Pad 1
       rect:
         serializedVersion: 2
-        x: 379
+        x: 378
         y: 271
         width: 16
         height: 3
@@ -6194,7 +6194,7 @@ TextureImporter:
       name: Spring Pad 5
       rect:
         serializedVersion: 2
-        x: 447
+        x: 446
         y: 271
         width: 16
         height: 12
@@ -6215,7 +6215,7 @@ TextureImporter:
       name: Spring Pad 6
       rect:
         serializedVersion: 2
-        x: 464
+        x: 463
         y: 271
         width: 16
         height: 16
@@ -6236,7 +6236,7 @@ TextureImporter:
       name: Crate Large
       rect:
         serializedVersion: 2
-        x: 480
+        x: 479
         y: 208
         width: 32
         height: 32
@@ -6383,7 +6383,7 @@ TextureImporter:
       name: Crate Large Piece Angle
       rect:
         serializedVersion: 2
-        x: 490
+        x: 489
         y: 130
         width: 22
         height: 28
@@ -6404,7 +6404,7 @@ TextureImporter:
       name: Crate Large Piece Straight
       rect:
         serializedVersion: 2
-        x: 480
+        x: 479
         y: 202
         width: 32
         height: 5
@@ -6425,7 +6425,7 @@ TextureImporter:
       name: Crate Large Piece 1
       rect:
         serializedVersion: 2
-        x: 464
+        x: 463
         y: 187
         width: 20
         height: 14
@@ -6446,7 +6446,7 @@ TextureImporter:
       name: Crate Large Piece 2
       rect:
         serializedVersion: 2
-        x: 485
+        x: 484
         y: 185
         width: 27
         height: 16
@@ -6467,7 +6467,7 @@ TextureImporter:
       name: Crate Large Piece 3
       rect:
         serializedVersion: 2
-        x: 465
+        x: 464
         y: 163
         width: 23
         height: 21
@@ -6488,7 +6488,7 @@ TextureImporter:
       name: Crate Large Piece 4
       rect:
         serializedVersion: 2
-        x: 489
+        x: 488
         y: 159
         width: 23
         height: 25
@@ -6530,7 +6530,7 @@ TextureImporter:
       name: Crate Medium
       rect:
         serializedVersion: 2
-        x: 455
+        x: 454
         y: 208
         width: 24
         height: 24
@@ -6551,7 +6551,7 @@ TextureImporter:
       name: Crate Medium Straight
       rect:
         serializedVersion: 2
-        x: 455
+        x: 454
         y: 203
         width: 24
         height: 4
@@ -6572,7 +6572,7 @@ TextureImporter:
       name: Crate Medium Angle
       rect:
         serializedVersion: 2
-        x: 471
+        x: 470
         y: 127
         width: 18
         height: 23
@@ -6593,7 +6593,7 @@ TextureImporter:
       name: Crate Medium Piece 1
       rect:
         serializedVersion: 2
-        x: 428
+        x: 427
         y: 165
         width: 17
         height: 15
@@ -6614,7 +6614,7 @@ TextureImporter:
       name: Crate Medium Piece 2
       rect:
         serializedVersion: 2
-        x: 448
+        x: 447
         y: 168
         width: 16
         height: 12
@@ -6635,7 +6635,7 @@ TextureImporter:
       name: Crate Medium Piece 3
       rect:
         serializedVersion: 2
-        x: 434
+        x: 433
         y: 148
         width: 13
         height: 16
@@ -6656,7 +6656,7 @@ TextureImporter:
       name: Crate Medium Piece 4
       rect:
         serializedVersion: 2
-        x: 448
+        x: 447
         y: 151
         width: 16
         height: 16
@@ -6677,7 +6677,7 @@ TextureImporter:
       name: Crate Small Straight
       rect:
         serializedVersion: 2
-        x: 438
+        x: 437
         y: 203
         width: 16
         height: 4
@@ -6698,7 +6698,7 @@ TextureImporter:
       name: Crate Small Angle
       rect:
         serializedVersion: 2
-        x: 427
+        x: 426
         y: 193
         width: 10
         height: 14
@@ -6719,7 +6719,7 @@ TextureImporter:
       name: Crate Small
       rect:
         serializedVersion: 2
-        x: 438
+        x: 437
         y: 208
         width: 16
         height: 16
@@ -6740,7 +6740,7 @@ TextureImporter:
       name: Crate Small Piece 1
       rect:
         serializedVersion: 2
-        x: 444
+        x: 443
         y: 189
         width: 8
         height: 11
@@ -6761,7 +6761,7 @@ TextureImporter:
       name: Crate Small Piece 2
       rect:
         serializedVersion: 2
-        x: 453
+        x: 452
         y: 195
         width: 10
         height: 7
@@ -6782,7 +6782,7 @@ TextureImporter:
       name: Crate Small Piece 3
       rect:
         serializedVersion: 2
-        x: 436
+        x: 435
         y: 181
         width: 16
         height: 7
@@ -6803,7 +6803,7 @@ TextureImporter:
       name: Crate Small Piece 4
       rect:
         serializedVersion: 2
-        x: 453
+        x: 452
         y: 181
         width: 10
         height: 13
@@ -7144,7 +7144,7 @@ TextureImporter:
         width: 7
         height: 7
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
@@ -7152,6 +7152,27 @@ TextureImporter:
       bones: []
       spriteID: 7ee236e03f9c90342b6050cbbc686508
       internalID: 51453209
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Instant Kill
+      rect:
+        serializedVersion: 2
+        x: 127
+        y: 427
+        width: 48
+        height: 7
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: d27688103c4860d469c2a6bf82206b56
+      internalID: -1106460628
       vertices: []
       indices: 
       edges: []
@@ -7358,6 +7379,7 @@ TextureImporter:
       Health Pack 7: 1334892102
       Health Pack 8: -1167262954
       Health Pack 9: 2142325147
+      Instant Kill: -1106460628
       Killer Wheel: -2010828533
       Laser Green: 21300580
       Laser Gun 1: 21300576
@@ -7366,6 +7388,7 @@ TextureImporter:
       Laser Red: 21300574
       Lava Gun: 21300634
       Lava Gun Glow: 1425134771
+      Level Portal Base: 275665336
       Lightning Gun: 21300724
       Lightning Gun Glow: -218421234
       Minigun 1: 21300348

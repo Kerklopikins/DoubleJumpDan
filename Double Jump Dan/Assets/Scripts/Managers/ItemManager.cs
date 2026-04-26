@@ -20,7 +20,7 @@ public class ItemManager : MonoBehaviour
 		
         if(SceneManager.GetActiveScene().name != "Main Menu")
         {
-            player = GameObject.FindWithTag("Player").GetComponent<Player>();
+            player = LevelManager.Instance.player;
 			
             playerAnimator = player.GetComponent<Animator>();
             hatParent = player.transform.Find("Legs").Find("Body");

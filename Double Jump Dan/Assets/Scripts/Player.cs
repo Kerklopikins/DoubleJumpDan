@@ -44,6 +44,15 @@ public class Player: MonoBehaviour
     [SerializeField] AudioClip destroyedSound;
     [SerializeField] SpriteRenderer weeSprite;
     [SerializeField] Sprite[] weeSprites;
+    [SerializeField] AudioClip weeSound;
+    
+    [Header("Controller Rumble")]
+    [SerializeField] float lowHurtRumble;
+    [SerializeField] float highHurtRumble;
+    [SerializeField] float hurtRumbleDuration;
+    [SerializeField] float lowDeathRumble;
+    [SerializeField] float highDeathRumble;
+    [SerializeField] float deathRumbleDuration;
 
     [Header("Particle Effects")]
     [SerializeField] ParticleSystem doubleJumpParticles;
@@ -55,7 +64,7 @@ public class Player: MonoBehaviour
 
     [Header("Camera Shake")]
     public CameraManager.Properties properties;
-
+    
     public event Action OnPlayerHurt;
     public event Action OnPlayerKilled;
     public event Action OnPlayerRespawn;
@@ -104,6 +113,12 @@ public class Player: MonoBehaviour
     float targetX;
     float targetY;
     GameInputManager gameInputManager;
+    MaterialPropertyBlock materialPropertyBlock;
+    Vector3 difference;
+    Vector3 eyeLookDirection;
+    int xInput;
+    int yInput;
+    Transform crosshairs;
 
     void Awake()
     {
@@ -124,6 +139,9 @@ public class Player: MonoBehaviour
         _fallTimer = weeEffectFallThreshold;
         shadowDanTracer = GetComponent<ShadowDanTracer>();
         shadowDanTracer.enabled = false;
+        materialPropertyBlock = new MaterialPropertyBlock();
+
+        crosshairs = GameHUD.Instance.crosshairs;
 
         pupilsParentStartPosition = pupilsParent.localPosition;
         eyeBrowStartPosition = eyeBrow.localPosition;
@@ -165,14 +183,7 @@ public class Player: MonoBehaviour
         }
     }
 
-    public bool CanHandleInput()
-    {
-        if(!dead && !gameHUDPaused && !gameHUDFrozen && !LevelManager.Instance.FinishedLevel() && _knockBackInputDelayTimer <= 0 && !teleporting)
-            return true;
-        else
-            return false;
-    }
-
+    #region PhysicsAndMovement
     void FixedUpdate()
     {
         if(rb2D.velocity.y <= -25)
@@ -193,25 +204,6 @@ public class Player: MonoBehaviour
             rb2D.velocity = Vector2.zero;
 
         CalculateGroundingAndLanding();
-    }
-
-    public void HandleInput()
-    {
-        input = new Vector2(gameInputManager.GetHorizontalInput(), gameInputManager.GetVerticalInput());
-
-        if(!gameInputManager.StrafeButton())
-        {
-            if(input.x > 0)
-                direction = 1;
-            else if(input.x < 0)
-                direction = -1;
-
-            transform.localScale = new Vector3(direction, 1, 1);
-        }
-
-        RotateArm();
-        RotateEyes();
-        Jump();
     }
 
     void Jump()
@@ -249,45 +241,181 @@ public class Player: MonoBehaviour
             doubleJump = true;
         }
     }
-    
-    void RotateArm()
-    {
-        Vector3 realMousePosition = gameInputManager.GetRealMousePosition();
-        float mouseDistance = Vector2.Distance(transform.position, realMousePosition);
-        Vector3 difference;
 
-        if(mouseDistance > 2)
+    void CalculateGroundingAndLanding()
+    {
+        Collider2D hit = Physics2D.OverlapBox(groundCheck.position + groundCheckOffset, groundCheckSize, 0, collisionMask);
+        float ySpeed = Mathf.Abs(rb2D.velocityY);
+        SetGrounded(hit);
+
+        if(ySpeed >= 0.01 && hit != null && hit.CompareTag("One Way Platform"))
         {
-            difference = realMousePosition - aimPoint.position;
-            difference.Normalize();
-            
-            lastAimDirection = difference;
+            grounded = false;
+            canJump = false;
+        }
+        else if(ySpeed < 0.01 && hit != null && hit.CompareTag("One Way Platform"))
+        {
+            grounded = true;
+            canJump = true;
         }
         else
         {
-            difference = lastAimDirection;
+            canJump = true;
+            grounded = hit;
+        }
+
+        if(grounded && !wasGroundedLastFrame)
+        {
+            float impactSpeed = Mathf.Abs(previousVelocityY);
+            
+            if(impactSpeed > 1.2f)
+                TriggerLandParticles(impactSpeed);
+        }
+
+        previousVelocityY = rb2D.velocity.y;
+        wasGroundedLastFrame = grounded;
+    }
+
+    public void SetGrounded(bool _grounded)
+    {
+        if(!isGrounded && _grounded)
+            fallButtonTimer = fallButtonDelay;
+
+        isGrounded = _grounded;
+    }
+
+    void RotateArm()
+    {
+        if(gameInputManager.ControllerConnected())
+        {            
+            difference = crosshairs.position - aimPoint.position;
+            difference.Normalize();
+        }
+        else
+        {
+            Vector3 realMousePosition = gameInputManager.GetRealMousePosition();
+            float mouseDistance = Vector2.Distance(transform.position, realMousePosition);
+
+            if(mouseDistance > 2)
+            {
+                difference = realMousePosition - aimPoint.position;
+                difference.Normalize();
+                
+                lastAimDirection = difference;
+            }
+            else
+            {
+                difference = lastAimDirection;
+            }
         }
 
         float rotZ = Mathf.Atan2(difference.y, difference.x) * Mathf.Rad2Deg;
-        armTwo.rotation = Quaternion.Slerp(armTwo.rotation, Quaternion.Euler(0, 0, rotZ + 90), Time.deltaTime * 10);    
+        armTwo.rotation = Quaternion.Slerp(armTwo.rotation, Quaternion.Euler(0, 0, rotZ + 90), Time.deltaTime * 10);       
     }
 
+    public void AddVelocity(Vector2 direction, int force)
+    {
+        rb2D.velocity = direction * force;
+    }
+
+    public void CancelYVelocity()
+    {
+        rb2D.velocity = new Vector2(rb2D.velocity.x, 0);
+    }
+
+    #endregion
+
+    #region Input
+    public bool CanHandleInput()
+    {
+        if(!dead && !gameHUDPaused && !gameHUDFrozen && !LevelManager.Instance.FinishedLevel() && _knockBackInputDelayTimer <= 0 && !teleporting)
+            return true;
+        else
+            return false;
+    }
+
+    public void HandleInput()
+    {
+        if(gameInputManager.GetHorizontalInput() > 0.1f)
+            xInput = 1;
+        else if(gameInputManager.GetHorizontalInput() < -0.1f)
+            xInput = -1;
+        else
+            xInput = 0;
+
+        if(gameInputManager.GetVerticalInput() > 0.1f)
+            yInput = 1;
+        else if(gameInputManager.GetVerticalInput() < -0.1f)
+            yInput = -1;
+        else
+            yInput = 0;
+
+        input = new Vector2(xInput, yInput);
+
+        if(!gameInputManager.StrafeButton())
+        {
+            if(input.x > 0)
+                direction = 1;
+            else if(input.x < 0)
+                direction = -1;
+
+            transform.localScale = new Vector3(direction, 1, 1);
+        }
+
+        RotateArm();
+        RotateEyes();
+        Jump();
+    }
+
+    IEnumerator ScaleCrosshairs(Vector3 from, Vector3 to)
+    {
+        float inTime = 0;
+        float duration = 0.35f;
+
+        while(inTime < duration)
+        {
+            inTime += Time.unscaledDeltaTime;
+            
+            float t = inTime / duration;
+            crosshairs.localScale = Vector3.Lerp(from, to, t);   
+
+            yield return null;
+        }
+
+        crosshairs.localScale = to;
+    }
+
+    public void ResetDownTimer()
+    {
+        fallButtonTimer = fallButtonDelay;
+    }
+
+    #endregion
+
+    #region Effects
     void RotateEyes()
     {
-        Vector3 realMousePosition = gameInputManager.GetRealMousePosition();
+        if(gameInputManager.ControllerConnected())
+        {
+            eyeLookDirection = crosshairs.position - transform.position;
+        }
+        else
+        {
+            Vector3 realMousePosition = gameInputManager.GetRealMousePosition();
 
-        realMousePosition.z = pupilsParent.position.z;
-        Vector3 direction = realMousePosition - transform.position;
+            realMousePosition.z = pupilsParent.position.z;
+            eyeLookDirection = realMousePosition - transform.position;
+        }
         
-        direction = new Vector3(direction.x * transform.localScale.x, direction.y, 0);
-        float distance = direction.magnitude;
+        eyeLookDirection = new Vector3(eyeLookDirection.x * transform.localScale.x, eyeLookDirection.y, 0);
+        float distance = eyeLookDirection.magnitude;
         
         float t = Mathf.Clamp01(distance / maxMouseDistance);
         float thresholdX = Mathf.Lerp(minThreshold, maxThreshold, t) + maxPupilsOffset.x;
         float thresholdY = Mathf.Lerp(minThreshold, maxThreshold, t) + maxPupilsOffset.y;
         
-        float scaledX = direction.x * horizontalSensitivity;
-        float scaledY = direction.y * verticalSensitivity;
+        float scaledX = eyeLookDirection.x * horizontalSensitivity;
+        float scaledY = eyeLookDirection.y * verticalSensitivity;
         
         if(scaledX > thresholdX)
             targetX = maxPupilsOffset.x;
@@ -335,6 +463,7 @@ public class Player: MonoBehaviour
             {
                 if(canAnimateWee && !animatedWee)
                 {
+                    AudioManager.Instance.PlaySound2D(weeSound);
                     StartCoroutine(AnimateWeeEffect(1));
                     animatedWee = true;
                 }
@@ -408,53 +537,63 @@ public class Player: MonoBehaviour
         shape.radius = Mathf.Lerp(0.5f, 1, t);
     }
 
-    public void ResetDownTimer()
+    IEnumerator Flash()
     {
-        fallButtonTimer = fallButtonDelay;
+        for(int i = 0; i < 4; i++)
+        {
+            ApplySpriteMaterialProperties(1);
+
+            yield return new WaitForSeconds(0.07f);
+
+            if(!dead)
+                ApplySpriteMaterialProperties(0);
+
+            yield return new WaitForSeconds(0.07f);
+        }
     }
 
-    void CalculateGroundingAndLanding()
+    public void EnableShadowDanTracer()
     {
-        Collider2D hit = Physics2D.OverlapBox(groundCheck.position + groundCheckOffset, groundCheckSize, 0, collisionMask);
-        float ySpeed = Mathf.Abs(rb2D.velocityY);
-        SetGrounded(hit);
-
-        if(ySpeed >= 0.01 && hit != null && hit.CompareTag("One Way Platform"))
-        {
-            grounded = false;
-            canJump = false;
-        }
-        else if(ySpeed < 0.01 && hit != null && hit.CompareTag("One Way Platform"))
-        {
-            grounded = true;
-            canJump = true;
-        }
-        else
-        {
-            canJump = true;
-            grounded = hit;
-        }
-
-        if(grounded && !wasGroundedLastFrame)
-        {
-            float impactSpeed = Mathf.Abs(previousVelocityY);
-            
-            if(impactSpeed > 1.2f)
-                TriggerLandParticles(impactSpeed);
-        }
-
-        previousVelocityY = rb2D.velocity.y;
-        wasGroundedLastFrame = grounded;
+        if(!shadowDanTracer.enabled)
+            shadowDanTracer.enabled = true;
     }
 
-    public void SetGrounded(bool _grounded)
+    void ApplySpriteMaterialProperties(float flashAmount)
     {
-        if(!isGrounded && _grounded)
-            fallButtonTimer = fallButtonDelay;
-
-        isGrounded = _grounded;
+        foreach(SpriteRenderer spriteMaterial in spriteMaterials)
+        {
+            spriteMaterial.GetPropertyBlock(materialPropertyBlock);
+            materialPropertyBlock.SetFloat("_FlashAmount", flashAmount);
+            spriteMaterial.SetPropertyBlock(materialPropertyBlock);
+        }
     }
 
+    void ApplySpriteMaterialProperties(float flashAmount, float alpha)
+    {
+        foreach(SpriteRenderer spriteMaterial in spriteMaterials)
+        {
+            spriteMaterial.GetPropertyBlock(materialPropertyBlock);
+            materialPropertyBlock.SetFloat("_FlashAmount", flashAmount);
+            materialPropertyBlock.SetColor("_Color", new Color(spriteMaterial.material.color.r, spriteMaterial.material.color.g, spriteMaterial.material.color.b, alpha));
+            spriteMaterial.SetPropertyBlock(materialPropertyBlock);
+        }
+    }
+
+    void ApplySpriteMaterialProperties(float flashAmount, float alpha, float applyStencilMasking)
+    {
+        foreach(SpriteRenderer spriteMaterial in spriteMaterials)
+        {
+            spriteMaterial.GetPropertyBlock(materialPropertyBlock);
+            materialPropertyBlock.SetFloat("_FlashAmount", flashAmount);
+            materialPropertyBlock.SetColor("_Color", new Color(spriteMaterial.material.color.r, spriteMaterial.material.color.g, spriteMaterial.material.color.b, alpha));
+            materialPropertyBlock.SetFloat("_EnableStencilMasking", applyStencilMasking);
+            spriteMaterial.SetPropertyBlock(materialPropertyBlock);
+        }
+    }
+
+    #endregion
+
+    #region HealthAndDamage
     public void GiveHealth(int healthToGive)
     {
         _health = _health + healthToGive;
@@ -506,6 +645,15 @@ public class Player: MonoBehaviour
             }
         }
 
+        FloatingNumberProperties numberProperties = new FloatingNumberProperties();
+        numberProperties.number = damage;
+        numberProperties.position = transform.position;
+        numberProperties.plusOrMinus = false;
+        numberProperties.color = Color.red;
+        numberProperties.instantKill = damage == health ? true : false;
+        
+        PoolManager.Instance.ReuseObject("Floating Numbers", numberProperties);
+
         Instantiate(hurtEffect, transform.position, Quaternion.identity);
 
         _health -= damage;
@@ -518,22 +666,17 @@ public class Player: MonoBehaviour
         AudioManager.Instance.PlaySound2D(hurtSound);
         StartCoroutine(Flash());
 
+        if(_health > 0)
+            gameInputManager.RumbleController(lowHurtRumble, highHurtRumble, hurtRumbleDuration);
+
         if(_health <= 0 && !dead)
             Kill();
 
         _hurtTimer = hurtTimer;
     }
+    #endregion
 
-    public void AddVelocity(Vector2 direction, int force)
-    {
-        rb2D.velocity = direction * force;
-    }
-
-    public void CancelYVelocity()
-    {
-        rb2D.velocity = new Vector2(rb2D.velocity.x, 0);
-    }
-
+    #region KillingAndRespawning
     public void Kill()
     {
         dead = true;        
@@ -547,22 +690,22 @@ public class Player: MonoBehaviour
         lives -= 1;
         weeSprite.gameObject.SetActive(false);
         walkParticles.Stop();
+        
+        if(gameInputManager.ControllerConnected())
+            StartCoroutine(ScaleCrosshairs(Vector3.one, Vector3.zero));
 
         OnPlayerKilled?.Invoke();
 
         GameManager.Instance.currentUser.totalDeaths += 1;
-        
+        gameInputManager.RumbleController(lowDeathRumble, highDeathRumble, deathRumbleDuration);
+
         StartCoroutine(KillCo());
     }
 
     IEnumerator KillCo()
     {
-        foreach(SpriteRenderer spriteMaterial in spriteMaterials)
-        {
-            spriteMaterial.material.SetFloat("_FlashAmount", 1);
-            spriteMaterial.material.SetFloat("_EnableStencilMasking", 1);
-        }
-
+        ApplySpriteMaterialProperties(1, 1, 1);
+        
         float inTime = 0;
         float duration = 1.25f;
         float alpha = 1;
@@ -580,9 +723,8 @@ public class Player: MonoBehaviour
             transform.localEulerAngles = Vector3.Lerp(Vector3.zero, new Vector3(0, 0, -125) * direction, smoothT);
             transform.localScale = Vector2.Lerp(from, to, smoothT);
             alpha = Mathf.Lerp(1, 0, smoothT);
-
-            foreach(SpriteRenderer spriteMaterial in spriteMaterials)
-                spriteMaterial.material.SetColor("_Color", new Color(spriteMaterial.material.color.r, spriteMaterial.material.color.g, spriteMaterial.material.color.b, alpha));
+            
+            ApplySpriteMaterialProperties(1, alpha);
 
             yield return null;
         }
@@ -598,8 +740,7 @@ public class Player: MonoBehaviour
         LevelManager.Instance.Respawn();
         OnPlayerRespawn?.Invoke();
 
-        foreach(SpriteRenderer spriteMaterial in spriteMaterials)
-            spriteMaterial.material.SetFloat("_EnableStencilMasking", 0);
+        ApplySpriteMaterialProperties(1, 0, 0);
 
         animator.enabled = true;
         pupilsParent.localPosition = new Vector3(pupilsParentStartPosition.x + maxPupilsOffset.x, pupilsParentStartPosition.y -maxPupilsOffset.y, 0);
@@ -621,11 +762,7 @@ public class Player: MonoBehaviour
             float t = inTime / duration;
             float smoothT = 1 - Mathf.Pow(1 - t, 4);
 
-            foreach(SpriteRenderer spriteMaterial in spriteMaterials)
-            {
-                spriteMaterial.material.SetColor("_Color", new Color(spriteMaterial.material.color.r, spriteMaterial.material.color.g, spriteMaterial.material.color.b, Mathf.Lerp(0, 1, smoothT)));
-                spriteMaterial.material.SetFloat("_FlashAmount", Mathf.Lerp(1, 0, smoothT));
-            }
+            ApplySpriteMaterialProperties(Mathf.Lerp(1, 0, smoothT), Mathf.Lerp(0, 1, smoothT));
             
             transform.localEulerAngles = Vector3.Lerp(new Vector3(0, 0, -125), Vector3.zero, smoothT);
             transform.localScale = Vector2.Lerp(Vector2.one * 3, Vector2.one, smoothT);
@@ -636,14 +773,12 @@ public class Player: MonoBehaviour
         transform.localScale = new Vector2(1, 1);
         transform.localEulerAngles = Vector3.zero;
         
-        foreach(SpriteRenderer spriteMaterial in spriteMaterials)
-        {
-            spriteMaterial.material.SetColor("_Color", new Color(spriteMaterial.material.color.r, spriteMaterial.material.color.g, spriteMaterial.material.color.b, 1));
-            spriteMaterial.material.SetFloat("_FlashAmount", 0);
-        }
+        ApplySpriteMaterialProperties(0, 1);
+        
+        if(gameInputManager.ControllerConnected())
+            StartCoroutine(ScaleCrosshairs(Vector3.zero, Vector3.one));
 
         direction = 1;
-        
         _knockBackInputDelayTimer = 0;
         canFollow = true;
         parts.SetActive(true);
@@ -656,7 +791,10 @@ public class Player: MonoBehaviour
         rb2D.bodyType = RigidbodyType2D.Dynamic;
         dead = false;
     }
+    
+    #endregion    
 
+    #region Misc
     public void Teleporting()
     {
         teleporting = true;
@@ -699,7 +837,6 @@ public class Player: MonoBehaviour
         {
             finishLevelInTime += Time.unscaledDeltaTime;
             
-            float t = finishLevelInTime / duration;
             float smoothT = Mathf.SmoothStep(0, 1, finishLevelInTime / duration);
 
             float velocityX = Mathf.Lerp(rb2D.velocity.x, 0, smoothT);
@@ -733,29 +870,8 @@ public class Player: MonoBehaviour
             }
         }
     }
-    
-    IEnumerator Flash()
-    {
-        for(int i = 0; i < 4; i++)
-        {
-            foreach(SpriteRenderer spriteMaterial in spriteMaterials)
-                spriteMaterial.material.SetFloat("_FlashAmount", 1);
 
-            yield return new WaitForSeconds(0.07f);
-
-            foreach(SpriteRenderer spriteMaterial in spriteMaterials)
-                if(!dead)
-                    spriteMaterial.material.SetFloat("_FlashAmount", 0);
-
-            yield return new WaitForSeconds(0.07f);
-        }
-    }
-
-    public void EnableShadowDanTracer()
-    {
-        if(!shadowDanTracer.enabled)
-            shadowDanTracer.enabled = true;
-    }
+    #endregion
 
     void OnDrawGizmos()
     {

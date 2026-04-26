@@ -17,7 +17,7 @@ public class ShadowDanTracer : MonoBehaviour
 	{
 		_rate = rate;
 		player = GetComponent<Player>();
-		PoolManager.instance.CreatePool(shadowDanTracer.name, shadowDanTracer.gameObject, tracersToSpawn);
+		PoolManager.Instance.CreatePool(shadowDanTracer.name, shadowDanTracer.gameObject, tracersToSpawn);
 	}
 	
 	void Update()
@@ -40,7 +40,7 @@ public class ShadowDanTracer : MonoBehaviour
 			else
 				properties.sprite = idleSprite;
 
-			PoolManager.instance.ReuseObject(shadowDanTracer.name, properties);
+			PoolManager.Instance.ReuseObject(shadowDanTracer.name, properties);
 			
 			_rate = rate;
 		}

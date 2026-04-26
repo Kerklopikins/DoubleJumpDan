@@ -25,7 +25,7 @@ public class FlyingLaserBotAI : MonoBehaviour
 
 	void Start()
 	{
-		player = GameObject.FindWithTag("Player").GetComponent<Player>();
+		player = LevelManager.Instance.player;
         watchOutTrigger = GetComponentInChildren<WatchOutTrigger>();
 	}
 

@@ -5287,6 +5287,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cab16cadb4e17804097cbc8904170507, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  rendererType: 0
 --- !u!114 &9072255642310647471
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -10287,6 +10288,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cab16cadb4e17804097cbc8904170507, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  rendererType: 1
 --- !u!1 &2923527250016839307
 GameObject:
   m_ObjectHideFlags: 0
@@ -10503,6 +10505,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cab16cadb4e17804097cbc8904170507, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  rendererType: 0
 --- !u!114 &1828095515611441992
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -10601,7 +10604,7 @@ Camera:
   far clip plane: 1000
   field of view: 60
   orthographic: 1
-  orthographic size: 11.25
+  orthographic size: 12
   m_Depth: 1
   m_CullingMask:
     serializedVersion: 2
@@ -10967,6 +10970,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cab16cadb4e17804097cbc8904170507, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  rendererType: 0
 --- !u!114 &7646925783188469679
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -11681,6 +11685,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cab16cadb4e17804097cbc8904170507, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  rendererType: 0
 --- !u!114 &4738856840138157841
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -11890,7 +11895,7 @@ Transform:
   m_GameObject: {fileID: 5242579398687461492}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: -20}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -11933,7 +11938,7 @@ Camera:
   far clip plane: 1000
   field of view: 62
   orthographic: 1
-  orthographic size: 11.25
+  orthographic size: 12
   m_Depth: 0
   m_CullingMask:
     serializedVersion: 2
@@ -11985,12 +11990,12 @@ MonoBehaviour:
   hurtSprite: {fileID: 4660542372651629655}
   whiteFadeSprite: {fileID: 5607559642550583770}
   greenCircleSprite: {fileID: 7307757664729379832}
-  grayscaleMaterial: {fileID: 2100000, guid: f50dbae2f6b952f46b8a05657940d91c, type: 2}
   useColorTemperature: 1
   colorTemperatureMaterial: {fileID: 2100000, guid: 7c5e85dcc5f88ea47840aa5eb4ee2ecf,
     type: 2}
   exposure: 0.32
-  tintColor: {r: 1, g: 0.7875625, b: 0.41037738, a: 1}
+  tintColor: {r: 1, g: 0.874, b: 0.65, a: 1}
+  grayscaleMaterial: {fileID: 2100000, guid: f50dbae2f6b952f46b8a05657940d91c, type: 2}
   grayscaleAmount: 0
 --- !u!114 &6925399933680529758
 MonoBehaviour:
@@ -12005,7 +12010,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   mainMaterial: {fileID: 2100000, guid: 575b6b33d095f2246af73bb393810685, type: 2}
-  mainMaterialStencil: {fileID: 2100000, guid: b6ef40862de0d27449b68980d08a532a, type: 2}
+  materials:
+  - {fileID: 2100000, guid: b6ef40862de0d27449b68980d08a532a, type: 2}
+  - {fileID: 2100000, guid: fe2643a27f2534646838231ae72f915c, type: 2}
   sky: {fileID: 2966690400463126853}
   sunGlow: {fileID: 8788531166266934278}
   sunPivot: {fileID: 2923527250016839307}
@@ -13682,7 +13689,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4d5d0542667c8be409c75e4090e2606d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  speed: {x: 0.3, y: 0.3}
+  speed: {x: 0.15, y: 0.15}
   yPingPong: 0
   yMinMax: {x: 0, y: 0}
   yPingPongLength: 0

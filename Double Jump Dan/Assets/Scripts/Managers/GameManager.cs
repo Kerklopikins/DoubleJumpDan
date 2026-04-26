@@ -12,8 +12,6 @@ public class GameManager : MonoBehaviour
 {
     public static GameManager Instance { get; private set; }
     public Sprite[] gemSprites;
-    public Material mainMaterial;
-    public Material mainMaterialStencil;
 
     //Game Data
     [HideInInspector] public User currentUser;
@@ -21,10 +19,12 @@ public class GameManager : MonoBehaviour
     [HideInInspector] public float sfxVolume = 1;
     [HideInInspector] public float musicVolume = 1;
 	[HideInInspector] public int screenResolution = -1;
+    [HideInInspector] public int frameRate = -1;
+    [HideInInspector] public bool vSync = true;
+    [HideInInspector] public bool showPerformanceData = false;
     [HideInInspector] public bool postProcessing = true;
     [HideInInspector] public bool distortionEffects = true;
     [HideInInspector] public bool weatherEffects = true;
-	
     string folderPath;
     public SpriteRenderer centralizedGem { get; set; }
     public static bool died;
@@ -58,6 +58,11 @@ public class GameManager : MonoBehaviour
         }        
     }
 
+    public bool InMainMenu()
+    {
+        return inMainMenu;
+    }
+    
     void Update()
     {
         if(users.Count > 0)
@@ -123,10 +128,13 @@ public class GameManager : MonoBehaviour
         gameData.sfxVolume = sfxVolume;
         gameData.musicVolume = musicVolume;
 		gameData.screenResolution = screenResolution;
+        gameData.frameRate = frameRate;
+        gameData.vSync = vSync;
+        gameData.showPerformanceData = showPerformanceData;
         gameData.postProcessing = postProcessing;
         gameData.distortionEffects = distortionEffects;
         gameData.weatherEffects = weatherEffects;
-        
+
         string json = JsonUtility.ToJson(gameData);
         string encrypted = Encrypt(json, "5a82be8ec0fdafa41013f6ac33b109");
         File.WriteAllText(folderPath + "/GameData.json", encrypted);
@@ -151,6 +159,9 @@ public class GameManager : MonoBehaviour
             sfxVolume = gameData.sfxVolume;
             musicVolume = gameData.musicVolume;
 			screenResolution = gameData.screenResolution;
+            frameRate = gameData.frameRate;
+            vSync = gameData.vSync;
+            showPerformanceData = gameData.showPerformanceData;
             postProcessing = gameData.postProcessing;
             distortionEffects = gameData.distortionEffects;
             weatherEffects = gameData.weatherEffects;
@@ -317,9 +328,6 @@ public class GameManager : MonoBehaviour
             SaveData();
             SaveUserData();
         }
-        
-        mainMaterial.color = new Color(1, 1, 1, mainMaterial.color.a);
-        mainMaterialStencil.color = mainMaterial.color;
     }
 }
 
@@ -331,6 +339,9 @@ public class GameData
     public float sfxVolume;
     public float musicVolume;
 	public int screenResolution;
+    public int frameRate;
+    public bool vSync;
+    public bool showPerformanceData;
     public bool postProcessing;
     public bool distortionEffects;
     public bool weatherEffects;

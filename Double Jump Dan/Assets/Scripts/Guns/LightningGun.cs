@@ -38,7 +38,7 @@ public class LightningGun : MonoBehaviour
 
     void Start()
     {
-        player = GameObject.FindWithTag("Player").GetComponent<Player>();
+        player = LevelManager.Instance.player;
         player.spriteMaterials.Add(glowSprite);
         startPosition = transform.localPosition;
         gameInputManager = GameInputManager.Instance;
@@ -73,7 +73,7 @@ public class LightningGun : MonoBehaviour
         timer = boltDuration;
 
         lightningSpawnPoint.gameObject.SetActive(false);
-        PoolManager.instance.CreatePool(lightningSparks.name, lightningSparks, (int)gunInfo.startingAmmo + (int)gunInfo.startingAmmo / 2);
+        PoolManager.Instance.CreatePool(lightningSparks.name, lightningSparks, (int)gunInfo.startingAmmo + (int)gunInfo.startingAmmo / 2);
     }
 
     void Update()
@@ -182,7 +182,7 @@ public class LightningGun : MonoBehaviour
                     properties.scale = Vector3.one;
                     properties.rotation = Quaternion.identity;
 
-                    PoolManager.instance.ReuseObject(lightningSparks.name, properties);
+                    PoolManager.Instance.ReuseObject(lightningSparks.name, properties);
 
                     if(hit.transform.gameObject.layer == LayerMask.NameToLayer("Enemies"))
                         hit.collider.GetComponent<Health>().TakeDamage(gunInfo.damage);

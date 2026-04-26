@@ -22,11 +22,11 @@ public class TrediconRocketLauncher : MonoBehaviour
 
     void Start()
     {
-        PoolManager.instance.CreatePool(rocket.name, rocket, rocketsToSpawn);
+        PoolManager.Instance.CreatePool(rocket.name, rocket, rocketsToSpawn);
 
         if(destroyedEffect != null)
         {
-            PoolManager.instance.CreatePool(destroyedEffect.name, destroyedEffect.gameObject, rocketsToSpawn);
+            PoolManager.Instance.CreatePool(destroyedEffect.name, destroyedEffect.gameObject, rocketsToSpawn);
             destroyedEffectPool = destroyedEffect.name;
         }
     }
@@ -93,7 +93,7 @@ public class TrediconRocketLauncher : MonoBehaviour
                 else if(transform.lossyScale.x < 0)
                     rocketProperties.rotationOffset = -90;
                 
-                PoolManager.instance.ReuseObject(rocket.name, rocketProperties);
+                PoolManager.Instance.ReuseObject(rocket.name, rocketProperties);
 
                 AudioManager.Instance.PlaySound2D(shootSound);
                 _fireRate = fireRate;

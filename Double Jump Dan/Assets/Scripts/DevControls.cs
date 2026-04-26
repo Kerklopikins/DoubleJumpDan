@@ -62,7 +62,7 @@ public class DevControls : MonoBehaviour
             screenSizeCheckTimer = 0.5f;
         }        
 #endif
-        if(Input.GetKeyDown(KeyCode.Q))
+        if(GameInputManager.Instance.DevModeButtonDown())
         {
             if(!searched)
             {
@@ -104,7 +104,7 @@ public class DevControls : MonoBehaviour
                 }
             }
 
-            if(textField.text.Length > 0 && Input.GetKeyDown(KeyCode.Return))
+            if(textField.text.Length > 0 && GameInputManager.Instance.ReturnButtonDown())
             {
                 string commandString = textField.text;
                 float value;
@@ -300,7 +300,7 @@ public class DevControls : MonoBehaviour
 
     public void ResizeBGAndPosUI()
     {
-        worldManager.ReloadSky();
+        worldManager.UpdatePositionAndScale();
         LevelLoadingManager.Instance.ResizeFadeBackground();
         StatsHUD.Instance.PositionUI();
         ScreenEffectsManager.Instance.ResizeScreenEffects();

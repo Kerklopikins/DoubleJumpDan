@@ -22,18 +22,20 @@ public class CameraManager : MonoBehaviour
     void Awake()
     {
         Instance = this;
-
-        player = GameObject.FindWithTag("Player").GetComponent<Player>();
-        player.OnPlayerRespawn += LerpToPlayerSpawnPoint;
-        _camera = GetComponent<Camera>();
-        bounds = GameObject.FindWithTag("Bounds").GetComponent<BoxCollider2D>();
-        _min = bounds.bounds.min;
-        _max = bounds.bounds.max;
-        parent = transform.parent;
     }
 
     void Start()
     {
+        _camera = GetComponent<Camera>();
+        
+        player = LevelManager.Instance.player;
+        player.OnPlayerRespawn += LerpToPlayerSpawnPoint;
+        
+        bounds = LevelManager.Instance.levelBounds;
+        _min = bounds.bounds.min;
+        _max = bounds.bounds.max;
+        parent = transform.parent;
+        
         SnapCamera(LevelManager.Instance.currentSpawnPoint);
     }
 

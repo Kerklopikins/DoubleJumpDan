@@ -45,11 +45,11 @@ public class ChickenGun : MonoBehaviour
 
         if(destroyedEffect != null)
         {
-            PoolManager.instance.CreatePool(destroyedEffect.name, destroyedEffect.gameObject, (int)gunInfo.startingAmmo);
+            PoolManager.Instance.CreatePool(destroyedEffect.name, destroyedEffect.gameObject, (int)gunInfo.startingAmmo);
             destroyedEffectPool = destroyedEffect.name;
         }
 
-        PoolManager.instance.CreatePool(gameObject.name, projectile.gameObject, (int)gunInfo.startingAmmo);
+        PoolManager.Instance.CreatePool(gameObject.name, projectile.gameObject, (int)gunInfo.startingAmmo);
     }
 
     void Update()
@@ -113,7 +113,7 @@ public class ChickenGun : MonoBehaviour
 
                 ricochetProperties.direction = ray.direction;
 
-                PoolManager.instance.ReuseObject(gameObject.name, ricochetProperties);
+                PoolManager.Instance.ReuseObject(gameObject.name, ricochetProperties);
 
                 _fireRate = gunInfo.fireRate;
                 transform.localPosition -= Vector3.down * Random.Range(kickMinMax.x, kickMinMax.y);

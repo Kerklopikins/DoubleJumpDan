@@ -27,6 +27,9 @@ public class GunInfoEditor : Editor
         }
         
         script.aimPointOffset = EditorGUILayout.FloatField("Aim Point Offset", script.aimPointOffset);
+        script.lowRumbleAmount = EditorGUILayout.Slider("Low Rumble Amount", script.lowRumbleAmount, 0, 1);
+        script.highRumbleAmount = EditorGUILayout.Slider("High Rumble Amount", script.highRumbleAmount, 0, 1);
+        script.rumbleDuration = EditorGUILayout.Slider("Rumble Duration", script.rumbleDuration, 0, 1);
 
         if(GUI.changed)
             EditorUtility.SetDirty(script);

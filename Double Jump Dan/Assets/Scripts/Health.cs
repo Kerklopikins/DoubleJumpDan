@@ -15,6 +15,7 @@ public class Health : MonoBehaviour
     [SerializeField] AudioClip hurtSound;
     [SerializeField] AudioClip destroyedSound;
     [SerializeField] GameObject destroyedEffect;
+    [SerializeField] List<SpriteRenderer> spriteMaterials = new List<SpriteRenderer>();
 
     [Header("Gems")]
     [SerializeField] int gemsToGive;
@@ -29,8 +30,6 @@ public class Health : MonoBehaviour
     float popHeight = 4; //For gem explosion
     float duration = 0.75f; //For gem explosion
     float magnetDuration = 0.75f; //For gem explosion
-    SpriteRenderer[] sprites;
-    List<Material> spriteMaterials = new List<Material>();
     int I;
     float hurtTimer = 0.125f;
     float _hurtTimer;
@@ -42,9 +41,7 @@ public class Health : MonoBehaviour
     void Start()
     {
         startingHealth = health;
-        _camera = Camera.main;
-
-        StartCoroutine(DelayStartCo());
+        _camera = LevelManager.Instance.mainCamera;
 
         if(GetComponentInParent<ObjectOpitimizer>() != null)
         {
@@ -72,20 +69,6 @@ public class Health : MonoBehaviour
         float _startingHealth = startingHealth;
         var healthPercent = health / _startingHealth;
         fill.transform.localScale = new Vector2(healthPercent, 1);
-    }
-
-    IEnumerator DelayStartCo()
-    {
-        yield return new WaitForEndOfFrame();
-
-        if(GetComponent<SpriteRenderer>() != null)
-            sprites = GetComponents<SpriteRenderer>();
-
-        if(GetComponentInChildren<SpriteRenderer>() != null)
-            sprites = GetComponentsInChildren<SpriteRenderer>();
-
-        for(int i = 0; i < sprites.Length; i++)
-            spriteMaterials.Add(sprites[i].material);
     }
 
     void OnTriggerStay2D(Collider2D other)
@@ -125,7 +108,7 @@ public class Health : MonoBehaviour
             if(hurtSound != null)
                 AudioManager.Instance.PlaySound2D(hurtSound);
 
-        if(I == 0)
+        if(I == 0 && spriteMaterials.Count > 0)
             StartCoroutine(Flash());
 
         if(health <= 0 && !dead)
@@ -185,13 +168,13 @@ public class Health : MonoBehaviour
         {
             I = i;
 
-            foreach(Material material in spriteMaterials)
-                material.SetFloat("_FlashAmount", 1);
+            foreach(SpriteRenderer sprite in spriteMaterials)
+                sprite.material.SetFloat("_FlashAmount", 1);
 
             yield return new WaitForSeconds(0.07f);
 
-            foreach(Material material in spriteMaterials)
-                material.SetFloat("_FlashAmount", 0);
+            foreach(SpriteRenderer sprite in spriteMaterials)
+                sprite.material.SetFloat("_FlashAmount", 0);
 
             yield return new WaitForSeconds(0.07f);
 
@@ -221,7 +204,7 @@ public class Health : MonoBehaviour
             transformProperties.scale = Vector3.zero;
             transformProperties.rotation = Quaternion.identity;
 
-            GameObject gem = PoolManager.instance.ReuseObject("Gems", transformProperties);
+            GameObject gem = PoolManager.Instance.ReuseObject("Gems", transformProperties);
             SpriteRenderer gemSprite = gem.GetComponent<SpriteRenderer>();
 
             gemSprite.sprite = GameManager.Instance.gemSprites[UnityEngine.Random.Range(0, GameManager.Instance.gemSprites.Length)];

@@ -14,7 +14,7 @@ public class HealthPack : MonoBehaviour
 
     void Start()
     {
-        player = GameObject.FindWithTag("Player").GetComponent<Player>();
+        player = LevelManager.Instance.player;
         spriteRenderer = GetComponentInChildren<SpriteRenderer>();
         startPosition = transform.position;
 

@@ -5028,6 +5028,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cab16cadb4e17804097cbc8904170507, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  rendererType: 0
 --- !u!1 &1672957855740656
 GameObject:
   m_ObjectHideFlags: 0
@@ -5140,6 +5141,9 @@ MonoBehaviour:
   burstsPerMagazine: 0
   burstCoolDownTime: 0
   aimPointOffset: 0.4375
+  lowRumbleAmount: 0.15
+  highRumbleAmount: 0.25
+  rumbleDuration: 0.2
 --- !u!114 &114787123091598316
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5157,7 +5161,6 @@ MonoBehaviour:
   shootSound: {fileID: 8300000, guid: 6c8d6a67f1af05140b1e45f9a3f1ba7b, type: 3}
   reloadSound: {fileID: 0}
   gunAnimator: {fileID: 0}
-  shootWhenTouchingGround: 0
   projectileType: 1
   projectile: {fileID: 0}
   projectileFirePoints:
@@ -5182,6 +5185,8 @@ MonoBehaviour:
   shell: {fileID: 438902, guid: f496011088b09b94cbb05c30980ee930, type: 3}
   onlyEjectShellsWhenReloading: 1
   shellEjectionPoint: {fileID: 4929798712430120}
+  hasGlow: 0
+  glowSprite: {fileID: 0}
   properties:
     angle: 0
     strength: 0.125

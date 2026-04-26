@@ -39,7 +39,7 @@ public class MrGobblesAI : MonoBehaviour
         timer = interval;
         _angrySpeed = angrySpeed;
         animator = GetComponent<Animator>();
-        player = GameObject.FindWithTag("Player").GetComponent<Player>();
+        player = LevelManager.Instance.player;
         wallCheckStartingPosition = wallCheck.localPosition;
     }
 

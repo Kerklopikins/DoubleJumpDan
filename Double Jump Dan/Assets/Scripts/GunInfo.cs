@@ -13,7 +13,10 @@ public class GunInfo: MonoBehaviour
     public int burstsPerMagazine;
     public float burstCoolDownTime;
     public float aimPointOffset;
-    
+    public float lowRumbleAmount;
+    public float highRumbleAmount;
+    public float rumbleDuration;
+
     public float fireRate { get; set; }
     public enum FireMode { Single, Automatic, Burst };
     public enum FireRate { ExtremelySlow, VerySlow, Slow, Normal, Fast, VeryFast, ExtremelyFast };
@@ -27,7 +30,8 @@ public class GunInfo: MonoBehaviour
     public event Action<float> OnAmmoChanged;
     public event Action OnShoot;
     public bool canShoot { get; private set; }
-    
+    GameInputManager gameInputManager;
+
     void Awake()
     {
         startReloadTimer = 0.25f;
@@ -58,6 +62,11 @@ public class GunInfo: MonoBehaviour
                 break;
         }
     }
+
+    void Start()
+    {
+        gameInputManager = GameInputManager.Instance;    
+    }
     
     public void Initialize()
     {
@@ -77,6 +86,8 @@ public class GunInfo: MonoBehaviour
 
         OnAmmoChanged?.Invoke(currentAmmo);
         OnShoot?.Invoke();
+
+        gameInputManager.RumbleController(lowRumbleAmount, highRumbleAmount, rumbleDuration);
     }
     
     public void Reload()

@@ -1,18 +1,21 @@
 ﻿using UnityEngine;
-using UnityEngine.SceneManagement;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 public class LevelButton : MonoBehaviour 
 {	
 	[SerializeField] LevelSelectMenu levelSelectMenu;
+	[SerializeField] EventSystem eventSystem;
+
+	ButtonEffects buttonEffects;
     Button button;
-    ButtonEffects buttonEffects;
 	GameManager gameManager;
 	int level;
 
     void Start()
 	{
 		gameManager = GameManager.Instance;
+		buttonEffects = GetComponent<ButtonEffects>();
 
 		if(levelSelectMenu == null)
 			Debug.LogError("Level Select Menu is null " + gameObject.name);
@@ -22,11 +25,23 @@ public class LevelButton : MonoBehaviour
 		level = int.Parse(gameObject.name);
 
         button = GetComponent<Button>();
-        buttonEffects = GetComponent<ButtonEffects>();
 
 		Refresh();
 	}
 
+	void Update()
+	{
+		if(eventSystem.gameObject.activeSelf == false)
+		{
+			if(level <= gameManager.currentUser.levelsCompleted)
+			{
+				buttonEffects.DiscontinueInput(true);
+				buttonEffects.SetNormal();
+				button.enabled = false;
+			}
+		}
+	}
+	
 	void Refresh()
 	{
 		if(level <= gameManager.currentUser.levelsCompleted)
@@ -37,7 +52,6 @@ public class LevelButton : MonoBehaviour
 
     public void LoadLevel()
     {
-        buttonEffects.enabled = false;
 		LevelLoadingManager.Instance.LoadScene("Level " + level);
     }
 }

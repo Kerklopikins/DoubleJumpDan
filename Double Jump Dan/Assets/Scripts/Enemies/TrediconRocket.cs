@@ -112,7 +112,7 @@ public class TrediconRocket: MonoBehaviour, IPoolable
             transformProperties.rotation = Quaternion.identity;
 
             if(!string.IsNullOrEmpty(destroyedEffectPool))
-                PoolManager.instance.ReuseObject(destroyedEffectPool, transformProperties);
+                PoolManager.Instance.ReuseObject(destroyedEffectPool, transformProperties);
             
             StartCoroutine(DelayDestroy());
             hit = true;

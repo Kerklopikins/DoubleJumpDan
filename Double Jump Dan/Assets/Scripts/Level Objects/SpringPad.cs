@@ -18,7 +18,7 @@ public class SpringPad : MonoBehaviour
 
     void Start()
     {
-        player = GameObject.FindWithTag("Player").GetComponent<Player>();
+        player = LevelManager.Instance.player;
         spriteRenderer = GetComponent<SpriteRenderer>();
     }
 

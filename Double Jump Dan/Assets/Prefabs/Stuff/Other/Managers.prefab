@@ -58,8 +58,6 @@ MonoBehaviour:
   - {fileID: -1290615325, guid: a84efda117f28ec47ace744a727c2bed, type: 3}
   - {fileID: -1008661209, guid: a84efda117f28ec47ace744a727c2bed, type: 3}
   - {fileID: 1190753641, guid: a84efda117f28ec47ace744a727c2bed, type: 3}
-  mainMaterial: {fileID: 2100000, guid: 575b6b33d095f2246af73bb393810685, type: 2}
-  mainMaterialStencil: {fileID: 2100000, guid: b6ef40862de0d27449b68980d08a532a, type: 2}
   currentUser:
     userID: 0
     userName: 
@@ -81,6 +79,9 @@ MonoBehaviour:
   sfxVolume: 1
   musicVolume: 1
   screenResolution: -1
+  frameRate: -1
+  vSync: 1
+  showPerformanceData: 0
   postProcessing: 1
   distortionEffects: 1
   weatherEffects: 1
@@ -193,6 +194,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f7f883916da39394089797f6369e4aeb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  inputActions: {fileID: -944628639613478452, guid: ed60705c2a4334745adad52aa57e9f07,
+    type: 3}
 --- !u!1 &607026113194731271
 GameObject:
   m_ObjectHideFlags: 0

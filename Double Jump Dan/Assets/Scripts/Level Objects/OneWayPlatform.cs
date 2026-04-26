@@ -17,7 +17,7 @@ public class OneWayPlatform : MonoBehaviour
 
     void Start()
     {
-        player = GameObject.FindWithTag("Player").GetComponent<Player>();
+        player = LevelManager.Instance.player;
         playerCollider = player.GetComponent<Collider2D>();
         gameInputManager = GameInputManager.Instance;
     }

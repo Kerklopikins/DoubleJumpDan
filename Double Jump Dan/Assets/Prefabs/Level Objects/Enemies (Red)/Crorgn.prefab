@@ -286,6 +286,10 @@ MonoBehaviour:
   destroyedSound: {fileID: 8300000, guid: e60a74f733716b1409a33d1d2dabf1e2, type: 3}
   destroyedEffect: {fileID: 1610945463146336, guid: b65cc760629506c42bd3ef679ad75f4c,
     type: 3}
+  spriteMaterials:
+  - {fileID: 1609629995008210791}
+  - {fileID: 212069510036648902}
+  - {fileID: 212134142675459416}
   gemsToGive: 10
   properties:
     angle: 0

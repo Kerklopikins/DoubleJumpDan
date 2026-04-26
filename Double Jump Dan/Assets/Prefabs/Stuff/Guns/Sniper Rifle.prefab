@@ -112,6 +112,9 @@ MonoBehaviour:
   burstsPerMagazine: 0
   burstCoolDownTime: 0
   aimPointOffset: 0.6875
+  lowRumbleAmount: 0.35
+  highRumbleAmount: 0.75
+  rumbleDuration: 0.2
 --- !u!114 &114619254987605938
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -129,7 +132,6 @@ MonoBehaviour:
   shootSound: {fileID: 8300000, guid: 04e94697265ca4d43936028fabe8725e, type: 3}
   reloadSound: {fileID: 0}
   gunAnimator: {fileID: 0}
-  shootWhenTouchingGround: 0
   projectileType: 1
   projectile: {fileID: 0}
   projectileFirePoints:
@@ -154,6 +156,8 @@ MonoBehaviour:
   shell: {fileID: 438902, guid: f496011088b09b94cbb05c30980ee930, type: 3}
   onlyEjectShellsWhenReloading: 0
   shellEjectionPoint: {fileID: 4100631615214554}
+  hasGlow: 0
+  glowSprite: {fileID: 0}
   properties:
     angle: 0
     strength: 0.25

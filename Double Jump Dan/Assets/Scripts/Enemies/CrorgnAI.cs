@@ -40,7 +40,7 @@ public class CrorgnAI : MonoBehaviour
     {
         moveDirection = -(int)transform.localScale.x;
         rb2D = GetComponent<Rigidbody2D>();
-        player = GameObject.FindWithTag("Player").GetComponent<Player>();
+        player = LevelManager.Instance.player;
         enemyGun = GetComponent<EnemyGun>();
         animator = GetComponent<Animator>();
         layerMask = (1 << LayerMask.NameToLayer("Collisions")) | (1 << LayerMask.NameToLayer("Player"));

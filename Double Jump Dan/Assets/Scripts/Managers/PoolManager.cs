@@ -2,30 +2,20 @@ using UnityEngine;
 using System.Collections.Generic;
 public class PoolManager: MonoBehaviour
 {
+    public static PoolManager Instance;
+
     [Header("Custom Pools")]
     public CustomPool[] customPools;
 
     Dictionary<string, LinkedList<ObjectInstance>> poolDictionary = new Dictionary<string, LinkedList<ObjectInstance>>();
     
-    static PoolManager _instance;
-
     void Awake()
     {
+        Instance = this;
+        
         if(customPools.Length > 0)
             for(int i = 0; i < customPools.Length; i++)
                 CreatePool(customPools[i].poolID, customPools[i].prefab, customPools[i].poolSize);
-    }
-
-    public static PoolManager instance
-    {
-        get
-        {
-            if(_instance == null)
-            {
-                _instance = FindFirstObjectByType<PoolManager>();
-            }
-            return _instance;
-        }
     }
 
     public void CreatePool(string poolID, GameObject prefab, int poolSize)

@@ -474,6 +474,8 @@ MonoBehaviour:
   hurtSound: {fileID: 0}
   destroyedSound: {fileID: 8300000, guid: de79cfb1edde7494299c8b15a8f36f5e, type: 3}
   destroyedEffect: {fileID: 0}
+  spriteMaterials:
+  - {fileID: 5242531861860229860}
   gemsToGive: 10
   properties:
     angle: 0

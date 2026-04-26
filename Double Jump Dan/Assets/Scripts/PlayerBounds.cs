@@ -16,7 +16,7 @@ public class PlayerBounds : MonoBehaviour
     void Start()
     {
         player = GetComponent<Player>();
-        bounds = GameObject.FindWithTag("Bounds").GetComponent<BoxCollider2D>();
+        bounds = LevelManager.Instance.levelBounds;
         _boxCollider2D = GetComponent<BoxCollider2D>();
     }
 

@@ -30,9 +30,9 @@ public class Portal : MonoBehaviour
 
     void Start()
     {
-		_camera = Camera.main;
+		_camera = LevelManager.Instance.mainCamera;
         cameraManager = _camera.GetComponent<CameraManager>();
-        player = GameObject.FindWithTag("Player").GetComponent<Player>();
+        player = LevelManager.Instance.player;
         rb2D = player.GetComponent<Rigidbody2D>();
         gameInputManager = GameInputManager.Instance;
     }

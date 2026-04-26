@@ -57,7 +57,7 @@ public class BasicEnemyAI : MonoBehaviour
         timer = interval;
         _angrySpeed = angrySpeed;
         animator = GetComponent<Animator>();
-        player = GameObject.FindWithTag("Player").GetComponent<Player>();
+        player = LevelManager.Instance.player;
         raycastMask = LayerMask.GetMask("Collisions", "Player");
         health = GetComponent<Health>();
         _collider = GetComponent<Collider2D>();

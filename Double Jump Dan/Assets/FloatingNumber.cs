@@ -2,12 +2,13 @@
 using UnityEngine;
 using System.Collections;
 
-public class FloatingNumber : MonoBehaviour
+public class FloatingNumber : MonoBehaviour, IPoolable
 {
     [SerializeField] float floatHeight;
     [SerializeField] float scaleDuration;
     [SerializeField] float floatDuration;
     [SerializeField] float hangDuration;
+    [SerializeField] SpriteRenderer instantKillSprite;
 
     [SerializeField] SpriteRenderer plusMinusSprite;
     [SerializeField] Sprite[] plusMinusSprites;
@@ -18,13 +19,12 @@ public class FloatingNumber : MonoBehaviour
     
     Vector2 numbersHolderStartPosition;
 
-    void Start()
+    void OnEnable()
     {
         transform.localScale = Vector2.zero;
-        SetNumber(1, transform.position, true);
     }
 
-    IEnumerator ScaleNumbers(Vector3 from, Vector3 to)
+    IEnumerator ScaleNumbers(Vector3 from, Vector3 to, bool disable)
     {
         float inTime = 0;
         transform.localScale = from;
@@ -41,11 +41,14 @@ public class FloatingNumber : MonoBehaviour
         }
 
         transform.localScale = to;
+
+        if(disable)
+            gameObject.SetActive(false);
     }
 
     IEnumerator FloatNumbers(Vector2 startPosition)
     {
-        StartCoroutine(ScaleNumbers(Vector3.zero, Vector3.one));
+        StartCoroutine(ScaleNumbers(Vector3.zero, Vector3.one, false));
         
         float inTime = 0;
 
@@ -63,14 +66,45 @@ public class FloatingNumber : MonoBehaviour
         transform.position = new Vector2(startPosition.x, startPosition.y + floatHeight);
         yield return new WaitForSeconds(hangDuration); 
         
-        StartCoroutine(ScaleNumbers(Vector3.one, Vector3.zero));
+        StartCoroutine(ScaleNumbers(Vector3.one, Vector3.zero, true));
     }
 
-    void SetNumber(int number, Vector2 position, bool plusOrMinus)
+    public void OnObjectReuse(object data)
     {
+        FloatingNumberProperties properties = (FloatingNumberProperties)data;
+        SetNumber(properties.number, properties.position, properties.plusOrMinus, properties.color, properties.instantKill);
+    }
+
+    public void SetNumber(int number, Vector2 position, bool plusOrMinus, Color color, bool instantKill)
+    {
+        ////Plus is 0
+        /// Minus is 1
         transform.position = position;
         plusMinusSprite.sprite = plusOrMinus == true ? plusMinusSprites[0] : plusMinusSprites[1];
+        plusMinusSprite.color = color;
+        instantKillSprite.color = color;
+        
+        foreach(SpriteRenderer sprite in numberSprites)
+        {
+            sprite.color = color;
+            
+            if(instantKill)
+                sprite.gameObject.SetActive(false);
+        }
+
         StartCoroutine(FloatNumbers(position));
+
+        if(instantKill)
+        {
+            instantKillSprite.gameObject.SetActive(true);
+            plusMinusSprite.gameObject.SetActive(false);
+            return;
+        }
+        else
+        {
+            instantKillSprite.gameObject.SetActive(false);
+            plusMinusSprite.gameObject.SetActive(true);
+        }
 
         int value = Mathf.Abs(number);
         
@@ -105,4 +139,13 @@ public class FloatingNumber : MonoBehaviour
             index++;
         }
     }
+}
+
+public struct FloatingNumberProperties
+{
+    public int number;
+    public Vector3 position;
+    public bool plusOrMinus;
+    public Color color;
+    public bool instantKill;
 }

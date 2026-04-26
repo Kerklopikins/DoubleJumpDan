@@ -5,14 +5,24 @@ public class UIScreenManager : MonoBehaviour
 {
     public Animator initiallyOpen;
 
-    public Animator m_Open { get; protected set; }
+    public Animator currentOpenPanel { get; set; }
+    Animator currentPanel;
     int m_OpenParameterId;
+    Transform cursor;
     const string k_OpenTransitionName = "Open";
     const string k_ClosedStateName = "Closed";
+    public float transitionTimer { get; set; }
 
     void Start()
     {
         StartCoroutine(StartCo());
+        cursor = GetComponent<MainMenuManager>().cursor.transform;
+    }
+
+    void Update()
+    {
+        if(transitionTimer > 0)
+            transitionTimer -= Time.deltaTime;
     }
 
     IEnumerator StartCo()
@@ -25,27 +35,30 @@ public class UIScreenManager : MonoBehaviour
 
     public void OpenPanel(Animator anim)
     {
-        if(m_Open == anim)
+        if(currentPanel == anim)
             return;
+
+        currentOpenPanel = anim;
 
         anim.gameObject.SetActive(true);
         anim.transform.SetAsLastSibling();
+        cursor.SetAsLastSibling();
 
         CloseCurrent();
 
-        m_Open = anim;
-        m_Open.SetBool(m_OpenParameterId, true);
+        currentPanel = anim;
+        currentPanel.SetBool(m_OpenParameterId, true);
     }
 
     void CloseCurrent()
     {
-        if(m_Open == null)
+        if(currentPanel == null)
             return;
 
-        m_Open.SetBool(m_OpenParameterId, false);
+        currentPanel.SetBool(m_OpenParameterId, false);
 
-        StartCoroutine(DisablePanelDeleyed(m_Open));
-        m_Open = null;
+        StartCoroutine(DisablePanelDeleyed(currentPanel));
+        currentPanel = null;
     }
 
     IEnumerator DisablePanelDeleyed(Animator anim)
@@ -69,7 +82,11 @@ public class UIScreenManager : MonoBehaviour
 
     public void OpenMiniPanel(Animator animator)
     {
+        currentOpenPanel = animator;
+
         animator.transform.SetAsLastSibling();
+        cursor.SetAsLastSibling();
+
         animator.gameObject.SetActive(true);
         animator.SetBool("Open", true);
     }

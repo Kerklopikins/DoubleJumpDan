@@ -153,6 +153,9 @@ MonoBehaviour:
   destroyedSound: {fileID: 8300000, guid: e60a74f733716b1409a33d1d2dabf1e2, type: 3}
   destroyedEffect: {fileID: 1680065718586648, guid: d9e423643bc1c854db1359b15757dc56,
     type: 3}
+  spriteMaterials:
+  - {fileID: 5043451145583223309}
+  - {fileID: 212526386173712636}
   gemsToGive: 5
   properties:
     angle: 0
@@ -539,7 +542,7 @@ SpriteRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 0c75f55fbcf3b804d85cafae30546d4c, type: 2}
+  - {fileID: 2100000, guid: 575b6b33d095f2246af73bb393810685, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0

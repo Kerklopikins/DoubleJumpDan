@@ -33,8 +33,11 @@ public class AudioManager : MonoBehaviour
     {
         sfxVolumePercent = GameManager.Instance.sfxVolume;
         musicVolumePercent = GameManager.Instance.musicVolume;
-
-        localWorldManager = GameObject.FindWithTag("Level Managers").GetComponent<LocalWorldManager>();
+        
+        if(!GameManager.Instance.InMainMenu())
+            localWorldManager = LevelManager.Instance.localWorldManager;
+        else
+            localWorldManager = GameObject.FindWithTag("Level Managers").GetComponent<LocalWorldManager>();
         
          //Music Selection
         switch(localWorldManager.world)

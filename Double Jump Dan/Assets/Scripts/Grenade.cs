@@ -12,6 +12,11 @@ public class Grenade : MonoBehaviour, IPoolable
     [Header("Camera Shake")]
     [SerializeField] CameraManager.Properties properties;
 
+    [Header("Controller Rumble")]
+    [SerializeField] float lowRumbleAmount;
+    [SerializeField] float highRumbleAmount;
+    [SerializeField] float rumbleDuration;
+
     Rigidbody2D rb2D;
     float lifeTime;
     string destroyedEffectPool;
@@ -100,10 +105,12 @@ public class Grenade : MonoBehaviour, IPoolable
             transformProperties.scale = Vector3.one;
             transformProperties.rotation = Quaternion.identity;
 
-            PoolManager.instance.ReuseObject(destroyedEffectPool, transformProperties);
+            PoolManager.Instance.ReuseObject(destroyedEffectPool, transformProperties);
 
             if(properties.strength > 0)
                 CameraManager.Instance.Shake(properties);
+
+            GameInputManager.Instance.RumbleController(lowRumbleAmount, highRumbleAmount, rumbleDuration);
         }
 	}
 

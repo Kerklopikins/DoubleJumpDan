@@ -7,14 +7,18 @@ public class ShopManager : MonoBehaviour
 {
     public static ShopManager Instance;
 
+    [SerializeField] GameObject shop;
     public ConfirmPurchase confirmPurchase;
 	[SerializeField] Text gemsText;
     [SerializeField] AudioClip tooExpensiveSound;
     public ScrollRect gunScrollRect;
     public ScrollRect hatScrollRect;
     public ScrollRect skinScrollRect;
+    [SerializeField] RectTransform gunsContent;
+    [SerializeField] RectTransform hatsContent;
+    [SerializeField] RectTransform skinsContent;
+    [SerializeField] float itemWidth;
     public Vector2 minMaxVisibilityDistance;
-    
     public ItemManager itemManager;
 
     public event Action OnShopItemsChanged;
@@ -22,10 +26,16 @@ public class ShopManager : MonoBehaviour
     public RectTransform currentGunRect { get; set; }
     public RectTransform currentHatRect { get; set; }
     public RectTransform currentSkinRect { get; set; }
-
+    public int currentItemIndex { get; set; }
     CurrentShopTab currentShopTab = CurrentShopTab.Guns;
     public enum CurrentShopTab { Guns, Hats, Skins }
     GameManager gameManager;
+    GameInputManager gameInputManager;
+    MainMenuManager mainMenuManager;
+    int gunsCount;
+    int hatsCount;
+    int skinsCount;
+    bool scrollViewMoved;
 
     void Awake()
     {
@@ -34,6 +44,122 @@ public class ShopManager : MonoBehaviour
     void Start()
     {
         gameManager = GameManager.Instance;
+        gameInputManager = GameInputManager.Instance;
+        mainMenuManager = GetComponent<MainMenuManager>();
+
+        gunsCount = itemManager.guns.Count - 1;
+        hatsCount = itemManager.hats.Count - 1;
+        skinsCount = itemManager.skins.Count - 1;
+    }
+
+    void Update()
+    {
+        /////////////////////////////////
+        /// MAKE BUMPERS SO YOU CAN HOLD
+        /// |THEM
+        /// Make cursor actually dissapear
+        /// Make screenshots Scroll
+        /// Add controller sensitivity to settigs
+        /// Make cursor not move when pressing keyboard arrows
+        /// 
+        ///
+        ///
+        /// 
+        
+        if(shop.activeSelf == false)
+            return;
+
+        if(gameInputManager.ControllerConnected())
+        {
+            if(Mathf.Abs(gameInputManager.AimDirection().x) > 0.1f)
+            {
+                scrollViewMoved = true;
+
+                if(gameInputManager.LeftTrigger())
+                    mainMenuManager._scrollSpeed = mainMenuManager.scrollSpeed * 2;
+                else
+                    mainMenuManager._scrollSpeed = mainMenuManager.scrollSpeed;
+
+                switch(currentShopTab)
+                {   
+                    case CurrentShopTab.Guns:
+                        gunsContent.anchoredPosition += new Vector2(-gameInputManager.AimDirection().x * mainMenuManager._scrollSpeed * Time.deltaTime, 0);
+                        gunsContent.anchoredPosition = new Vector2(Mathf.Clamp(gunsContent.anchoredPosition.x, -gunsContent.sizeDelta.x + (itemWidth * 3) - 4, 0), gunsContent.anchoredPosition.y);
+                        break;
+                    case CurrentShopTab.Hats:
+                        hatsContent.anchoredPosition += new Vector2(-gameInputManager.AimDirection().x * mainMenuManager._scrollSpeed * Time.deltaTime, 0);      
+                        hatsContent.anchoredPosition = new Vector2(Mathf.Clamp(hatsContent.anchoredPosition.x, -hatsContent.sizeDelta.x + (itemWidth * 3) - 4, 0), hatsContent.anchoredPosition.y);
+                        break;
+                    case CurrentShopTab.Skins:
+                        skinsContent.anchoredPosition += new Vector2(-gameInputManager.AimDirection().x * mainMenuManager._scrollSpeed * Time.deltaTime, 0);      
+                        skinsContent.anchoredPosition = new Vector2(Mathf.Clamp(skinsContent.anchoredPosition.x, -skinsContent.sizeDelta.x + (itemWidth * 3) - 4, 0), skinsContent.anchoredPosition.y);
+                        break;
+                }
+            }
+
+            if(gameInputManager.LeftBumperDown())
+            {
+                if(!scrollViewMoved)
+                {               
+                    currentItemIndex--;
+                }
+                else
+                {
+                    CenterScrollRectsAndUpdateScrollIndex();
+                    scrollViewMoved = false;
+                }
+
+                switch(currentShopTab)
+                {   
+                    case CurrentShopTab.Guns:
+                        ScrollItems(gunsCount, gunsContent);          
+                        break;
+                    case CurrentShopTab.Hats:
+                        ScrollItems(hatsCount, hatsContent);                    
+                        break;
+                    case CurrentShopTab.Skins:
+                        ScrollItems(skinsCount, skinsContent);                   
+                        break;
+                }
+            }
+            else if(gameInputManager.RightBumperDown())
+            {
+                if(!scrollViewMoved)
+                {               
+                    currentItemIndex++;
+                }
+                else
+                {
+                    CenterScrollRectsAndUpdateScrollIndex();
+                    scrollViewMoved = false;
+                }
+
+                switch(currentShopTab)
+                {   
+                    case CurrentShopTab.Guns:
+                        ScrollItems(gunsCount, gunsContent);          
+                        break;
+                    case CurrentShopTab.Hats:
+                        ScrollItems(hatsCount, hatsContent);                    
+                        break;
+                    case CurrentShopTab.Skins:
+                        ScrollItems(skinsCount, skinsContent);                   
+                        break;
+                }
+            }
+        }
+    }   
+
+    void ScrollItems(int itemCount, RectTransform content)
+    {            
+        currentItemIndex = Mathf.Clamp(currentItemIndex, 0, itemCount - 2);
+        content.anchoredPosition = new Vector2(-(currentItemIndex * itemWidth), content.anchoredPosition.y);      
+    }
+    
+    public void UpdateScrollIndex(int index, int itemCount)
+    {
+        currentItemIndex = index - 2;
+        currentItemIndex = Mathf.Clamp(currentItemIndex, 0, itemCount - 2);
     }
 
     public void EquipItem(ShopItem shopItem)
@@ -58,31 +184,34 @@ public class ShopManager : MonoBehaviour
         yield return null;
         yield return null;
         
+        CenterScrollRectsAndUpdateScrollIndex();
+    }
+    
+    void CenterScrollRectsAndUpdateScrollIndex()
+    {
         switch(currentShopTab)
         {   
             case CurrentShopTab.Guns:
                 CenterShopScrollRect(gunScrollRect, currentGunRect);
+                UpdateScrollIndex(currentGunRect.transform.GetSiblingIndex() + 1, gunsCount);
                 break;
             case CurrentShopTab.Hats:
                 CenterShopScrollRect(hatScrollRect, currentHatRect);
+                UpdateScrollIndex(currentHatRect.transform.GetSiblingIndex() + 1, hatsCount);
                 break;
             case CurrentShopTab.Skins:
                 CenterShopScrollRect(skinScrollRect, currentSkinRect);
+                UpdateScrollIndex(currentSkinRect.transform.GetSiblingIndex() + 1, skinsCount);
                 break;
         }
     }
+
     public void CenterShopScrollRect(ScrollRect scrollRect, RectTransform currentRect)
     {
-        RectTransform content = scrollRect.content;
-        RectTransform viewport = scrollRect.viewport;
-
-        float contentWidth = content.rect.width;
-        float viewportWidth = viewport.rect.width;
-
         float itemPosition = Mathf.Abs(currentRect.anchoredPosition.x);
-        float targetPosition = itemPosition - (viewportWidth / 2);
+        float targetPosition = itemPosition - (scrollRect.viewport.rect.width / 2);
 
-        float normalized = Mathf.Clamp01(targetPosition / (contentWidth - viewportWidth));
+        float normalized = Mathf.Clamp01(targetPosition / (scrollRect.content.rect.width - scrollRect.viewport.rect.width));
         scrollRect.horizontalNormalizedPosition = normalized;
 
         OnShopTabsChanged?.Invoke();

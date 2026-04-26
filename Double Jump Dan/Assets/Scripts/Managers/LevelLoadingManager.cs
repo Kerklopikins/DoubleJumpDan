@@ -10,16 +10,14 @@ public class LevelLoadingManager : MonoBehaviour
     [SerializeField] bool startClear;
 
     public bool animationFinished { get; set; }
-    public bool levelStarted { get; set; }
     public bool loading { get; set; }
-    public bool done { get; set; }
+    public bool busy { get; set; }
 	public SpriteRenderer fadeSprite { get; set; }
     SpriteRenderer loadingDan;
     Transform loadingSpritesTransform;
     GameObject loadingCircle;
     SpriteRenderer loadingCircleSprite;
     bool loaded;
-    bool fadingIn;
     float levelDelay = 0.125f;
     GameObject eventSystem;
     GameHUD gameHUD;
@@ -27,6 +25,8 @@ public class LevelLoadingManager : MonoBehaviour
     Player player;
     GameObject levelLoadingGameObject;
     Camera _camera;
+    float fadeDuration = 0.6f;
+    bool fadedOut;
 
     void Awake()
     {
@@ -62,7 +62,7 @@ public class LevelLoadingManager : MonoBehaviour
 
         if(IsNormalLevel())
         {
-            player = GameObject.FindWithTag("Player").GetComponent<Player>();
+            player = LevelManager.Instance.player;
             gameHUD = GameHUD.Instance;
             
             if(GameManager.died)
@@ -83,111 +83,130 @@ public class LevelLoadingManager : MonoBehaviour
 
     void Update()
     {
-        if(loading || loaded)
-            loadingCircle.transform.Rotate(Vector3.forward, -200 * Time.unscaledDeltaTime);
+        if(loading)
+            loadingCircle.transform.Rotate(Vector3.forward, -250 * Time.unscaledDeltaTime);
 
-        if(animationFinished && !levelStarted)
-        {
-            animationFinished = false;
-            levelStarted = true;
-        }
-
-        if(loaded)
-        {
-            loadingSpritesTransform.localScale -= Vector3.one * 1.5f * Time.unscaledDeltaTime;
-            loadingSpritesTransform.localScale = new Vector3(Mathf.Clamp(loadingSpritesTransform.localScale.x, 0, 1), Mathf.Clamp(loadingSpritesTransform.localScale.y, 0, 1), Mathf.Clamp(loadingSpritesTransform.localScale.z, 0, 1));
-        }
-
-        if(fadingIn && !loaded)
-        {
-            if(eventSystem != null && eventSystem.activeInHierarchy == true)
-                eventSystem.SetActive(false);
+        if(startClear)
+            return;
             
-            if(player != null)
-            {
-                if(player.lives > 0)
-                {
-                    loadingCircleSprite.color = Color.white;
-                    fadeSprite.color = new Color(0, 0, 0, fadeSprite.color.a);
-                }
-                else
-                {
-                    loadingCircleSprite.color = Color.black;
-                    fadeSprite.color = new Color(1, 0, 0, fadeSprite.color.a);
-                    GameManager.died = true;
-                }
-            }
-            else
-            {
-                loadingCircleSprite.color = Color.white;
-                fadeSprite.color = new Color(0, 0, 0, fadeSprite.color.a);
-            }
-            
-            fadeSprite.color += new Color(0, 0, 0, 1.5f * Time.unscaledDeltaTime);
-            
-            if(localWorldManager.world != LocalWorldManager.World.SplashScreen)
-            {
-                loadingSpritesTransform.localScale += Vector3.one * 1.5f * Time.unscaledDeltaTime;
-                loadingSpritesTransform.localScale = new Vector3(Mathf.Clamp(loadingSpritesTransform.localScale.x, 0, 1), Mathf.Clamp(loadingSpritesTransform.localScale.y, 0, 1), Mathf.Clamp(loadingSpritesTransform.localScale.z, 0, 1));
-            } 
-            
-            fadeSprite.color = new Vector4(Mathf.Clamp(fadeSprite.color.r, 0, 1), Mathf.Clamp(fadeSprite.color.g, 0, 1), Mathf.Clamp(fadeSprite.color.b, 0, 1), Mathf.Clamp(fadeSprite.color.a, 0, 1));
-
-            if(fadeSprite.color.a >= 1)
-                animationFinished = true;
-        }
-
         if(levelDelay > 0)
         {
             levelDelay -= Time.deltaTime;
             return;
         }
 
-        FadeOut();
+        if(!fadedOut)
+            StartCoroutine(FadeOutCo());
     }
     
-    void FadeOut()
+    IEnumerator FadeInCo()
     {
-        if(!levelStarted)
+        busy = true;
+
+        if(eventSystem != null && eventSystem.activeInHierarchy == true)
+            eventSystem.SetActive(false);
+
+        if(player != null)
         {
-            fadeSprite.color -= new Color(0, 0, 0, 1.5f * Time.unscaledDeltaTime);
-            loadingSpritesTransform.localScale = Vector3.zero;
-
-            fadeSprite.color = new Vector4(Mathf.Clamp(fadeSprite.color.r, 0, 1), Mathf.Clamp(fadeSprite.color.g, 0, 1), Mathf.Clamp(fadeSprite.color.b, 0, 1), Mathf.Clamp(fadeSprite.color.a, 0, 1));
-
-            if(fadeSprite.color.a <= 0)
+            if(player.lives > 0)
             {
-                levelStarted = true;
-
-                if(IsNormalLevel())
-                    GameManager.died = false;
+                loadingCircleSprite.color = Color.white;
+                fadeSprite.color = new Color(0, 0, 0, fadeSprite.color.a);
+            }
+            else
+            {
+                loadingCircleSprite.color = Color.black;
+                fadeSprite.color = new Color(1, 0, 0, fadeSprite.color.a);
+                GameManager.died = true;
             }
         }
-
-        if(fadeSprite.color.a <= 0)
-            done = true;
         else
-            done = false;
+        {
+            loadingCircleSprite.color = Color.white;
+            fadeSprite.color = new Color(0, 0, 0, fadeSprite.color.a);
+        }
+
+        float inTime = 0;
+
+        while(inTime < fadeDuration)
+        {
+            inTime += Time.unscaledDeltaTime;
+            
+            if(localWorldManager.world != LocalWorldManager.World.SplashScreen)
+                loadingSpritesTransform.localScale = Vector3.Lerp(Vector3.zero, Vector3.one, inTime / fadeDuration);
+
+            fadeSprite.color = new Color(fadeSprite.color.r, fadeSprite.color.g, fadeSprite.color.b, Mathf.Lerp(0, 1, inTime / fadeDuration));
+            yield return null;
+        }
+
+        fadeSprite.color = new Color(fadeSprite.color.r, fadeSprite.color.g, fadeSprite.color.b, 1);
+        loadingSpritesTransform.localScale = Vector3.one;
+
+        animationFinished = true;
+    }
+
+    IEnumerator FadeOutCo()
+    {
+        fadedOut = true;
+        busy = true;
+
+        float inTime = 0;
+
+        while(inTime < fadeDuration)
+        {
+            inTime += Time.unscaledDeltaTime;
+            fadeSprite.color = new Color(fadeSprite.color.r, fadeSprite.color.g, fadeSprite.color.b, Mathf.Lerp(1, 0, inTime / fadeDuration));
+            yield return null;
+        }
+
+        fadeSprite.color = new Color(fadeSprite.color.r, fadeSprite.color.g, fadeSprite.color.b, 0);
+        busy = false;
+
+        if(IsNormalLevel())
+            GameManager.died = false;
+    }
+
+    IEnumerator ScaleLoadingSprites()
+    {
+        loaded = true;
+
+        float inTime = 0;
+
+        while(inTime < fadeDuration)
+        {
+            inTime += Time.unscaledDeltaTime;
+
+            if(localWorldManager.world != LocalWorldManager.World.SplashScreen)
+                loadingSpritesTransform.localScale = Vector3.Lerp(Vector3.one, Vector3.zero, inTime / fadeDuration);
+            
+            yield return null;
+        }
+
+        loadingSpritesTransform.localScale = Vector3.zero;
     }
 
     public void ResizeFadeBackground()
     {
-        float cameraWidth = Camera.main.orthographicSize * ((float)Screen.width / Screen.height);
-        
-        if(Camera.main.orthographic)
-			fadeSprite.transform.localScale = new Vector2(cameraWidth + 0.2f, _camera.orthographicSize + 0.2f);
-		else
-			fadeSprite.transform.localScale = new Vector2(cameraWidth + 0.2f, _camera.orthographicSize + 0.2f);
+        float cameraWidth = _camera.orthographicSize * ((float)Screen.width / Screen.height);
+        fadeSprite.transform.localScale = new Vector2(cameraWidth + 0.2f, _camera.orthographicSize + 0.2f);
     }
 
-    public void SetAnimationFinishedToTrue()
+    public void ForceFadeResizeBackground()
     {
-        animationFinished = true;
+        StartCoroutine(ForceFadeResizeBackgroundCo());
+    }
+
+    IEnumerator ForceFadeResizeBackgroundCo()
+    {
+        while(fadeSprite.color.a > 0.1f)
+        {
+            ResizeFadeBackground();
+            yield return null;
+        }   
     }
 
     public void LoadScene(int sceneToLoad)
     {
-        fadingIn = true;
         loading = true;
 
         if(localWorldManager.world != LocalWorldManager.World.SplashScreen)
@@ -195,11 +214,11 @@ public class LevelLoadingManager : MonoBehaviour
 
         ResizeFadeBackground();		
         StartCoroutine(LoadSceneSlowly(sceneToLoad));
+        StartCoroutine(FadeInCo());
     }
 
     public void LoadScene(string sceneToLoad)
     {
-        fadingIn = true;
         loading = true;
 
         if(localWorldManager.world != LocalWorldManager.World.SplashScreen)
@@ -207,6 +226,7 @@ public class LevelLoadingManager : MonoBehaviour
             
         ResizeFadeBackground();		
         StartCoroutine(LoadSceneSlowly(sceneToLoad));
+        StartCoroutine(FadeInCo());
     }
 
     IEnumerator LoadSceneSlowly(int sceneToLoad)
@@ -222,8 +242,8 @@ public class LevelLoadingManager : MonoBehaviour
         {
             asyncLoad.allowSceneActivation = false;
 
-            if(asyncLoad.progress == 0.9f)
-                loaded = true;
+            if(asyncLoad.progress == 0.9f && !loaded)
+                StartCoroutine(ScaleLoadingSprites());
 
             if(loadingSpritesTransform.localScale.x <= 0)
                 asyncLoad.allowSceneActivation = true;
@@ -245,8 +265,8 @@ public class LevelLoadingManager : MonoBehaviour
         {
             asyncLoad.allowSceneActivation = false;
 
-            if(asyncLoad.progress == 0.9f)
-                loaded = true;
+            if(asyncLoad.progress == 0.9f && !loaded)
+                StartCoroutine(ScaleLoadingSprites());
 
             if(loadingSpritesTransform.transform.localScale.x <= 0)
                 asyncLoad.allowSceneActivation = true;

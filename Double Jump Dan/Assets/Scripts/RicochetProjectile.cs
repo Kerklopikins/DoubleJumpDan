@@ -121,7 +121,7 @@ public class RicochetProjectile : MonoBehaviour, IPoolable
         transformProperties.scale = new Vector3(-transform.lossyScale.x, 1, 1);
         transformProperties.rotation = transform.rotation;
 
-        PoolManager.instance.ReuseObject(destroyedEffectPool, transformProperties);
+        PoolManager.Instance.ReuseObject(destroyedEffectPool, transformProperties);
 
         gameObject.SetActive(false);
     }

@@ -56,7 +56,7 @@ public class TrediconAI : MonoBehaviour
         health = GetComponent<Health>();
         _angrySpeed = angrySpeed;
         animator = GetComponent<Animator>();
-        player = GameObject.FindWithTag("Player").GetComponent<Player>();
+        player = LevelManager.Instance.player;
         layerMask = (1 << LayerMask.NameToLayer("Collisions")) | (1 << LayerMask.NameToLayer("Player"));
         rocketLauncher.player = player;
 

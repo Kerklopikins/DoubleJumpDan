@@ -51,7 +51,7 @@ public class MovingPlatform : MonoBehaviour
 
     void Start()
     {
-		player = GameObject.FindWithTag("Player").GetComponent<Player>();
+		player = LevelManager.Instance.player;
 		spatialAudioController = GetComponent<SpatialAudioController>();
         currentPoint = points[0];
 

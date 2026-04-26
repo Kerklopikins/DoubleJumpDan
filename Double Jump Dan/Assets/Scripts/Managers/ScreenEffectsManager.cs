@@ -9,7 +9,6 @@ public class ScreenEffectsManager : MonoBehaviour
     [SerializeField] SpriteRenderer hurtSprite;
     [SerializeField] SpriteRenderer whiteFadeSprite;
     [SerializeField] SpriteRenderer greenCircleSprite;
-    [SerializeField] Material grayscaleMaterial;
 
     [Header("Color Temperature")]
     [SerializeField] bool useColorTemperature;
@@ -19,6 +18,7 @@ public class ScreenEffectsManager : MonoBehaviour
     [SerializeField] Color tintColor = Color.white;
     
     [Header("Grayscale")]
+    [SerializeField] Material grayscaleMaterial;
     [Range(0, 1)]
     [SerializeField] float grayscaleAmount;
 
@@ -44,7 +44,7 @@ public class ScreenEffectsManager : MonoBehaviour
         if(SceneManager.GetActiveScene().name == "Main Menu")
             return;
 
-        player = GameObject.FindWithTag("Player").GetComponent<Player>();
+        player = LevelManager.Instance.player;
         canAnimateWhiteFade = true;
         player.OnPlayerHealthChange += AnimateHealthCollect;
         ResizeScreenEffects();
@@ -255,31 +255,31 @@ public class ScreenEffectsManager : MonoBehaviour
         RenderTexture temp = RenderTexture.GetTemporary(src.width, src.height);
         RenderTexture currentSource = src;
 
-        if(grayscaleMaterial != null)
-        {
-            grayscaleMaterial.SetFloat("_Amount", grayscaleAmount);
-            Graphics.Blit(currentSource, temp, grayscaleMaterial);
-
-            currentSource = temp;
-        }
-        else
-        {
-            Graphics.Blit(src, dest);
-        }
-        
         if(colorTemperatureMaterial != null)
         {
             //colorTemperatureMaterial.SetFloat("_Temperature", colorTemperature);
             colorTemperatureMaterial.SetFloat("_Exposure", exposure);
             colorTemperatureMaterial.SetColor("_TintColor", tintColor);
 
-            Graphics.Blit(currentSource, dest, colorTemperatureMaterial);
+            Graphics.Blit(currentSource, temp, colorTemperatureMaterial);
+            currentSource = temp;
+        }
+        else
+        {
+            Graphics.Blit(src, temp);
+            currentSource = temp;
+        }
+
+        if(grayscaleMaterial != null)
+        {
+            grayscaleMaterial.SetFloat("_Amount", grayscaleAmount);
+            Graphics.Blit(currentSource, dest, grayscaleMaterial);
         }
         else
         {
             Graphics.Blit(currentSource, dest);
         }
-
+        
         RenderTexture.ReleaseTemporary(temp);
     }
 }

@@ -51,7 +51,7 @@ public class StatsHUD : MonoBehaviour
 
     void Start()
     {
-        player = GameObject.FindWithTag("Player").GetComponent<Player>();
+        player = LevelManager.Instance.player;
         
         player.OnPlayerHurt += PlayerHurt;
         player.OnPlayerKilled += PlayerKilled;

@@ -22,7 +22,7 @@ public class HornyToadAI : MonoBehaviour
     {
         direction = new Vector2(-transform.localScale.x, 0);
         rb2D = GetComponent<Rigidbody2D>();
-        player = GameObject.FindWithTag("Player").GetComponent<Player>();
+        player = LevelManager.Instance.player;
     }
 
     void Update()

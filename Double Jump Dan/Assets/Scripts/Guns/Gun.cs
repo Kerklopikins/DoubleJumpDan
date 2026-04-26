@@ -76,22 +76,22 @@ public class Gun : MonoBehaviour
 
         if(destroyedEffect != null)
         {
-            PoolManager.instance.CreatePool(destroyedEffect.name, destroyedEffect.gameObject, destroyedEffectPoolAmount);
+            PoolManager.Instance.CreatePool(destroyedEffect.name, destroyedEffect.gameObject, destroyedEffectPoolAmount);
             destroyedEffectPool = destroyedEffect.name;
         }
         
         if(projectileType == ProjectileType.GameObjectBased)
-            PoolManager.instance.CreatePool(gameObject.name, projectile.gameObject, destroyedEffectPoolAmount);
+            PoolManager.Instance.CreatePool(gameObject.name, projectile.gameObject, destroyedEffectPoolAmount);
 
         if(ejectShells)
         {
             if(gunInfo.startingAmmo < 8)
-                PoolManager.instance.CreatePool(shell.name, shell.gameObject, (int)gunInfo.startingAmmo * 3);
+                PoolManager.Instance.CreatePool(shell.name, shell.gameObject, (int)gunInfo.startingAmmo * 3);
             else
-                PoolManager.instance.CreatePool(shell.name, shell.gameObject, (int)gunInfo.startingAmmo * 2);
+                PoolManager.Instance.CreatePool(shell.name, shell.gameObject, (int)gunInfo.startingAmmo * 2);
         }
         
-        Transform bulletsParent = GameObject.FindWithTag("Level Objects").transform;
+        Transform bulletsParent = LevelManager.Instance.levelObjects;
 
         for(int i = 0; i < bullets.Length; i++)
             bullets[i].parent = bulletsParent;
@@ -227,12 +227,11 @@ public class Gun : MonoBehaviour
             {
                 if(projectileType == ProjectileType.RaycastBased)
                 {
-                    float shotDistance = Camera.main.orthographicSize * ((float)Screen.width / Screen.height);
+                    float shotDistance = 50;
                     RaycastHit2D hit;
                     Ray2D ray = new Ray2D(spawnPosition, GunDirection(i));
                     hit = Physics2D.Raycast(ray.origin, ray.direction, shotDistance, collisionMask);
                     ///////////////////////////////////////////////WHY IS IT NOT ACTIVATING AT START
-                    /// FIX SHOTGUN RAYS
                     Vector3 fixedRotation = new Vector3(0, 0, transform.lossyScale.x > 0 ? 0 : 180);
                     
                     bullets[i].transform.position = spawnPosition;
@@ -300,7 +299,7 @@ public class Gun : MonoBehaviour
                             projectileProperties.direction = ray.direction;
                         }
 
-                        PoolManager.instance.ReuseObject(gameObject.name, projectileProperties);
+                        PoolManager.Instance.ReuseObject(gameObject.name, projectileProperties);
                     }
                     else
                     {
@@ -324,7 +323,7 @@ public class Gun : MonoBehaviour
 
                         ricochetProperties.direction = ray.direction;
 
-                        PoolManager.instance.ReuseObject(gameObject.name, ricochetProperties);
+                        PoolManager.Instance.ReuseObject(gameObject.name, ricochetProperties);
                     }
                 }
             }
@@ -346,7 +345,7 @@ public class Gun : MonoBehaviour
         properties.scale = new Vector3(-transform.lossyScale.x, 1, 1);
         properties.rotation = transform.rotation;
 
-        PoolManager.instance.ReuseObject(destroyedEffectPool, properties);
+        PoolManager.Instance.ReuseObject(destroyedEffectPool, properties);
     }
     
     void EjectShell()
@@ -355,7 +354,7 @@ public class Gun : MonoBehaviour
         properties.position = shellEjectionPoint.position;
         properties.rotation = shellEjectionPoint.rotation;
 
-        PoolManager.instance.ReuseObject(shell.name, properties);
+        PoolManager.Instance.ReuseObject(shell.name, properties);
     }
     public void ActivateMuzzleFlash()
     {

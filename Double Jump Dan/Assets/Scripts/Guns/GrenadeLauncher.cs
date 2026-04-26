@@ -33,7 +33,7 @@ public class GrenadeLauncher : MonoBehaviour
 
 	void Start()
     {
-        player = GameObject.FindWithTag("Player").GetComponent<Player>();
+        player = LevelManager.Instance.player;
         projectileTrajectory = GetComponent<ProjectileTrajectory>();
         
         startingPosition = transform.localPosition;
@@ -46,8 +46,8 @@ public class GrenadeLauncher : MonoBehaviour
         player.OnPlayerRespawn += ForceReload;
         collisionMask = (1 << LayerMask.NameToLayer("Collisions")) | (1 << LayerMask.NameToLayer("Enemies"));
 
-        PoolManager.instance.CreatePool(grenadeDestroyedEffect.name, grenadeDestroyedEffect.gameObject, (int)gunInfo.startingAmmo / 2);        
-        PoolManager.instance.CreatePool(gameObject.name, grenade.gameObject, (int)gunInfo.startingAmmo / 2);
+        PoolManager.Instance.CreatePool(grenadeDestroyedEffect.name, grenadeDestroyedEffect.gameObject, (int)gunInfo.startingAmmo / 2);        
+        PoolManager.Instance.CreatePool(gameObject.name, grenade.gameObject, (int)gunInfo.startingAmmo / 2);
         destroyedEffectPool = grenadeDestroyedEffect.name;
     }
 
@@ -117,7 +117,7 @@ public class GrenadeLauncher : MonoBehaviour
                 projectileProperties.scale = player.transform.localScale;
                 projectileProperties.destroyedEffectPool = destroyedEffectPool;
 
-                PoolManager.instance.ReuseObject(gameObject.name, projectileProperties);
+                PoolManager.Instance.ReuseObject(gameObject.name, projectileProperties);
 
                 _shotForce = 1;
                 _fireRate = gunInfo.fireRate;

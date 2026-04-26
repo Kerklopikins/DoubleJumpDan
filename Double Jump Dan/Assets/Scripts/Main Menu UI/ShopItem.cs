@@ -9,6 +9,7 @@ public class ShopItem : MonoBehaviour
 	[SerializeField] Sprite normalItemBackground;
 	[SerializeField] Sprite premiumItemBackground;
     [SerializeField] ShopManager shopManager;
+	[SerializeField] UIScreenManager uIScreenManager;
 	[SerializeField] Sprite[] fireRateSprites;
 	[SerializeField] AudioClip equippedSound;
 	
@@ -254,9 +255,7 @@ public class ShopItem : MonoBehaviour
 	{
         if(gameManager.currentUser.gems >= item.price)
         {
-            confirmPurchase.transform.SetAsLastSibling();
-            confirmPurchase.gameObject.SetActive(true);
-            confirmPurchaseAnimator.SetBool("Open", true);
+            uIScreenManager.OpenMiniPanel(confirmPurchaseAnimator);
             confirmPurchase.shopItem = this;
 
 			if(item.price > 0)

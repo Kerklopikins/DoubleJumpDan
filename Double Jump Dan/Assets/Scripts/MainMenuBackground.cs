@@ -10,6 +10,7 @@ public class MainMenuBackground : MonoBehaviour
 
     LocalWorldManager localWorldManager;
     WorldManager worldManager;
+
     void Start()
     {
         localWorldManager = GameObject.FindWithTag("Level Managers").GetComponent<LocalWorldManager>();
@@ -33,7 +34,8 @@ public class MainMenuBackground : MonoBehaviour
                 mountainsShadowParent.transform.localScale = new Vector3(mountainsShadowParent.transform.localScale.x, mountainsShadowParent.transform.localScale.y, shadowScaling[1]);
                 break;
             case LocalWorldManager.TimeOfDay.Night:
-                mountainsShadow.gameObject.SetActive(false);
+                mountainsShadow.gameObject.SetActive(true);
+                mountainsShadowParent.transform.localScale = new Vector3(mountainsShadowParent.transform.localScale.x, mountainsShadowParent.transform.localScale.y, shadowScaling[0]);
                 break;
             case LocalWorldManager.TimeOfDay.Sunrise:
                 mountainsShadow.gameObject.SetActive(false);

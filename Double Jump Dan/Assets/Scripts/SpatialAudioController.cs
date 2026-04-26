@@ -18,7 +18,7 @@ public class SpatialAudioController : MonoBehaviour
     void Start()
     {
         audioManager = AudioManager.Instance;    
-        _camera = Camera.main;
+        _camera = LevelManager.Instance.mainCamera;
         audioSource = GetComponent<AudioSource>();
 
         maxVolume = audioManager.sfxVolumePercent;

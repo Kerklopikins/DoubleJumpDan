@@ -23,7 +23,7 @@ public class LavaGun : MonoBehaviour
     void Start()
     {
         lava = GetComponent<ParticleSystem>();
-        player = GameObject.FindWithTag("Player").GetComponent<Player>();
+        player = LevelManager.Instance.player;
         player.spriteMaterials.Add(glowSprite);
         lavaEmission = lava.emission;
         lavaStartEmission = lavaEmission.rateOverTime.constantMax;
