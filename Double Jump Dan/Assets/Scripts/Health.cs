@@ -104,6 +104,14 @@ public class Health : MonoBehaviour
         _hurtTimer = hurtTimer;
         health -= damage;
 
+        //FloatingNumberProperties numberProperties = new FloatingNumberProperties();
+        //numberProperties.number = damage;
+        //numberProperties.position = transform.position;
+        //numberProperties.plusOrMinus = false;
+        //numberProperties.color = Color.red;
+        
+        //PoolManager.Instance.ReuseObject("Floating Numbers", numberProperties);
+
         if(health > 0)
             if(hurtSound != null)
                 AudioManager.Instance.PlaySound2D(hurtSound);

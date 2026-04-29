@@ -2,13 +2,19 @@ using UnityEngine;
 using System;
 using UnityEngine.InputSystem;
 using System.Collections;
+using System.Linq;
+using UnityEngine.InputSystem.Controls;
 
 public class GameInputManager : MonoBehaviour
 {
     public static GameInputManager Instance;
 
     [SerializeField] InputActionAsset inputActions;
-
+    
+    public float HorizontalInputSensitivity { get; private set; }
+    public float VerticalInputSensitivity { get; private set; }
+    public InputMode inputMode { get; private set; }
+    public enum InputMode { KeyboardAndMouse, Controller }
     public event Action<bool> OnControllerChanged;
     InputAction move;
     InputAction shoot;
@@ -27,17 +33,16 @@ public class GameInputManager : MonoBehaviour
     InputAction leftTrigger;
     InputAction leftBumper;
     InputAction rightBumper;
+    InputAction cursorPress;
     Camera _camera;
     Coroutine rumbleCoroutine;
-    bool controllerConnectionState;
+    public static bool IsControllerConnected;
+    Gamepad currentGamepad;
 
     void Awake()
     {
         Instance = this;
-    }
 
-    void OnEnable()
-    {
         move = inputActions.FindAction("Move");
         jump = inputActions.FindAction("Jump");
         strafe = inputActions.FindAction("Strafe");
@@ -55,6 +60,8 @@ public class GameInputManager : MonoBehaviour
         leftTrigger = inputActions.FindAction("Left Trigger");
         leftBumper = inputActions.FindAction("Left Bumper");
         rightBumper = inputActions.FindAction("Right Bumper");
+        cursorPress = inputActions.FindAction("Cursor Press");
+
         move.Enable();
         jump.Enable();
         strafe.Enable();
@@ -72,27 +79,10 @@ public class GameInputManager : MonoBehaviour
         leftTrigger.Enable();
         leftBumper.Enable();
         rightBumper.Enable();
-    }
+        cursorPress.Enable();
 
-    void OnDisable()
-    {
-        move.Disable();
-        jump.Enable();
-        strafe.Disable();
-        shoot.Disable();
-        reload.Disable();
-        pause.Disable();
-        escape.Disable();
-        enter.Disable();
-        screenshot.Disable();
-        devMode.Disable();
-        aim.Disable();
-        click.Disable();
-        joystickMove.Disable();
-        point.Disable();
-        leftTrigger.Disable();
-        leftBumper.Disable();
-        rightBumper.Disable();
+        HorizontalInputSensitivity = 0.2f;
+        VerticalInputSensitivity = 0.5f;
     }
 
     void Start()
@@ -102,25 +92,70 @@ public class GameInputManager : MonoBehaviour
         else
             _camera = Camera.main;
 
-        controllerConnectionState = ControllerConnected();
-        OnControllerChanged?.Invoke(ControllerConnected());
-    }
-
-    void Update()
-    {
-        if(controllerConnectionState != ControllerConnected())
-        {
-            OnControllerChanged?.Invoke(ControllerConnected());
-            controllerConnectionState = ControllerConnected();
-        }
+        if(ControllerConnected())
+            SetInput(InputMode.Controller);
+        else
+            SetInput(InputMode.KeyboardAndMouse);
     }
 
     public bool ControllerConnected()
     {
-        if(Gamepad.all.Count > 0)
-            return true;
-        else
-            return false;
+        return IsControllerConnected;
+    }
+
+    void Update()
+    {
+        if(Gamepad.current != null)
+        {
+            currentGamepad = Gamepad.current;
+            
+            if(currentGamepad.leftStick.ReadValue().magnitude > 0.1f || currentGamepad.rightStick.ReadValue().magnitude > 0.1f)
+            {
+                SetInput(InputMode.Controller);
+                return;
+            }
+
+            foreach(var control in currentGamepad.allControls)
+            {
+                if(control is ButtonControl button && button.wasPressedThisFrame)
+                {
+                    SetInput(InputMode.Controller);
+                    return;
+                }
+            }
+        }    
+
+        if(Mouse.current != null && Mouse.current.leftButton.wasPressedThisFrame || Mouse.current.rightButton.wasPressedThisFrame)
+        {
+            SetInput(InputMode.KeyboardAndMouse);
+            return;
+        }
+
+        if(Keyboard.current != null && Keyboard.current.anyKey.wasPressedThisFrame)
+        {
+            SetInput(InputMode.KeyboardAndMouse);
+            return;
+        }
+    }
+
+    void SetInput(InputMode newMode)
+    {
+        if(inputMode == newMode)
+            return;
+
+        inputMode = newMode;
+
+        if(inputMode == InputMode.KeyboardAndMouse)
+        {
+            OnControllerChanged?.Invoke(false);
+            IsControllerConnected = false;           
+        }
+
+        if(inputMode == InputMode.Controller)
+        {
+            OnControllerChanged?.Invoke(true);
+            IsControllerConnected = true;
+        }
     }
 
     public float GetHorizontalInput()
@@ -239,6 +274,14 @@ public class GameInputManager : MonoBehaviour
     public bool DevModeButtonDown()
     {
         if(devMode.WasPressedThisFrame())
+            return true;
+        else
+            return false;
+    }
+
+    public bool CursorPress()
+    {
+        if(cursorPress.IsPressed())
             return true;
         else
             return false;

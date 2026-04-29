@@ -8,8 +8,11 @@ public class ExitUIArea : MonoBehaviour
     [SerializeField] float animationLength;
     public UIScreenManager uIScreenManager;
     [SerializeField] AudioClip exitSound;
+    [SerializeField] bool saveGameDataOnExit;
+    [SerializeField] SettingsManager settingsManager;
 
     GameInputManager gameInputManager;
+    LevelLoadingManager levelLoadingManager;
     MiniPanel miniPanel;
     Animator animator;
     public enum PanelType { Normal, Mini }
@@ -17,6 +20,7 @@ public class ExitUIArea : MonoBehaviour
     void Start()
     {
         gameInputManager = GameInputManager.Instance;    
+        levelLoadingManager = LevelLoadingManager.Instance;
 
         if(panelType == PanelType.Mini)
             miniPanel = GetComponent<MiniPanel>();
@@ -42,6 +46,9 @@ public class ExitUIArea : MonoBehaviour
 
     void Update()
     { 
+        if(levelLoadingManager.busy)
+            return;
+            
         if(uIScreenManager.transitionTimer <= 0)
         {
             if(gameInputManager.EscapeButtonDown())
@@ -52,9 +59,15 @@ public class ExitUIArea : MonoBehaviour
                     {
                         case PanelType.Normal:
                             uIScreenManager.OpenPanel(previousPanel);
+                            
+                            if(saveGameDataOnExit)
+                                settingsManager.SaveSettings();
                             break;
                         case PanelType.Mini:
                             miniPanel.Close(animator);
+
+                            if(saveGameDataOnExit)
+                                settingsManager.SaveSettings();
                             break;
                     }
                     

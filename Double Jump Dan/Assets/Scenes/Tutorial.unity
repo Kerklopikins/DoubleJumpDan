@@ -84,10 +84,7 @@ Transform:
   - {fileID: 231323935}
   - {fileID: 597125682}
   - {fileID: 1534625744}
-  - {fileID: 1539828276}
-  - {fileID: 355880638}
-  - {fileID: 148083273}
-  - {fileID: 1265598553}
+  - {fileID: 1178720479}
   - {fileID: 1173314033}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -270,7 +267,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 470}
+  m_Father: {fileID: 1178720479}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &148083274
 MonoBehaviour:
@@ -580,7 +577,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 470}
+  m_Father: {fileID: 1178720479}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &355880639
 MonoBehaviour:
@@ -692,10 +689,9 @@ TextMesh:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 423493951}
-  m_Text: 'Press A or Left Arrow to move left
+  m_Text: 'WASD, Arrow Keys, or Left Stick
 
-    Press D or Right Arrow to move
-    right'
+    to move'
   m_OffsetZ: 0
   m_CharacterSize: 0.18
   m_LineSpacing: 1
@@ -805,7 +801,7 @@ TextMesh:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 498611886}
-  m_Text: Hold SHIFT to strafe
+  m_Text: SHIFT or Right Bumper to strafe
   m_OffsetZ: 0
   m_CharacterSize: 0.18
   m_LineSpacing: 1
@@ -978,7 +974,10 @@ TextMesh:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 879459022}
-  m_Text: Make sure to shoot this evil alien thing.
+  m_Text: 'Make sure to shoot these alien things!
+
+    Or not, if you truly, deeply
+    care about them.'
   m_OffsetZ: 0
   m_CharacterSize: 0.18
   m_LineSpacing: 1
@@ -1088,9 +1087,10 @@ TextMesh:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1026457222}
-  m_Text: 'Left Click to shoot
+  m_Text: 'Left Click or Right Trigger to shoot
 
-    Right Click or R to reload'
+    Right Click, R, or (X)/(O) on
+    Controller to reload'
   m_OffsetZ: 0
   m_CharacterSize: 0.18
   m_LineSpacing: 1
@@ -1185,7 +1185,9 @@ TextMesh:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1046751918}
-  m_Text: Press SPACE to jump
+  m_Text: 'SPACE or Left Trigger
+
+    to jump'
   m_OffsetZ: 0
   m_CharacterSize: 0.18
   m_LineSpacing: 1
@@ -1250,7 +1252,7 @@ Transform:
   m_GameObject: {fileID: 1046751918}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 21, y: 7, z: 0}
+  m_LocalPosition: {x: 21, y: 8, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -3179,6 +3181,41 @@ Transform:
   - {fileID: 302723150}
   m_Father: {fileID: 470}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1178720478
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1178720479}
+  m_Layer: 0
+  m_Name: Background
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1178720479
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1178720478}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 1539828276}
+  - {fileID: 355880638}
+  - {fileID: 148083273}
+  - {fileID: 1265598553}
+  m_Father: {fileID: 470}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1260674900
 GameObject:
   m_ObjectHideFlags: 0
@@ -3241,7 +3278,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 470}
+  m_Father: {fileID: 1178720479}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1265598554
 MonoBehaviour:
@@ -3551,7 +3588,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 470}
+  m_Father: {fileID: 1178720479}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!850595691 &1839127471
 LightingSettings:
@@ -3656,7 +3693,7 @@ TextMesh:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1986836534}
-  m_Text: Press SPACE 2x to double jump
+  m_Text: SPACE or Left Trigger 2x to double jump
   m_OffsetZ: 0
   m_CharacterSize: 0.18
   m_LineSpacing: 1

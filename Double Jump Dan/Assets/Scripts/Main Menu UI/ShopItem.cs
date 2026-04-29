@@ -24,22 +24,21 @@ public class ShopItem : MonoBehaviour
     Text damageText;
 	RectTransform rectTransform;
 	Image image;
-	ItemManager itemManager;
 	Button buyButton;
 
 	ConfirmPurchase confirmPurchase;
     Text priceText;
     Animator confirmPurchaseAnimator;
-	bool checkedVisibilityAfterScaling;
 	List<GameObject> children = new List<GameObject>();
 	float lastStep;
 	RectTransform contentHolder;
 	RectTransform rect;
+	RectTransform itemPictureRect;
+	MainMenuManager mainMenuManager;
 
 	void Awake()
 	{
 		gameManager = GameManager.Instance;
-		itemManager = shopManager.itemManager;
 		equipButton = GetComponentInChildren<Button>();
 		equipButtonText = equipButton.GetComponentInChildren<Text>();
 		rectTransform = GetComponent<RectTransform>();
@@ -49,6 +48,7 @@ public class ShopItem : MonoBehaviour
 		equipButton.onClick.AddListener(OnEquipButtonClicked);
 		shopManager.OnShopItemsChanged += Refresh;
 		shopManager.OnShopTabsChanged += UpdateVisibility;
+		mainMenuManager = shopManager.GetComponent<MainMenuManager>();
 
 		for(int i = 0; i < transform.childCount; i++)
 			children.Add(transform.GetChild(i).gameObject);
@@ -84,61 +84,64 @@ public class ShopItem : MonoBehaviour
             damageFillPivot = transform.Find("Damage").GetChild(0).GetComponent<RectTransform>();
             damageText = transform.Find("Damage Text").GetComponent<Text>();
 
-            foreach(var _gun in itemManager.guns)
-            {
-                GunInfo gunInfo = _gun.GetComponent<GunInfo>();
+			GunInfo gunInfo = item.GetComponent<GunInfo>();
 
-                if(_gun.itemID == item.itemID)
-                {
-                    switch(gunInfo._fireRate)
-                    {
-                        case GunInfo.FireRate.ExtremelySlow:
-                            fireRateImage.sprite = fireRateSprites[0];
-                            break;
-                        case GunInfo.FireRate.VerySlow:
-                            fireRateImage.sprite = fireRateSprites[1];
-                            break;
-                        case GunInfo.FireRate.Slow:
-                            fireRateImage.sprite = fireRateSprites[2];
-                            break;
-                        case GunInfo.FireRate.Normal:
-                            fireRateImage.sprite = fireRateSprites[3];
-                            break;
-                        case GunInfo.FireRate.Fast:
-                            fireRateImage.sprite = fireRateSprites[4];
-                            break;
-                        case GunInfo.FireRate.VeryFast:
-                            fireRateImage.sprite = fireRateSprites[5];
-                            break;
-                        case GunInfo.FireRate.ExtremelyFast:
-                            fireRateImage.sprite = fireRateSprites[6];
-                            break;
-                    }
+			switch(gunInfo._fireRate)
+			{
+				case GunInfo.FireRate.ExtremelySlow:
+					fireRateImage.sprite = fireRateSprites[0];
+					break;
+				case GunInfo.FireRate.VerySlow:
+					fireRateImage.sprite = fireRateSprites[1];
+					break;
+				case GunInfo.FireRate.Slow:
+					fireRateImage.sprite = fireRateSprites[2];
+					break;
+				case GunInfo.FireRate.Normal:
+					fireRateImage.sprite = fireRateSprites[3];
+					break;
+				case GunInfo.FireRate.Fast:
+					fireRateImage.sprite = fireRateSprites[4];
+					break;
+				case GunInfo.FireRate.VeryFast:
+					fireRateImage.sprite = fireRateSprites[5];
+					break;
+				case GunInfo.FireRate.ExtremelyFast:
+					fireRateImage.sprite = fireRateSprites[6];
+					break;
+			}
 
-					float damagePercent = (float)gunInfo.damage / 100;
-                    damageFillPivot.localScale = new Vector3(damagePercent, 1, 1);
-                    damageText.text = "Damage: " + gunInfo.damage;
+			float damagePercent = (float)gunInfo.damage / 100;
+			damageFillPivot.localScale = new Vector3(damagePercent, 1, 1);
+			damageText.text = "Damage: " + gunInfo.damage;
 
-                    if(gunInfo.fireMode == GunInfo.FireMode.Single)
-                        fireModeText.text = " Fire Mode - Single";
-                    else if(gunInfo.fireMode == GunInfo.FireMode.Automatic)
-                        fireModeText.text = "Fire Mode - Automatic";
-					else if(gunInfo.fireMode == GunInfo.FireMode.Burst)
-                        fireModeText.text = "Fire Mode - Burst";
-                }
-            }
+			if(gunInfo.fireMode == GunInfo.FireMode.Single)
+				fireModeText.text = " Fire Mode - Single";
+			else if(gunInfo.fireMode == GunInfo.FireMode.Automatic)
+				fireModeText.text = "Fire Mode - Automatic";
+			else if(gunInfo.fireMode == GunInfo.FireMode.Burst)
+				fireModeText.text = "Fire Mode - Burst";
 		}
 
 		transform.Find("Title Text").GetComponent<Text>().text = transform.name;
 
 		if(itemPicture != null)
+		{
+			itemPictureRect = itemPicture.GetComponent<RectTransform>();
 			itemPicture.sprite = item.picture;
+			itemPicture.SetNativeSize();
+
+			if(itemPictureRect.sizeDelta.x > 248)
+				itemPictureRect.sizeDelta = new Vector2(248, itemPictureRect.sizeDelta.y);
+		}
 
 		if(descriptionText != null)
 			descriptionText.text = item.description;
 		
 		UpdateVisibility();
 		Refresh();
+
+		mainMenuManager.shopItems.Add(gameObject);
 	}
 
     public void Refresh()

@@ -97,7 +97,7 @@ public class LightningGun : MonoBehaviour
         Vector3 gunDirection = new Vector3();
         
         if(transform.lossyScale.x < 0)
-            gunDirection = firePoint.right;
+            gunDirection = -firePoint.right;
         else if(transform.lossyScale.x > 0)
             gunDirection = firePoint.right;
 

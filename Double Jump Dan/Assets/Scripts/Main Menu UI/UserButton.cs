@@ -1,7 +1,6 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
-using System.Collections.Generic;
 
 public class UserButton : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IPointerUpHandler, IPointerDownHandler, IPointerClickHandler
 {
@@ -21,11 +20,14 @@ public class UserButton : MonoBehaviour, IPointerEnterHandler, IPointerExitHandl
     bool isPointerOver;
     bool isPointerDown;
     Image buttonImage;
-    
+    MainMenuManager mainMenuManager;
+
 	void Start() 
 	{
         gameManager = GameManager.Instance;
         userMenu = GameObject.FindWithTag("Main Menu").GetComponent<UserMenu>();
+        mainMenuManager = userMenu.GetComponent<MainMenuManager>();
+
         button = GetComponent<Button>();
         buttonImage = GetComponent<Image>();
 
@@ -49,6 +51,8 @@ public class UserButton : MonoBehaviour, IPointerEnterHandler, IPointerExitHandl
 
         userMenu.OnUserButtonsRefresh += Refresh;
         userMenu.OnButtonsDisabled += ButtonDisable;
+
+        mainMenuManager.initialUserButtons.Add(gameObject);
 	}
     
     public void Remove()

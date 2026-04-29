@@ -283,8 +283,8 @@
                 },
                 {
                     "name": "",
-                    "id": "01f759e0-1fdb-4fb3-b77c-acecd55fff01",
-                    "path": "<Gamepad>/leftStickPress",
+                    "id": "a221bdaa-2bd6-4602-a8e9-ed98bd005089",
+                    "path": "<Gamepad>/rightShoulder",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
@@ -382,17 +382,6 @@
                     "name": "",
                     "id": "304584f7-fbf3-420d-90b0-10c45b8706e9",
                     "path": "<Gamepad>/start",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "",
-                    "action": "Pause",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
-                    "id": "b08e0c63-263a-4952-9467-92926cf39add",
-                    "path": "<Gamepad>/buttonEast",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
@@ -604,6 +593,15 @@
                     "name": "Right Bumper",
                     "type": "Button",
                     "id": "7ac6fbdd-d2ba-48cc-985d-da87a2cf0c8a",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "Cursor Press",
+                    "type": "Button",
+                    "id": "366a5c4f-3240-4fd9-9af9-6d417434a613",
                     "expectedControlType": "Button",
                     "processors": "",
                     "interactions": "",
@@ -987,6 +985,17 @@
                 },
                 {
                     "name": "",
+                    "id": "a3dd4d84-39c3-4abe-bc54-e7cf85ffee62",
+                    "path": "<Gamepad>/rightTrigger",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Click",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
                     "id": "e5f08a70-3fa7-48a5-b88d-54a5d69f1126",
                     "path": "<Mouse>/scroll",
                     "interactions": "",
@@ -1092,6 +1101,28 @@
                     "processors": "",
                     "groups": "",
                     "action": "Right Bumper",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "5e2b36f3-e5ad-46cd-b414-7a913354bd15",
+                    "path": "<Gamepad>/buttonSouth",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Cursor Press",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "ebe81fb1-0934-420e-afea-c9db4925736a",
+                    "path": "<Gamepad>/rightTrigger",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Cursor Press",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

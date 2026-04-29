@@ -259,7 +259,7 @@ public class Gun : MonoBehaviour
                     }
                     else
                     {
-                        bullets[i].localScale = new Vector3(shotDistance, 1, 1);
+                        bullets[i].localScale = new Vector3(shotDistance * 0.5f, 1, 1);
                     }
                     
                     StartCoroutine(DeactivateBullet());

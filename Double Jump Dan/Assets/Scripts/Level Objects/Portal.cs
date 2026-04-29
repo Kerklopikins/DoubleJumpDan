@@ -67,7 +67,7 @@ public class Portal : MonoBehaviour
             if(!player.CanHandleInput())
                 return;
 
-            if(gameInputManager.GetVerticalInput() > 0 && inPortal && !initiated)
+            if(gameInputManager.GetVerticalInput() > gameInputManager.VerticalInputSensitivity && inPortal && !initiated)
                 Teleport();
         }
         else

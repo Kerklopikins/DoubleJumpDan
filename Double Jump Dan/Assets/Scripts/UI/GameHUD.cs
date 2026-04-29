@@ -13,7 +13,7 @@ public class GameHUD: MonoBehaviour
     [Header("Pause Menu")]
     [SerializeField] Button pauseButton;
     [SerializeField] Animator pauseAnimator;
-    [SerializeField] AudioClip pauseSound;
+    public AudioClip pauseSound;
     [SerializeField] Text pausedText;
     [SerializeField] Button[] pauseMenuButtons;
 
@@ -31,20 +31,21 @@ public class GameHUD: MonoBehaviour
     [Header("Settings")]
     [SerializeField] GameObject settings;
     
-    [Header("Controller")]
+    [Header("Joystick")]
     [SerializeField] RectTransform cursor;
-    [SerializeField] float cursorSpeed;
+    [SerializeField] Sprite[] cursorSprites;
 
     [Header("Player Crosshairs")]
     public Transform crosshairsParent;
     public Transform crosshairs;
     [SerializeField] float maxCrosshairsRadius = 10;
-    [SerializeField] float crosshairsSmoothSpeed = 8;
     [SerializeField] Sprite[] crosshairSprites;
-    [SerializeField] float crosshairAnimationSpeed = 0.1f;
+    [SerializeField] float crosshairsAnimationSpeed = 0.1f;
 
     public bool paused { get; protected set; }
     public bool canPause { get; set; }
+    public float cursorSpeed { get; set; }
+    public float crosshairsSmoothSpeed { get; set; }
     public static float referenceTime;
     float startDelay = 1;
     Player player;
@@ -62,9 +63,13 @@ public class GameHUD: MonoBehaviour
     float currentAngle;
     int crosshairAnimationIndex;
     SpriteRenderer crosshairsSprite;
-    float crosshairAnimationTimer;
+    float crosshairsAnimationTimer;
     float _cursorSpeed;
+    float _crosshairsAnimationSpeed;
     bool finishedLevel;
+    bool crosshairsRed;
+    SettingsManager settingsManager;
+    Image cursorImage;
 
     void Awake()
     {
@@ -79,6 +84,7 @@ public class GameHUD: MonoBehaviour
         levelNameText.text = SceneManager.GetActiveScene().name + " Completed";
         pauseButtonRect = pauseButton.GetComponent<RectTransform>();
         gameInputManager = GameInputManager.Instance;
+        settingsManager = GetComponent<SettingsManager>();
 
         player.OnPlayerKilled += PlayerKilled;
         player.OnPlayerRespawn += PlayerRespawn;
@@ -92,14 +98,15 @@ public class GameHUD: MonoBehaviour
         cursor.transform.localScale = Vector3.zero;
         _cursorSpeed = cursorSpeed;
         canvas = GetComponent<Canvas>();
+        cursorImage = cursor.gameObject.GetComponent<Image>();
+
+        position = new Vector2(Screen.width / 2, Screen.height / 4);
+
+        InputState.Change(Mouse.current.position, position);
+        InputState.Change(Mouse.current.delta, Vector2.zero);
 
         if(gameInputManager.ControllerConnected())
-        {
-            position = new Vector2(Screen.width / 2, Screen.height / 4);
-
-            InputState.Change(Mouse.current.position, position);
-            InputState.Change(Mouse.current.delta, Vector2.zero);
-            
+        {    
             Cursor.visible = false;
 
             cursor.gameObject.SetActive(true);
@@ -107,8 +114,8 @@ public class GameHUD: MonoBehaviour
         }
 
         crosshairsSprite = crosshairs.GetComponent<SpriteRenderer>();
-        crosshairAnimationTimer = crosshairAnimationSpeed;
     }
+
     public void SubscribeToGun(GunInfo _gunInfo)
     {
         gunInfo = _gunInfo;
@@ -140,7 +147,8 @@ public class GameHUD: MonoBehaviour
 
     void FixedUpdate()
     {
-        crosshairsParent.position = player.transform.position;
+        if(gameInputManager.ControllerConnected())
+            crosshairsParent.position = player.transform.position;
     }
 
     void Update()
@@ -148,7 +156,7 @@ public class GameHUD: MonoBehaviour
         if(gameInputManager.ControllerConnected())
         {
             ///Main Cursor
-            if(paused || finishedLevel)
+            if(paused || finishedLevel || screenshotScript.frozen)
             {
                 input = gameInputManager.GetJoystickMovement();
 
@@ -168,6 +176,11 @@ public class GameHUD: MonoBehaviour
                 screenPosition = Mouse.current.position.ReadValue();
                 RectTransformUtility.ScreenPointToLocalPointInRectangle(canvas.transform as RectTransform, screenPosition, canvas.worldCamera, out Vector2 localPosition);
                 cursor.anchoredPosition = localPosition;
+
+                if(gameInputManager.CursorPress())
+                    cursorImage.sprite = cursorSprites[1];
+                else
+                    cursorImage.sprite = cursorSprites[0];
             }
 
             ///Player Crosshairs
@@ -185,9 +198,20 @@ public class GameHUD: MonoBehaviour
             Vector2 direction = new Vector2(Mathf.Cos(angleRad), Mathf.Sin(angleRad));
             crosshairs.localPosition = direction * maxCrosshairsRadius;
 
-            crosshairAnimationTimer -= Time.deltaTime;
+            crosshairsAnimationTimer -= Time.deltaTime;
 
-            if(crosshairAnimationTimer <= 0)
+            if(gameInputManager.ShootButton() && CanPause() && !paused)
+            {
+                _crosshairsAnimationSpeed = crosshairsAnimationSpeed * 0.5f;
+                crosshairsSprite.color = crosshairsRed ? Color.red : Color.yellow;
+            }
+            else
+            {
+                _crosshairsAnimationSpeed = crosshairsAnimationSpeed;
+                crosshairsSprite.color = Color.white;
+            }
+                
+            if(crosshairsAnimationTimer <= 0)
             {
                 crosshairAnimationIndex++;
 
@@ -195,7 +219,9 @@ public class GameHUD: MonoBehaviour
                     crosshairAnimationIndex = 0;
 
                 crosshairsSprite.sprite = crosshairSprites[crosshairAnimationIndex];
-                crosshairAnimationTimer = crosshairAnimationSpeed;
+                crosshairsAnimationTimer = _crosshairsAnimationSpeed;
+                
+                crosshairsRed = !crosshairsRed;
             }
         }
 
@@ -218,9 +244,19 @@ public class GameHUD: MonoBehaviour
             pauseButton.interactable = true;
 
         if(CanPause())
-            if(gameInputManager.PauseButtonDown())
-                TogglePause();
-        
+        {
+            if(!paused)
+            {
+                if(gameInputManager.PauseButtonDown())
+                    TogglePause();
+            }
+            else if(paused)
+            {
+                if(gameInputManager.EscapeButtonDown() || gameInputManager.PauseButtonDown())
+                    TogglePause();
+            }
+        }
+            
         if(gameInputManager.EscapeButtonDown())
             ToggleSettings(false);
     }
@@ -237,11 +273,8 @@ public class GameHUD: MonoBehaviour
         referenceTime = 0;
         Time.timeScale = 0;
 
-        position = new Vector2(Screen.width / 2, Screen.height / 4);
-        InputState.Change(Mouse.current.position, position);
-        InputState.Change(Mouse.current.delta, Vector2.zero);
-
-        StartCoroutine(ScaleCursor(Vector3.zero, Vector3.one));
+        ResetCursorPosition();
+        ScaleCursor(Vector3.zero, Vector3.one);
 
         for(int i = 0; i < pauseMenuButtons.Length; i++)
             pauseMenuButtons[i].interactable = false;
@@ -263,7 +296,7 @@ public class GameHUD: MonoBehaviour
         canPause = false;
         canToggleSettings = false;
 
-        StartCoroutine(ScaleCursor(Vector3.one, Vector3.zero));
+        ScaleCursor(Vector3.one, Vector3.zero);
 
         for(int i = 0; i < pauseMenuButtons.Length; i++)
             pauseMenuButtons[i].interactable = false;
@@ -279,7 +312,22 @@ public class GameHUD: MonoBehaviour
         canPause = true;
     }
 
-    IEnumerator ScaleCursor(Vector3 from, Vector3 to)
+    public void ScaleCursor(Vector3 from, Vector3 to)
+    {
+        StartCoroutine(ScaleCursorCo(from, to));
+    }
+
+    public void ResetCursorPosition()
+    {
+        if(gameInputManager.ControllerConnected())
+        {
+            position = new Vector2(Screen.width / 2, Screen.height / 4);
+            InputState.Change(Mouse.current.position, position);
+            InputState.Change(Mouse.current.delta, Vector2.zero);
+        }
+    }
+    
+    IEnumerator ScaleCursorCo(Vector3 from, Vector3 to)
     {
         float inTime = 0;
         float duration = 0.35f;
@@ -317,11 +365,8 @@ public class GameHUD: MonoBehaviour
         {
             finishedLevel = true;
 
-            position = new Vector2(Screen.width / 2, Screen.height / 4);
-            InputState.Change(Mouse.current.position, position);
-            InputState.Change(Mouse.current.delta, Vector2.zero);
-
-            StartCoroutine(ScaleCursor(Vector3.zero, Vector3.one));
+            ResetCursorPosition();            
+            ScaleCursor(Vector3.zero, Vector3.one);
 
             levelCompleteUI.SetActive(true);
         }
@@ -401,7 +446,8 @@ public class GameHUD: MonoBehaviour
         canToggleSettings = false;
         pauseAnimator.SetBool("Settings", false);
         AudioManager.Instance.PlaySound2D(pauseSound);
-
+        settingsManager.SaveSettings();
+        
         yield return new WaitForSecondsRealtime(0.45f);
 
         settings.SetActive(false);

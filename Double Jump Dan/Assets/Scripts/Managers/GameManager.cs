@@ -7,7 +7,6 @@ using System.Security.Cryptography;
 using System.Text;
 using UnityEngine.SceneManagement;
 
-
 public class GameManager : MonoBehaviour
 {
     public static GameManager Instance { get; private set; }
@@ -22,6 +21,8 @@ public class GameManager : MonoBehaviour
     [HideInInspector] public int frameRate = -1;
     [HideInInspector] public bool vSync = true;
     [HideInInspector] public bool showPerformanceData = false;
+    [HideInInspector] public float aimSensitivity = 0.5f; 
+    [HideInInspector] public float cursorSensitivity = 0.5f; 
     [HideInInspector] public bool postProcessing = true;
     [HideInInspector] public bool distortionEffects = true;
     [HideInInspector] public bool weatherEffects = true;
@@ -131,6 +132,8 @@ public class GameManager : MonoBehaviour
         gameData.frameRate = frameRate;
         gameData.vSync = vSync;
         gameData.showPerformanceData = showPerformanceData;
+        gameData.aimSensitivity = aimSensitivity;
+        gameData.cursorSensitivity = cursorSensitivity;
         gameData.postProcessing = postProcessing;
         gameData.distortionEffects = distortionEffects;
         gameData.weatherEffects = weatherEffects;
@@ -162,6 +165,8 @@ public class GameManager : MonoBehaviour
             frameRate = gameData.frameRate;
             vSync = gameData.vSync;
             showPerformanceData = gameData.showPerformanceData;
+            aimSensitivity = gameData.aimSensitivity;
+            cursorSensitivity = gameData.cursorSensitivity;
             postProcessing = gameData.postProcessing;
             distortionEffects = gameData.distortionEffects;
             weatherEffects = gameData.weatherEffects;
@@ -342,6 +347,8 @@ public class GameData
     public int frameRate;
     public bool vSync;
     public bool showPerformanceData;
+    public float aimSensitivity; 
+    public float cursorSensitivity; 
     public bool postProcessing;
     public bool distortionEffects;
     public bool weatherEffects;

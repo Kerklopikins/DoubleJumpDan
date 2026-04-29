@@ -26,11 +26,14 @@ public class SettingsManager : MonoBehaviour
     [SerializeField] Button changeFrameRateButton;
 	[SerializeField] Toggle vSyncToggle;
     [SerializeField] Toggle showFPSToggle;
+    [SerializeField] Slider aimSensitivitySlider;
+    [SerializeField] Slider cursorSensitivitySlider;
     
     public MainMenuManager mainMenuManager { get; private set; }
     List<Vector2> screenResolutions = new List<Vector2>();
     List<int> frameRates = new List<int>();
     GameManager gameManager;
+    GameHUD gameHUD;
 
     void Start()
     {
@@ -38,6 +41,8 @@ public class SettingsManager : MonoBehaviour
 
         if(GetComponent<MainMenuManager>() != null)
             mainMenuManager = GetComponent<MainMenuManager>();
+        else if(GetComponent<GameHUD>() != null)
+            gameHUD = GetComponent<GameHUD>();
 
         volumeSliders[0].value = gameManager.sfxVolume;
         volumeSliders[1].value = gameManager.musicVolume;
@@ -93,13 +98,23 @@ public class SettingsManager : MonoBehaviour
         
             if(!gameManager.vSync)
                 Application.targetFrameRate = frameRates[gameManager.frameRate];
+
+            mainMenuManager.cursorSpeed = 1600 * cursorSensitivitySlider.value;
+
+            aimSensitivitySlider.value = gameManager.aimSensitivity;
+            cursorSensitivitySlider.value = gameManager.cursorSensitivity;
+
+            postProcessingToggle.isOn = gameManager.postProcessing;
+            distortionEffectsToggle.isOn = gameManager.distortionEffects;
+            weatherEffectsToggle.isOn = gameManager.weatherEffects;
+        }
+        else if(gameHUD != null)
+        {
+            gameHUD.cursorSpeed = 1600 * gameManager.cursorSensitivity;
+            gameHUD.crosshairsSmoothSpeed = 16 * gameManager.aimSensitivity;
         }
 
         UpdateFPSText(gameManager.showPerformanceData);
-
-        postProcessingToggle.isOn = gameManager.postProcessing;
-        distortionEffectsToggle.isOn = gameManager.distortionEffects;
-        weatherEffectsToggle.isOn = gameManager.weatherEffects;
     }
 
     public void RefreshFullscreenToggle()
@@ -157,6 +172,14 @@ public class SettingsManager : MonoBehaviour
         screenResolutionText.text = screenResolutions[(int)screenResolutionSlider.value].x.ToString() + "x" + screenResolutions[(int)screenResolutionSlider.value].y.ToString();
     }
 
+    public void RestoreDefaultControllerSettings()
+    {
+        aimSensitivitySlider.value = 0.5f;
+        cursorSensitivitySlider.value = 0.5f;
+
+        AdjustCursorSensitivity();
+    }
+
     public void UpdateFrameRateText()
     {
         if(!gameManager.vSync)
@@ -176,9 +199,21 @@ public class SettingsManager : MonoBehaviour
     {
         gameManager.musicVolume = volumeSliders[1].value;
         gameManager.sfxVolume = volumeSliders[0].value;
+
+        if(mainMenuManager != null)
+        {    
+            gameManager.aimSensitivity = aimSensitivitySlider.value;
+            gameManager.cursorSensitivity = cursorSensitivitySlider.value;
+        }
+
         gameManager.SaveData();
     }
 
+    public void AdjustCursorSensitivity()
+    {
+        mainMenuManager.cursorSpeed = 1600 * cursorSensitivitySlider.value;
+    }
+    
     public void AdjustSfxVolume()
     {
         AudioManager.Instance.sfxVolumePercent = volumeSliders[0].value;

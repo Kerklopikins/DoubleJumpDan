@@ -48,7 +48,9 @@ public class Screenshot : MonoBehaviour
         canShoot = false;
         frozen = true;
         Time.timeScale = 0;
-
+        gameHUD.ScaleCursor(Vector3.zero, Vector3.one);
+        gameHUD.ResetCursorPosition();
+        
         if(!Directory.Exists(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyPictures), "Double Jump Dan")))
             Directory.CreateDirectory(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyPictures), "Double Jump Dan"));
 
@@ -66,6 +68,9 @@ public class Screenshot : MonoBehaviour
     {
         canShoot = false;
         animator.SetBool("Screenshot", false);
+        gameHUD.ScaleCursor(Vector3.one, Vector3.zero);
+        AudioManager.Instance.PlaySound2D(gameHUD.pauseSound);
+        
         yield return new WaitForSecondsRealtime(0.35f);
         Time.timeScale = 1;
         frozen = false;

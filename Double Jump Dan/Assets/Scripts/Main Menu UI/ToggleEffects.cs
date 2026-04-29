@@ -17,9 +17,6 @@ public class ToggleEffects : MonoBehaviour, IPointerClickHandler
     {
 		if(gameObject.name == "Equip Button")
 			isEquipButton = true;
-		
-        if(toggleClick == null)
-            print(gameObject.name + " doesn't have a toggle click.");
 
 		if(!blankToggle)
 			animator = GetComponent<Animator>();

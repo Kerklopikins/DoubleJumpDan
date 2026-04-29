@@ -1794,10 +1794,6 @@ MonoBehaviour:
     prefab: {fileID: 5060079438404901527, guid: 3be47dee572b70148b4a245359145a1a,
       type: 3}
     poolSize: 150
-  - poolID: Floating Numbers
-    prefab: {fileID: 1402850895764712760, guid: 65711bf83d3f57645bd2cf6d67e64911,
-      type: 3}
-    poolSize: 10
 --- !u!114 &694510040
 MonoBehaviour:
   m_ObjectHideFlags: 0

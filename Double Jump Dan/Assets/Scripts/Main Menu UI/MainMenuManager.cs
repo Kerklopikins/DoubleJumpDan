@@ -2,8 +2,8 @@
 using UnityEngine.UI;
 using System.Collections;
 using UnityEngine.InputSystem;
-using UnityEngine.InputSystem.UI;
 using UnityEngine.InputSystem.LowLevel;
+using System.Collections.Generic;
 
 public class MainMenuManager : MonoBehaviour
 {
@@ -15,21 +15,28 @@ public class MainMenuManager : MonoBehaviour
     public Button tutorialButton;
     public Button statsButton;
 
+    [Header("Initialization")]
+    [SerializeField] GameObject shopGameObject;
+    [SerializeField] GameObject userMenuGameObject;
+    [SerializeField] GameObject screenshotsMenuGameObject;
+
+
     [Header("Tampered User File")]
     [SerializeField] Image tamperedUserFileImage;
     [SerializeField] Text tamperedUserFileText;
 
     [Header("Joystick")]
     public RectTransform cursor;
-    [SerializeField] float cursorSpeed;
     [SerializeField] Camera _camera;
     public float scrollSpeed;
+    [SerializeField] Sprite[] cursorSprites;
 
     ShopManager shopManager;
     UserMenu userMenu;
     UserStatsMenu userStatsMenu;
     LevelSelectMenu levelSelectMenu;
     SettingsManager settingsManager;
+    ScreenshotsMenu screenshotsMenu;
     Canvas canvas;
     Vector2 position;
     Vector2 screenPosition;
@@ -38,6 +45,17 @@ public class MainMenuManager : MonoBehaviour
     GameInputManager gameInputManager;
     float _cursorSpeed;
     public float _scrollSpeed { get; set; }
+    public float cursorSpeed { get; set; }
+    Image cursorImage;
+    [HideInInspector]
+    public List<GameObject> initialUserButtons = new List<GameObject>();
+    [HideInInspector]
+    public List<GameObject> shopItems = new List<GameObject>();
+    [HideInInspector]
+    public int screenshotsCount { get; set; }
+    int initialUserCount;
+    int shopItemCount;
+    bool initialized;
 
     void Start()
     {
@@ -47,8 +65,20 @@ public class MainMenuManager : MonoBehaviour
         userStatsMenu = GetComponent<UserStatsMenu>();
         levelSelectMenu = GetComponent<LevelSelectMenu>();
         settingsManager = GetComponent<SettingsManager>();
+        screenshotsMenu = GetComponent<ScreenshotsMenu>();
+
+        shopGameObject.SetActive(true);
+        userMenuGameObject.SetActive(true);
+        screenshotsMenuGameObject.SetActive(true);
+
         gameInputManager = GameInputManager.Instance;
-        
+
+        initialUserCount = GameManager.Instance.users.Count;
+
+        shopItemCount += shopManager.itemManager.guns.Count;
+        shopItemCount += shopManager.itemManager.hats.Count;
+        shopItemCount += shopManager.itemManager.skins.Count;
+
         if(playButton == null || shopButton == null || userButton == null || statsButton == null || settingsButton == null)
             Debug.LogError("Main Menu button is null");
             
@@ -61,20 +91,19 @@ public class MainMenuManager : MonoBehaviour
         gameInputManager.OnControllerChanged += OnControllerChanged;
 
         canvas = GetComponent<Canvas>();
-        _cursorSpeed = cursorSpeed;
+        cursorImage = cursor.gameObject.GetComponent<Image>();
+
+        position = new Vector2(Screen.width / 2, Screen.height / 2);
+        
+        InputState.Change(Mouse.current.position, position);
+        InputState.Change(Mouse.current.delta, Vector2.zero);
 
         if(gameInputManager.ControllerConnected())
-        {
-            position = new Vector2(Screen.width / 2, Screen.height / 1.5f);
-            
-            InputState.Change(Mouse.current.position, position);
-            InputState.Change(Mouse.current.delta, Vector2.zero);
-            
+        {    
             Cursor.visible = false;
             cursor.gameObject.SetActive(true);
         }
     }
-
     public void OnControllerChanged(bool enabled)
     {
         if(enabled)
@@ -88,10 +117,27 @@ public class MainMenuManager : MonoBehaviour
             cursor.gameObject.SetActive(false);
         }
     }
-
+    
     void Update()
     {
-       if(gameInputManager.ControllerConnected())
+        if(!initialized)
+        {
+            if(initialUserButtons.Count == initialUserCount && shopItems.Count == shopItemCount && screenshotsMenu.screenshotsCount == screenshotsCount)
+            {
+                initialized = true;
+
+                shopGameObject.SetActive(false);
+                userMenuGameObject.SetActive(false);
+
+                Canvas.ForceUpdateCanvases();
+                screenshotsMenu.Initialize();
+                screenshotsMenuGameObject.SetActive(false);
+            }
+
+            return;
+        }
+        
+        if(gameInputManager.ControllerConnected())
         {
             input = gameInputManager.GetJoystickMovement();
 
@@ -110,6 +156,11 @@ public class MainMenuManager : MonoBehaviour
             screenPosition = Mouse.current.position.ReadValue();
             RectTransformUtility.ScreenPointToLocalPointInRectangle(canvas.transform as RectTransform, screenPosition, canvas.worldCamera, out Vector2 localPosition);
             cursor.anchoredPosition = localPosition;
+
+            if(gameInputManager.CursorPress())
+                cursorImage.sprite = cursorSprites[1];
+            else
+                cursorImage.sprite = cursorSprites[0];
         }
 
         if(startDelay > 0)

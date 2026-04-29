@@ -11,16 +11,23 @@ public class LevelSelectMenu : MonoBehaviour
     public event Action OnLevelButtonsRefresh;
     MainMenuManager mainMenuManager;
     GameInputManager gameInputManager;
+    LevelLoadingManager levelLoadingManager;
 
     void Start()
     {
         mainMenuManager = GetComponent<MainMenuManager>();    
         gameInputManager = GameInputManager.Instance;
+        levelLoadingManager = LevelLoadingManager.Instance;
+
+        gameInputManager.OnControllerChanged += OnControllerChanged;
+
+        if(gameInputManager.ControllerConnected())
+            levelsScrollRect.inertia = false;
     }
 
     void Update()
     {
-        if(levelSelect.activeSelf == false)
+        if(levelSelect.activeSelf == false || levelLoadingManager.busy)
             return;
             
         if(gameInputManager.ControllerConnected())
@@ -33,10 +40,19 @@ public class LevelSelectMenu : MonoBehaviour
                     mainMenuManager._scrollSpeed = mainMenuManager.scrollSpeed;
 
                 levelsContent.anchoredPosition += new Vector2(0, -gameInputManager.AimDirection().y * mainMenuManager._scrollSpeed * Time.deltaTime);
-                levelsContent.anchoredPosition = new Vector2(levelsContent.anchoredPosition.x, Mathf.Clamp(levelsContent.anchoredPosition.y, 0, 918));
+                levelsContent.anchoredPosition = new Vector2(levelsContent.anchoredPosition.x, Mathf.Clamp(levelsContent.anchoredPosition.y, 0, levelsContent.sizeDelta.y - 524));
             }
         }
     }
+
+    public void OnControllerChanged(bool enabled)
+    {
+        if(enabled)
+            levelsScrollRect.inertia = false;
+        else
+            levelsScrollRect.inertia = true;
+    }
+
     public void RefreshLevels()
     {
         OnLevelButtonsRefresh?.Invoke();

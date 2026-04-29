@@ -14,28 +14,38 @@ public class ShopManager : MonoBehaviour
     public ScrollRect gunScrollRect;
     public ScrollRect hatScrollRect;
     public ScrollRect skinScrollRect;
+    public Vector2 minMaxVisibilityDistance;
+    public ItemManager itemManager;
+    [SerializeField] float itemWidth;
     [SerializeField] RectTransform gunsContent;
     [SerializeField] RectTransform hatsContent;
     [SerializeField] RectTransform skinsContent;
-    [SerializeField] float itemWidth;
-    public Vector2 minMaxVisibilityDistance;
-    public ItemManager itemManager;
-
+    [SerializeField] Button skinsButton;
+    [SerializeField] Button hatsButton;
+    [SerializeField] Button gunsButton;
+    [SerializeField] AudioClip shopTabSwitchSound;
     public event Action OnShopItemsChanged;
     public event Action OnShopTabsChanged;
     public RectTransform currentGunRect { get; set; }
     public RectTransform currentHatRect { get; set; }
     public RectTransform currentSkinRect { get; set; }
-    public int currentItemIndex { get; set; }
     CurrentShopTab currentShopTab = CurrentShopTab.Guns;
     public enum CurrentShopTab { Guns, Hats, Skins }
     GameManager gameManager;
     GameInputManager gameInputManager;
     MainMenuManager mainMenuManager;
-    int gunsCount;
-    int hatsCount;
-    int skinsCount;
-    bool scrollViewMoved;
+    int shopTabIndex = 2;
+    float shopTabTransitionTimer;
+    UIScreenManager uIScreenManager;
+    Animator shopAnimator;
+    UIArea gunsArea;
+    UIArea hatsArea;
+    UIArea skinsArea;
+    //bool scrollViewMoved;
+    //int gunsCount;
+    //int hatsCount;
+    //int skinsCount;
+    //public int currentItemIndex { get; set; }
 
     void Awake()
     {
@@ -46,34 +56,45 @@ public class ShopManager : MonoBehaviour
         gameManager = GameManager.Instance;
         gameInputManager = GameInputManager.Instance;
         mainMenuManager = GetComponent<MainMenuManager>();
+        uIScreenManager = GetComponent<UIScreenManager>();
+        shopAnimator = shop.GetComponent<Animator>();
 
-        gunsCount = itemManager.guns.Count - 1;
-        hatsCount = itemManager.hats.Count - 1;
-        skinsCount = itemManager.skins.Count - 1;
-    }
-
-    void Update()
-    {
-        /////////////////////////////////
-        /// MAKE BUMPERS SO YOU CAN HOLD
-        /// |THEM
-        /// Make cursor actually dissapear
-        /// Make screenshots Scroll
-        /// Add controller sensitivity to settigs
-        /// Make cursor not move when pressing keyboard arrows
-        /// 
-        ///
-        ///
-        /// 
-        
-        if(shop.activeSelf == false)
-            return;
+        gameInputManager.OnControllerChanged += OnControllerChanged;
 
         if(gameInputManager.ControllerConnected())
         {
+            gunScrollRect.inertia = false;
+            hatScrollRect.inertia = false;
+            skinScrollRect.inertia = false;
+        }
+
+        skinsButton.onClick.AddListener(SwitchToSkinTab);
+        hatsButton.onClick.AddListener(SwitchToHatTab);
+        gunsButton.onClick.AddListener(SwitchToGunTab);
+        
+        skinsArea = skinsButton.GetComponent<UIArea>();
+        hatsArea = hatsButton.GetComponent<UIArea>();
+        gunsArea = gunsButton.GetComponent<UIArea>();
+
+        gunsButton.interactable = false;
+        //gunsCount = itemManager.guns.Count - 1;
+        //hatsCount = itemManager.hats.Count - 1;
+        //skinsCount = itemManager.skins.Count - 1;
+    }
+
+    void Update()
+    {        
+        if(shop.activeSelf == false)
+            return;
+
+        if(shopTabTransitionTimer > 0)
+            shopTabTransitionTimer -= Time.deltaTime;
+
+        if(gameInputManager.ControllerConnected() && uIScreenManager.currentOpenPanel == shopAnimator && uIScreenManager.transitionTimer <= 0)
+        {
             if(Mathf.Abs(gameInputManager.AimDirection().x) > 0.1f)
             {
-                scrollViewMoved = true;
+                //scrollViewMoved = true;
 
                 if(gameInputManager.LeftTrigger())
                     mainMenuManager._scrollSpeed = mainMenuManager.scrollSpeed * 2;
@@ -96,70 +117,203 @@ public class ShopManager : MonoBehaviour
                         break;
                 }
             }
-
-            if(gameInputManager.LeftBumperDown())
+            
+            if(shopTabTransitionTimer <= 0)
             {
-                if(!scrollViewMoved)
-                {               
-                    currentItemIndex--;
-                }
-                else
+                if(gameInputManager.LeftBumperDown())
                 {
-                    CenterScrollRectsAndUpdateScrollIndex();
-                    scrollViewMoved = false;
+                    shopTabIndex--;
+                    
+                    if(shopTabIndex == -1)
+                        shopTabIndex = 2;
+
+                    SwitchShopTabs();
                 }
 
-                switch(currentShopTab)
-                {   
-                    case CurrentShopTab.Guns:
-                        ScrollItems(gunsCount, gunsContent);          
-                        break;
-                    case CurrentShopTab.Hats:
-                        ScrollItems(hatsCount, hatsContent);                    
-                        break;
-                    case CurrentShopTab.Skins:
-                        ScrollItems(skinsCount, skinsContent);                   
-                        break;
+                if(gameInputManager.RightBumperDown())
+                {                    
+                    shopTabIndex++;
+                    
+                    if(shopTabIndex == 3)
+                        shopTabIndex = 0;
+
+                    SwitchShopTabs();
                 }
             }
-            else if(gameInputManager.RightBumperDown())
-            {
-                if(!scrollViewMoved)
-                {               
-                    currentItemIndex++;
-                }
-                else
-                {
-                    CenterScrollRectsAndUpdateScrollIndex();
-                    scrollViewMoved = false;
-                }
 
-                switch(currentShopTab)
-                {   
-                    case CurrentShopTab.Guns:
-                        ScrollItems(gunsCount, gunsContent);          
-                        break;
-                    case CurrentShopTab.Hats:
-                        ScrollItems(hatsCount, hatsContent);                    
-                        break;
-                    case CurrentShopTab.Skins:
-                        ScrollItems(skinsCount, skinsContent);                   
-                        break;
-                }
-            }
+            //if(gameInputManager.LeftBumperDown())
+            //{
+                //if(!scrollViewMoved)
+               // {               
+                    //currentItemIndex--;
+               // }
+                //else 
+                //{
+                    //CenterScrollRectsAndUpdateScrollIndex();
+                    //scrollViewMoved = false;
+                //}
+
+                //switch(currentShopTab)
+                //{   
+                    //case CurrentShopTab.Guns:
+                        //ScrollItems(gunsCount, gunsContent);          
+                        //break;
+                    //case CurrentShopTab.Hats:
+                        //ScrollItems(hatsCount, hatsContent);                    
+                        //break;
+                    //case CurrentShopTab.Skins:
+                        //ScrollItems(skinsCount, skinsContent);                   
+                        //break;
+                //}
+            //}
+            //else if(gameInputManager.RightBumperDown())
+            //{
+                //if(!scrollViewMoved)
+                //{               
+                    //currentItemIndex++;
+                //}
+                //else
+                //{
+                    //CenterScrollRectsAndUpdateScrollIndex();
+                    //scrollViewMoved = false;
+                //}
+
+                //switch(currentShopTab)
+                //{   
+                    //case CurrentShopTab.Guns:
+                        //ScrollItems(gunsCount, gunsContent);          
+                        //break;
+                    //case CurrentShopTab.Hats:
+                        //ScrollItems(hatsCount, hatsContent);                    
+                        //break;
+                    //case CurrentShopTab.Skins:
+                        //ScrollItems(skinsCount, skinsContent);                   
+                        //break;
+                //}
+            //}
         }
+    
     }   
 
-    void ScrollItems(int itemCount, RectTransform content)
-    {            
-        currentItemIndex = Mathf.Clamp(currentItemIndex, 0, itemCount - 2);
-        content.anchoredPosition = new Vector2(-(currentItemIndex * itemWidth), content.anchoredPosition.y);      
-    }
+    //void ScrollItems(int itemCount, RectTransform content)
+    //{            
+        //currentItemIndex = Mathf.Clamp(currentItemIndex, 0, itemCount - 2);
+        //content.anchoredPosition = new Vector2(-(currentItemIndex * itemWidth), content.anchoredPosition.y);      
+    //}
     
-    public void UpdateScrollIndex(int index, int itemCount)
+    //public void UpdateScrollIndex(int index, int itemCount)
+    //{
+        //currentItemIndex = index - 2;
+        //currentItemIndex = Mathf.Clamp(currentItemIndex, 0, itemCount - 2);
+    //}
+    
+    public void OnControllerChanged(bool enabled)
     {
-        currentItemIndex = index - 2;
-        currentItemIndex = Mathf.Clamp(currentItemIndex, 0, itemCount - 2);
+        if(enabled)
+        {
+            gunScrollRect.inertia = false;
+            hatScrollRect.inertia = false;
+            skinScrollRect.inertia = false;
+        }
+        else
+        {
+            gunScrollRect.inertia = true;
+            hatScrollRect.inertia = true;
+            skinScrollRect.inertia = true;
+        }
+    }
+
+    void ResetShopTabTransitionTimer()
+    {
+        shopTabTransitionTimer = 0.3f;
+    }
+
+    void SwitchShopTabs()
+    {
+        switch(shopTabIndex)
+        {
+            case 0:
+                skinsButton.interactable = false;
+                hatsButton.interactable = true;
+                gunsButton.interactable = true;
+
+                if(currentShopTab != CurrentShopTab.Skins)
+                {
+                    currentShopTab = CurrentShopTab.Skins;
+                    
+                    skinsArea.OpenArea(true);
+                    hatsArea.OpenArea(false);
+                    gunsArea.OpenArea(false);
+
+                    AudioManager.Instance.PlaySound2D(shopTabSwitchSound);
+                    ResetShopTabTransitionTimer();
+                    RefreshShopScrollRects();
+                }
+                break;
+            case 1:
+                skinsButton.interactable = true;
+                hatsButton.interactable = false;
+                gunsButton.interactable = true;
+
+                if(currentShopTab != CurrentShopTab.Hats)
+                {
+                    currentShopTab = CurrentShopTab.Hats;
+
+                    skinsArea.OpenArea(false);
+                    hatsArea.OpenArea(true);
+                    gunsArea.OpenArea(false);
+
+                    AudioManager.Instance.PlaySound2D(shopTabSwitchSound);
+                    ResetShopTabTransitionTimer();
+                    RefreshShopScrollRects();
+                }
+                break;
+            case 2:
+                skinsButton.interactable = true;
+                hatsButton.interactable = true;
+                gunsButton.interactable = false;
+
+                if(currentShopTab != CurrentShopTab.Guns)
+                {
+                    currentShopTab = CurrentShopTab.Guns;
+
+                    skinsArea.OpenArea(false);
+                    hatsArea.OpenArea(false);
+                    gunsArea.OpenArea(true);
+
+                    AudioManager.Instance.PlaySound2D(shopTabSwitchSound);
+                    ResetShopTabTransitionTimer();
+                    RefreshShopScrollRects();
+                }
+                break;
+        }
+    }
+
+    public void SwitchToGunTab()
+    {
+        if(gunsButton.interactable && shopTabTransitionTimer <= 0)
+        {
+            shopTabIndex = 2;
+            SwitchShopTabs();
+        }
+    }
+
+    public void SwitchToSkinTab()
+    {
+        if(skinsButton.interactable && shopTabTransitionTimer <= 0)
+        {
+            shopTabIndex = 0;
+            SwitchShopTabs();
+        }
+    }
+
+    public void SwitchToHatTab()
+    {
+        if(hatsButton.interactable && shopTabTransitionTimer <= 0)
+        {
+            shopTabIndex = 1;
+            SwitchShopTabs();
+        }
     }
 
     public void EquipItem(ShopItem shopItem)
@@ -184,24 +338,24 @@ public class ShopManager : MonoBehaviour
         yield return null;
         yield return null;
         
-        CenterScrollRectsAndUpdateScrollIndex();
+        CenterScrollRects();
     }
     
-    void CenterScrollRectsAndUpdateScrollIndex()
+    void CenterScrollRects()
     {
         switch(currentShopTab)
         {   
             case CurrentShopTab.Guns:
                 CenterShopScrollRect(gunScrollRect, currentGunRect);
-                UpdateScrollIndex(currentGunRect.transform.GetSiblingIndex() + 1, gunsCount);
+                //UpdateScrollIndex(currentGunRect.transform.GetSiblingIndex() + 1, gunsCount);
                 break;
             case CurrentShopTab.Hats:
                 CenterShopScrollRect(hatScrollRect, currentHatRect);
-                UpdateScrollIndex(currentHatRect.transform.GetSiblingIndex() + 1, hatsCount);
+                //UpdateScrollIndex(currentHatRect.transform.GetSiblingIndex() + 1, hatsCount);
                 break;
             case CurrentShopTab.Skins:
                 CenterShopScrollRect(skinScrollRect, currentSkinRect);
-                UpdateScrollIndex(currentSkinRect.transform.GetSiblingIndex() + 1, skinsCount);
+                //UpdateScrollIndex(currentSkinRect.transform.GetSiblingIndex() + 1, skinsCount);
                 break;
         }
     }
@@ -215,24 +369,6 @@ public class ShopManager : MonoBehaviour
         scrollRect.horizontalNormalizedPosition = normalized;
 
         OnShopTabsChanged?.Invoke();
-    }
-    
-    public void SwitchToGunTab()
-    {
-        currentShopTab = CurrentShopTab.Guns;
-        RefreshShopScrollRects();
-    }
-
-    public void SwitchToSkinTab()
-    {
-        currentShopTab = CurrentShopTab.Skins;
-        RefreshShopScrollRects();
-    }
-
-    public void SwitchToHatTab()
-    {
-        currentShopTab = CurrentShopTab.Hats;
-        RefreshShopScrollRects();
     }
     
     public void RefreshGemsText()

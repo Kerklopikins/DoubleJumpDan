@@ -211,7 +211,7 @@ public class Player: MonoBehaviour
         if(fallButtonTimer > 0)
             fallButtonTimer -= Time.deltaTime;
 
-        if(grounded && fallButtonTimer <= 0 && gameInputManager.GetVerticalInput() < 0)
+        if(grounded && fallButtonTimer <= 0 && gameInputManager.GetVerticalInput() < -gameInputManager.VerticalInputSensitivity)
             fallButtonTimer = 0;
         else if(!grounded)
             fallButtonTimer = fallButtonDelay;
@@ -336,16 +336,16 @@ public class Player: MonoBehaviour
 
     public void HandleInput()
     {
-        if(gameInputManager.GetHorizontalInput() > 0.1f)
+        if(gameInputManager.GetHorizontalInput() > gameInputManager.HorizontalInputSensitivity)
             xInput = 1;
-        else if(gameInputManager.GetHorizontalInput() < -0.1f)
+        else if(gameInputManager.GetHorizontalInput() < -gameInputManager.HorizontalInputSensitivity)
             xInput = -1;
         else
             xInput = 0;
 
-        if(gameInputManager.GetVerticalInput() > 0.1f)
+        if(gameInputManager.GetVerticalInput() > gameInputManager.VerticalInputSensitivity)
             yInput = 1;
-        else if(gameInputManager.GetVerticalInput() < -0.1f)
+        else if(gameInputManager.GetVerticalInput() < -gameInputManager.VerticalInputSensitivity)
             yInput = -1;
         else
             yInput = 0;
@@ -645,14 +645,14 @@ public class Player: MonoBehaviour
             }
         }
 
-        FloatingNumberProperties numberProperties = new FloatingNumberProperties();
-        numberProperties.number = damage;
-        numberProperties.position = transform.position;
-        numberProperties.plusOrMinus = false;
-        numberProperties.color = Color.red;
-        numberProperties.instantKill = damage == health ? true : false;
+        //FloatingNumberProperties numberProperties = new FloatingNumberProperties();
+        //numberProperties.number = damage;
+        //numberProperties.position = transform.position;
+        //numberProperties.plusOrMinus = false;
+        //numberProperties.color = Color.red;
+        //numberProperties.instantKill = damage == health ? true : false;
         
-        PoolManager.Instance.ReuseObject("Floating Numbers", numberProperties);
+        //PoolManager.Instance.ReuseObject("Floating Numbers", numberProperties);
 
         Instantiate(hurtEffect, transform.position, Quaternion.identity);
 
@@ -815,7 +815,8 @@ public class Player: MonoBehaviour
     {
         invincible = true;
         canFollow = false;
-        
+        StartCoroutine(ScaleCrosshairs(Vector3.one, Vector3.zero));
+
         ParticleSystem.EmissionModule emission = walkParticles.emission;
         emission.rateOverTime = 0;
 
