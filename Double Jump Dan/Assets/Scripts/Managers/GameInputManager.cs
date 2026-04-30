@@ -2,7 +2,6 @@ using UnityEngine;
 using System;
 using UnityEngine.InputSystem;
 using System.Collections;
-using System.Linq;
 using UnityEngine.InputSystem.Controls;
 
 public class GameInputManager : MonoBehaviour
@@ -38,6 +37,8 @@ public class GameInputManager : MonoBehaviour
     Coroutine rumbleCoroutine;
     public static bool IsControllerConnected;
     Gamepad currentGamepad;
+    GameManager gameManager;
+    float currentRumbleAmount;
 
     void Awake()
     {
@@ -87,7 +88,9 @@ public class GameInputManager : MonoBehaviour
 
     void Start()
     {
-        if(!GameManager.Instance.InMainMenu())
+        gameManager = GameManager.Instance;
+        
+        if(!gameManager.InMainMenu())
             _camera = LevelManager.Instance.mainCamera;
         else
             _camera = Camera.main;
@@ -96,6 +99,8 @@ public class GameInputManager : MonoBehaviour
             SetInput(InputMode.Controller);
         else
             SetInput(InputMode.KeyboardAndMouse);
+
+        RumbleController(0, 0, 0);
     }
 
     public bool ControllerConnected()
@@ -313,19 +318,27 @@ public class GameInputManager : MonoBehaviour
 
     public void RumbleController(float low, float high, float duration)
     {
-        if(rumbleCoroutine != null)
-            StopCoroutine(rumbleCoroutine);
+        if(gameManager.controllerVibration && inputMode == InputMode.Controller)
+        {
+            if(low + high < currentRumbleAmount)
+                return;
+
+            if(rumbleCoroutine != null)
+                StopCoroutine(rumbleCoroutine);
         
-        rumbleCoroutine = StartCoroutine(RumbleControllerCo(low, high, duration));
+            rumbleCoroutine = StartCoroutine(RumbleControllerCo(low, high, duration));
+        }
     }
 
     IEnumerator RumbleControllerCo(float low, float high, float duration)
     {
         if(Gamepad.current == null)
             yield break;
-            
+        
+        currentRumbleAmount = low + high;
         Gamepad.current.SetMotorSpeeds(low, high);
         yield return new WaitForSecondsRealtime(duration);
         Gamepad.current.SetMotorSpeeds(0, 0);
+        currentRumbleAmount = 0;
     }
 }

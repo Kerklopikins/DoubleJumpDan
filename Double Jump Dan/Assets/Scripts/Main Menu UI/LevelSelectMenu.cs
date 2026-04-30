@@ -27,7 +27,7 @@ public class LevelSelectMenu : MonoBehaviour
 
     void Update()
     {
-        if(levelSelect.activeSelf == false || levelLoadingManager.busy)
+        if(levelSelect.activeSelf == false || levelLoadingManager.Busy)
             return;
             
         if(gameInputManager.ControllerConnected())

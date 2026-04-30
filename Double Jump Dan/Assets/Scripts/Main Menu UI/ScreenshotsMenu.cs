@@ -3,7 +3,6 @@ using UnityEngine.UI;
 using System;
 using System.IO;
 using System.Collections;
-using System.Linq;
 
 public class ScreenshotsMenu : MonoBehaviour
 {
@@ -39,7 +38,7 @@ public class ScreenshotsMenu : MonoBehaviour
         {
             directory = new DirectoryInfo(Environment.GetFolderPath(Environment.SpecialFolder.MyPictures) + "/Double Jump Dan");
             files = directory.GetFiles("*.jpg");
-            screenshotsCount = files.Count();
+            screenshotsCount = files.Length;
         }
     }
     void Start()

@@ -6842,27 +6842,6 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Cactus
-      rect:
-        serializedVersion: 2
-        x: 261
-        y: 263
-        width: 17
-        height: 21
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: fd51213393a4b6a48b1eb7d4220972a0
-      internalID: -1933055312
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
       name: Wee Right
       rect:
         serializedVersion: 2
@@ -7177,6 +7156,153 @@ TextureImporter:
       indices: 
       edges: []
       weights: []
+    - serializedVersion: 2
+      name: Custom Skin Legs 1
+      rect:
+        serializedVersion: 2
+        x: 19
+        y: 172
+        width: 6
+        height: 8
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: de3c0b5ff21ff1643bbe9c225ff55f74
+      internalID: -2051350964
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Custom Skin Legs 2
+      rect:
+        serializedVersion: 2
+        x: 26
+        y: 172
+        width: 6
+        height: 8
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: fe921efe21628134fa07dbf5ad176842
+      internalID: 1064876400
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Custom Skin Legs 3
+      rect:
+        serializedVersion: 2
+        x: 33
+        y: 172
+        width: 6
+        height: 8
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: a8655a087eaecce41a9a350d4e89341c
+      internalID: -1562616220
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Custom Skin Jump
+      rect:
+        serializedVersion: 2
+        x: 40
+        y: 173
+        width: 10
+        height: 7
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 9eb604d4af6691343b9dc1f533862341
+      internalID: 1824282275
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Custom Skin Arm 1
+      rect:
+        serializedVersion: 2
+        x: 51
+        y: 170
+        width: 2
+        height: 10
+      alignment: 9
+      pivot: {x: 0.5, y: 0.9}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: b324657af2663b9468e67f080fbe18f0
+      internalID: 1597590126
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Custom Skin Body
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 79
+        width: 18
+        height: 12
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 290f9ae0dc4ae2143bb8bdbc993532cb
+      internalID: -1535349455
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Custom Skin Eyes
+      rect:
+        serializedVersion: 2
+        x: 32
+        y: 201
+        width: 10
+        height: 4
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: a6e9bbf0ed6e1774d8c4e1d9b36ae016
+      internalID: -115065162
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
     outline: []
     physicsShape: []
     bones: []
@@ -7276,6 +7402,13 @@ TextureImporter:
       Crushing Spikes H: 1051629059
       Crushing Spikes Single: 844471746
       Crushing Spikes V: -289554004
+      Custom Skin Arm 1: 1597590126
+      Custom Skin Body: -1535349455
+      Custom Skin Eyes: -115065162
+      Custom Skin Jump: 1824282275
+      Custom Skin Legs 1: -2051350964
+      Custom Skin Legs 2: 1064876400
+      Custom Skin Legs 3: -1562616220
       Cyclops Arm: 21300770
       Cyclops Body: -1437075179
       Cyclops Legs 1: 21300762
@@ -7305,6 +7438,7 @@ TextureImporter:
       Danielle Walk 2: 21300778
       Devil Horns: 1143102318
       Dotted Line: -161986581
+      Double Jump Dan Sprite Sheet_1: -1338767249
       Egg: 21300728
       Emoji Man Arm: 862658699
       Emoji Man Arm Jump: -1041291766

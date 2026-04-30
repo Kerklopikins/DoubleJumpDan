@@ -28,6 +28,7 @@ public class SettingsManager : MonoBehaviour
     [SerializeField] Toggle showFPSToggle;
     [SerializeField] Slider aimSensitivitySlider;
     [SerializeField] Slider cursorSensitivitySlider;
+    [SerializeField] Toggle controllerVibrationToggle;
     
     public MainMenuManager mainMenuManager { get; private set; }
     List<Vector2> screenResolutions = new List<Vector2>();
@@ -103,6 +104,7 @@ public class SettingsManager : MonoBehaviour
 
             aimSensitivitySlider.value = gameManager.aimSensitivity;
             cursorSensitivitySlider.value = gameManager.cursorSensitivity;
+            controllerVibrationToggle.isOn = gameManager.controllerVibration;
 
             postProcessingToggle.isOn = gameManager.postProcessing;
             distortionEffectsToggle.isOn = gameManager.distortionEffects;
@@ -176,6 +178,8 @@ public class SettingsManager : MonoBehaviour
     {
         aimSensitivitySlider.value = 0.5f;
         cursorSensitivitySlider.value = 0.5f;
+        controllerVibrationToggle.isOn = true;
+        gameManager.controllerVibration = true;
 
         AdjustCursorSensitivity();
     }

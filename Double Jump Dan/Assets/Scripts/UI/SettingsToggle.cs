@@ -6,7 +6,7 @@ public class SettingsToggle : MonoBehaviour, IPointerClickHandler
     [SerializeField] SettingsManager settingsManager;
     [SerializeField] SettingType settingType;
     
-    public enum SettingType { PostProcessing, DistortionEffects, WeatherEffects, Fullscreen, VSync, ShowFPS }
+    public enum SettingType { PostProcessing, DistortionEffects, WeatherEffects, Fullscreen, VSync, ShowFPS, ControllerVibration }
     GameManager gameManager;
 
     void Start()
@@ -35,6 +35,9 @@ public class SettingsToggle : MonoBehaviour, IPointerClickHandler
             break;
             case SettingType.ShowFPS:
             ToggleFPSText();
+            break;
+            case SettingType.ControllerVibration:
+            ToggleControllerVibration();
             break;
         }
 	}
@@ -73,5 +76,13 @@ public class SettingsToggle : MonoBehaviour, IPointerClickHandler
     {
         gameManager.showPerformanceData = !gameManager.showPerformanceData;
         settingsManager.UpdateFPSText(gameManager.showPerformanceData);
+    }
+
+    void ToggleControllerVibration()
+    {
+        gameManager.controllerVibration = !gameManager.controllerVibration;
+
+        if(gameManager.controllerVibration)
+            GameInputManager.Instance.RumbleController(0.9f, 0.9f, 0.5f);
     }
 }

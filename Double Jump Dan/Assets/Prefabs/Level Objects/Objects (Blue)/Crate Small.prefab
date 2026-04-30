@@ -486,6 +486,9 @@ MonoBehaviour:
     noisePercent: 0
     dampingPercent: 0
     rotationPercent: 0
+  lowRumbleAmount: 0.15
+  highRumbleAmount: 0.25
+  rumbleDuration: 0.3
 --- !u!61 &8300176423098504559
 BoxCollider2D:
   m_ObjectHideFlags: 0

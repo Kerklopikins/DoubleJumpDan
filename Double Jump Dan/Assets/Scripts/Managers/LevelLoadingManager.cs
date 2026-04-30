@@ -11,7 +11,7 @@ public class LevelLoadingManager : MonoBehaviour
 
     public bool animationFinished { get; set; }
     public bool loading { get; set; }
-    public bool busy { get; set; }
+    public bool Busy { get; set; }
 	public SpriteRenderer fadeSprite { get; set; }
     SpriteRenderer loadingDan;
     Transform loadingSpritesTransform;
@@ -101,7 +101,7 @@ public class LevelLoadingManager : MonoBehaviour
     
     IEnumerator FadeInCo()
     {
-        busy = true;
+        Busy = true;
 
         if(eventSystem != null && eventSystem.activeInHierarchy == true)
             eventSystem.SetActive(false);
@@ -148,7 +148,7 @@ public class LevelLoadingManager : MonoBehaviour
     IEnumerator FadeOutCo()
     {
         fadedOut = true;
-        busy = true;
+        Busy = true;
 
         float inTime = 0;
 
@@ -160,7 +160,7 @@ public class LevelLoadingManager : MonoBehaviour
         }
 
         fadeSprite.color = new Color(fadeSprite.color.r, fadeSprite.color.g, fadeSprite.color.b, 0);
-        busy = false;
+        Busy = false;
 
         if(IsNormalLevel())
             GameManager.died = false;

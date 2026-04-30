@@ -49,9 +49,10 @@ public class LevelButton : MonoBehaviour
 		else
 			button.interactable = false;
 	}
-
+	
     public void LoadLevel()
     {
+		GameInputManager.Instance.RumbleController(0.5f, 0.5f, 0.75f);
 		LevelLoadingManager.Instance.LoadScene("Level " + level);
     }
 }

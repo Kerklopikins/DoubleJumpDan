@@ -261,6 +261,9 @@ MonoBehaviour:
     noisePercent: 0.5
     dampingPercent: 0.895
     rotationPercent: 0.125
+  lowRumbleAmount: 0.15
+  highRumbleAmount: 0.25
+  rumbleDuration: 0.3
 --- !u!114 &2270541816692860415
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -72,7 +72,20 @@ public class ItemManager : MonoBehaviour
 	{
 		var skinAnimator = skin.gameObject.GetComponent<Animator>();
 		playerAnimator.runtimeAnimatorController = skinAnimator.runtimeAnimatorController;
+
+		//Custom skin
+		if(skin.itemID == 9999)
+		{
+			Color bodyColor = new Color(gameManager.currentUser.customSkinColor[0], gameManager.currentUser.customSkinColor[1], gameManager.currentUser.customSkinColor[2]);
+			Color armsAndLegsColor = new Color(gameManager.currentUser.customSkinColor[3], gameManager.currentUser.customSkinColor[4], gameManager.currentUser.customSkinColor[5]);
+			
+			player.spriteMaterials[0].color = bodyColor;
+			
+			for(int i = 1; i < 4; i++)
+				player.spriteMaterials[i].color = armsAndLegsColor;
+		}
 	}
+
     public void EquipItem(ShopItem shopItem)
 	{
 		switch(shopItem.item.itemType)

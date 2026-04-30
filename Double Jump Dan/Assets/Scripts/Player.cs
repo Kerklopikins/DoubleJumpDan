@@ -65,31 +65,18 @@ public class Player: MonoBehaviour
     [Header("Camera Shake")]
     public CameraManager.Properties properties;
     
+    //Event Actions
     public event Action OnPlayerHurt;
     public event Action OnPlayerKilled;
     public event Action OnPlayerRespawn;
     public event Action OnPlayerHealthChange;
     public event Action OnPlayerTeleported;
-    public bool canFollow { get; set; }
+
+    //Physics
     public bool grounded { get; private set; }
-    public bool dead { get; private set; }
-    public int _health { get; private set; }
-    public bool canFall { get; set; }
     public float fallButtonTimer { get; set; }
-    public int lives { get; set; }
-    public bool gameHUDPaused { get; set; }
-    public bool gameHUDFrozen { get; set; }
-    bool doubleJump;
-    Rigidbody2D rb2D;
-    Animator animator;
-    Collider2D _collider2D;
     float velocityXSmoothing;
-    GameObject parts;
-    ShadowDanTracer shadowDanTracer;
-    float finishLevelJumpTimer;
-    float weeEffectFallThreshold = 2.5f;
-    bool animatedWee;
-    bool canAnimateWee = true;
+    bool doubleJump;
     float _fallTimer;
     float _coyoteTime;
     float doubleJumpTimer;
@@ -97,29 +84,60 @@ public class Player: MonoBehaviour
     float fallButtonDelay = 0.1f;
     bool isGrounded;
     float _knockBackInputDelayTimer;
-    bool teleporting = false;
-    Vector2 input;
-    Vector3 lastAimDirection;
-    float hurtTimer = 0.125f;
-    float _hurtTimer;
-    int direction = 1;
     bool wasGroundedLastFrame;
     float previousVelocityY;
+    int direction = 1;
+    
+    //Input
+    Vector2 input;
+    int xInput;
+    int yInput;
+    Vector3 lastAimDirection; //For arm
+    Vector3 difference; //For arm
+    public Transform crosshairs { get; set; }
+    bool teleporting = false;
+
+    //Rotating Eyes
+    Vector3 pupilsParentStartPosition;
+    Vector3 eyeBrowStartPosition;
+    Vector3 eyeLookDirection;
+    float targetX;
+    float targetY;
+
+    //Health, damage, lives, kill, respawn
+    public bool dead { get; private set; }
+    public int _health { get; private set; }
+    public int lives { get; set; }
+    float hurtTimer = 0.125f;
+    float _hurtTimer;
+
+    //Finish Level
+    float finishLevelJumpTimer;
     float finishLevelInTime;
     float finalPositionX;
     bool firstFinishJump;
-    Vector3 pupilsParentStartPosition;
-    Vector3 eyeBrowStartPosition;
-    float targetX;
-    float targetY;
-    GameInputManager gameInputManager;
-    MaterialPropertyBlock materialPropertyBlock;
-    Vector3 difference;
-    Vector3 eyeLookDirection;
-    int xInput;
-    int yInput;
-    Transform crosshairs;
 
+    //Game HUD
+    public bool gameHUDPaused { get; set; }
+    public bool gameHUDFrozen { get; set; }
+
+    //Wee effect
+    float weeEffectFallThreshold = 2.5f;
+    bool animatedWee;
+    bool canAnimateWee = true;
+
+    //Camera
+    public bool canFollow { get; set; }
+
+    //References
+    Rigidbody2D rb2D;
+    GameInputManager gameInputManager;
+    Animator animator;
+    Collider2D _collider2D;
+    GameObject parts;
+    ShadowDanTracer shadowDanTracer;
+    MaterialPropertyBlock materialPropertyBlock;
+        
     void Awake()
     {
         lives = 3;
@@ -140,8 +158,6 @@ public class Player: MonoBehaviour
         shadowDanTracer = GetComponent<ShadowDanTracer>();
         shadowDanTracer.enabled = false;
         materialPropertyBlock = new MaterialPropertyBlock();
-
-        crosshairs = GameHUD.Instance.crosshairs;
 
         pupilsParentStartPosition = pupilsParent.localPosition;
         eyeBrowStartPosition = eyeBrow.localPosition;
@@ -168,10 +184,10 @@ public class Player: MonoBehaviour
         }
         
         if(CanHandleInput())
-        {
             HandleInput();
+
+        if(CanAnimate())
             SetAnimationsAndWalkEffects();
-        }
 
         if(LevelManager.Instance.FinishedLevel())
             FinishLevel();
@@ -192,7 +208,8 @@ public class Player: MonoBehaviour
         float targetVelocityX = input.x * speed;
         float smoothedX = Mathf.SmoothDamp(rb2D.velocity.x, targetVelocityX, ref velocityXSmoothing, (grounded) ? accelerationTimeGrounded : accelerationTimeInAir);
 
-        if(float.IsNaN(velocityXSmoothing) || dead)
+        /////MAKE SURE THIS ISNT MESSING ANYTHING UP
+        if(float.IsNaN(velocityXSmoothing) || dead || Mathf.Abs(velocityXSmoothing) < 0.0005f)
             velocityXSmoothing = 0;
 
         if(float.IsNaN(smoothedX) || dead)
@@ -286,7 +303,7 @@ public class Player: MonoBehaviour
 
     void RotateArm()
     {
-        if(gameInputManager.ControllerConnected())
+        if(gameInputManager.ControllerConnected() && crosshairs != null)
         {            
             difference = crosshairs.position - aimPoint.position;
             difference.Normalize();
@@ -329,6 +346,14 @@ public class Player: MonoBehaviour
     public bool CanHandleInput()
     {
         if(!dead && !gameHUDPaused && !gameHUDFrozen && !LevelManager.Instance.FinishedLevel() && _knockBackInputDelayTimer <= 0 && !teleporting)
+            return true;
+        else
+            return false;
+    }
+
+    public bool CanAnimate()
+    {
+        if(!dead && !gameHUDPaused && !gameHUDFrozen && !LevelManager.Instance.FinishedLevel() && !teleporting)
             return true;
         else
             return false;
@@ -691,7 +716,7 @@ public class Player: MonoBehaviour
         weeSprite.gameObject.SetActive(false);
         walkParticles.Stop();
         
-        if(gameInputManager.ControllerConnected())
+        if(gameInputManager.ControllerConnected() && crosshairs != null)
             StartCoroutine(ScaleCrosshairs(Vector3.one, Vector3.zero));
 
         OnPlayerKilled?.Invoke();
@@ -775,7 +800,7 @@ public class Player: MonoBehaviour
         
         ApplySpriteMaterialProperties(0, 1);
         
-        if(gameInputManager.ControllerConnected())
+        if(gameInputManager.ControllerConnected() && crosshairs != null)
             StartCoroutine(ScaleCrosshairs(Vector3.zero, Vector3.one));
 
         direction = 1;

@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using System;
 using System.Collections;
+using System.Linq;
 
 public class ShopManager : MonoBehaviour
 {
@@ -24,6 +25,16 @@ public class ShopManager : MonoBehaviour
     [SerializeField] Button hatsButton;
     [SerializeField] Button gunsButton;
     [SerializeField] AudioClip shopTabSwitchSound;
+
+    [Header("Custom Skin")]
+    [SerializeField] Image bodyImage;
+    [SerializeField] Image armsLegsImage;
+    [SerializeField] Slider[] sliders;
+    [SerializeField] Image[] sliderHandles;
+    [SerializeField] Image[] sliderFills;
+    [SerializeField] Sprite[] sliderFillSprites;
+    [SerializeField] Text[] rgbValuesText;
+
     public event Action OnShopItemsChanged;
     public event Action OnShopTabsChanged;
     public RectTransform currentGunRect { get; set; }
@@ -75,8 +86,13 @@ public class ShopManager : MonoBehaviour
         skinsArea = skinsButton.GetComponent<UIArea>();
         hatsArea = hatsButton.GetComponent<UIArea>();
         gunsArea = gunsButton.GetComponent<UIArea>();
-
+    
         gunsButton.interactable = false;
+
+        UpdateCustomSkinSliders();
+
+        //UpdateCustomSkinBody();
+        //UpdateCustomSkinArmsLegs();
         //gunsCount = itemManager.guns.Count - 1;
         //hatsCount = itemManager.hats.Count - 1;
         //skinsCount = itemManager.skins.Count - 1;
@@ -319,12 +335,15 @@ public class ShopManager : MonoBehaviour
     public void EquipItem(ShopItem shopItem)
 	{
         itemManager.EquipItem(shopItem);
+        UpdateCustomSkinSliders();
+
         OnShopItemsChanged?.Invoke();
     }
 
     public void RefreshShop()
     {
         RefreshGemsText();
+        UpdateCustomSkinSliders();
         OnShopItemsChanged?.Invoke();  
     }
 
@@ -381,6 +400,77 @@ public class ShopManager : MonoBehaviour
     public void RefreshGemsText(string text)
     {
         gemsText.text = text;
+    }
+
+    void UpdateCustomSkinSliders()
+    {
+        //Custom skin
+        if(gameManager.currentUser.skinID == 9999)
+        {
+            for(int i = 0; i < sliderFills.Length; i++)
+            {
+                sliders[i].interactable = true;
+                sliderFills[i].sprite = sliderFillSprites[0];
+            }
+        }
+        else
+        {
+            for(int i = 0; i < sliderFills.Length; i++)
+            {
+                sliders[i].interactable = false;
+                sliderFills[i].sprite = sliderFillSprites[1];
+            }
+        }
+
+        sliders[0].value = gameManager.currentUser.customSkinColor[0];
+        sliders[1].value = gameManager.currentUser.customSkinColor[1];
+        sliders[2].value = gameManager.currentUser.customSkinColor[2];
+
+        sliders[3].value = gameManager.currentUser.customSkinColor[3];
+        sliders[4].value = gameManager.currentUser.customSkinColor[4];
+        sliders[5].value = gameManager.currentUser.customSkinColor[5];
+
+        UpdateCustomSkinBody();
+        UpdateCustomSkinArmsLegs();
+    }
+    
+    public void UpdateCustomSkinBody()
+    {
+        bodyImage.color = new Color(sliders[0].value, sliders[1].value, sliders[2].value, 1);
+
+        sliderHandles[0].color = new Color(sliders[0].value, 0, 0, 1);
+        sliderHandles[1].color = new Color(0, sliders[1].value, 0, 1);
+        sliderHandles[2].color = new Color(0, 0, sliders[2].value, 1);
+        sliderFills[0].color = new Color(sliders[0].value, 0, 0, 1);
+        sliderFills[1].color = new Color(0, sliders[1].value, 0, 1);
+        sliderFills[2].color = new Color(0, 0, sliders[2].value, 1);
+
+        rgbValuesText[0].text = Mathf.RoundToInt(255 * sliders[0].value).ToString() + "   " + Mathf.RoundToInt(255 * sliders[1].value).ToString() + "   " + Mathf.RoundToInt(255 * sliders[2].value).ToString();
+    }
+
+    public void UpdateCustomSkinArmsLegs()
+    {
+        armsLegsImage.color = new Color(sliders[3].value, sliders[4].value, sliders[5].value, 1);
+        sliderHandles[3].color = new Color(sliders[3].value, 0, 0, 1);
+        sliderHandles[4].color = new Color(0, sliders[4].value, 0, 1);
+        sliderHandles[5].color = new Color(0, 0, sliders[5].value, 1);
+        sliderFills[3].color = new Color(sliders[3].value, 0, 0, 1);
+        sliderFills[4].color = new Color(0, sliders[4].value, 0, 1);
+        sliderFills[5].color = new Color(0, 0, sliders[5].value, 1);
+
+        rgbValuesText[1].text = Mathf.RoundToInt(255 * sliders[3].value).ToString() + "   " + Mathf.RoundToInt(255 * sliders[4].value).ToString() + "   " + Mathf.RoundToInt(255 * sliders[5].value).ToString();
+    }
+
+    public void SaveCustomSkin()
+    {
+        gameManager.currentUser.customSkinColor[0] = sliders[0].value;
+        gameManager.currentUser.customSkinColor[1] = sliders[1].value;
+        gameManager.currentUser.customSkinColor[2] = sliders[2].value;
+        gameManager.currentUser.customSkinColor[3] = sliders[3].value;
+        gameManager.currentUser.customSkinColor[4] = sliders[4].value;
+        gameManager.currentUser.customSkinColor[5] = sliders[5].value;
+
+        gameManager.SaveUserData();
     }
 
     public void GetOneThousandGems()

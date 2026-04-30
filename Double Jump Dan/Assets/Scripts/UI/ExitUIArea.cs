@@ -10,7 +10,7 @@ public class ExitUIArea : MonoBehaviour
     [SerializeField] AudioClip exitSound;
     [SerializeField] bool saveGameDataOnExit;
     [SerializeField] SettingsManager settingsManager;
-
+    [SerializeField] ShopManager shopManager;
     GameInputManager gameInputManager;
     LevelLoadingManager levelLoadingManager;
     MiniPanel miniPanel;
@@ -46,7 +46,7 @@ public class ExitUIArea : MonoBehaviour
 
     void Update()
     { 
-        if(levelLoadingManager.busy)
+        if(levelLoadingManager.Busy)
             return;
             
         if(uIScreenManager.transitionTimer <= 0)
@@ -61,13 +61,25 @@ public class ExitUIArea : MonoBehaviour
                             uIScreenManager.OpenPanel(previousPanel);
                             
                             if(saveGameDataOnExit)
-                                settingsManager.SaveSettings();
+                            {
+                                if(settingsManager != null)
+                                    settingsManager.SaveSettings();
+
+                                if(shopManager != null)
+                                    shopManager.SaveCustomSkin();
+                            }
                             break;
                         case PanelType.Mini:
                             miniPanel.Close(animator);
 
                             if(saveGameDataOnExit)
-                                settingsManager.SaveSettings();
+                            {
+                                if(settingsManager != null)
+                                    settingsManager.SaveSettings();
+
+                                if(shopManager != null)
+                                    shopManager.SaveCustomSkin();
+                            }
                             break;
                     }
                     

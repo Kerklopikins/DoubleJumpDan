@@ -112,8 +112,8 @@ MonoBehaviour:
   burstsPerMagazine: 0
   burstCoolDownTime: 0
   aimPointOffset: 0.5625
-  lowRumbleAmount: 0.15
-  highRumbleAmount: 0.25
+  lowRumbleAmount: 0.3
+  highRumbleAmount: 0.3
   rumbleDuration: 0.2
 --- !u!114 &114619254987605938
 MonoBehaviour:

@@ -31,6 +31,7 @@ public class GunInfo: MonoBehaviour
     public event Action OnShoot;
     public bool canShoot { get; private set; }
     GameInputManager gameInputManager;
+    bool inputInitialized;
 
     void Awake()
     {
@@ -66,6 +67,7 @@ public class GunInfo: MonoBehaviour
     void Start()
     {
         gameInputManager = GameInputManager.Instance;    
+        inputInitialized = true;
     }
     
     public void Initialize()
@@ -77,6 +79,9 @@ public class GunInfo: MonoBehaviour
 
     public void Shoot(float amount)
     {
+        if(!inputInitialized)
+            return;
+
         if(currentAmmo <= 0)
             return;
         
@@ -86,7 +91,7 @@ public class GunInfo: MonoBehaviour
 
         OnAmmoChanged?.Invoke(currentAmmo);
         OnShoot?.Invoke();
-
+        
         gameInputManager.RumbleController(lowRumbleAmount, highRumbleAmount, rumbleDuration);
     }
     

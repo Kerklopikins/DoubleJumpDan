@@ -13,8 +13,8 @@ public class GameManager : MonoBehaviour
     public Sprite[] gemSprites;
 
     //Game Data
-    [HideInInspector] public User currentUser;
-    [HideInInspector] public List<User> users = new List<User>();
+    public User currentUser;
+    public List<User> users = new List<User>();
     [HideInInspector] public float sfxVolume = 1;
     [HideInInspector] public float musicVolume = 1;
 	[HideInInspector] public int screenResolution = -1;
@@ -23,6 +23,7 @@ public class GameManager : MonoBehaviour
     [HideInInspector] public bool showPerformanceData = false;
     [HideInInspector] public float aimSensitivity = 0.5f; 
     [HideInInspector] public float cursorSensitivity = 0.5f; 
+    [HideInInspector] public bool controllerVibration = true;
     [HideInInspector] public bool postProcessing = true;
     [HideInInspector] public bool distortionEffects = true;
     [HideInInspector] public bool weatherEffects = true;
@@ -134,6 +135,7 @@ public class GameManager : MonoBehaviour
         gameData.showPerformanceData = showPerformanceData;
         gameData.aimSensitivity = aimSensitivity;
         gameData.cursorSensitivity = cursorSensitivity;
+        gameData.controllerVibration = controllerVibration;
         gameData.postProcessing = postProcessing;
         gameData.distortionEffects = distortionEffects;
         gameData.weatherEffects = weatherEffects;
@@ -167,6 +169,7 @@ public class GameManager : MonoBehaviour
             showPerformanceData = gameData.showPerformanceData;
             aimSensitivity = gameData.aimSensitivity;
             cursorSensitivity = gameData.cursorSensitivity;
+            controllerVibration = gameData.controllerVibration;
             postProcessing = gameData.postProcessing;
             distortionEffects = gameData.distortionEffects;
             weatherEffects = gameData.weatherEffects;
@@ -190,6 +193,7 @@ public class GameManager : MonoBehaviour
         user.hatID = currentUser.hatID;
         user.gunID = currentUser.gunID;
 		user.skinID = currentUser.skinID;
+        user.customSkinColor = currentUser.customSkinColor;
 		user.levelsCompleted = currentUser.levelsCompleted;
         user.hash = (user.gems * 17 + 9).ToString();
         user.totalEnemiesKilled = currentUser.totalEnemiesKilled;
@@ -224,6 +228,7 @@ public class GameManager : MonoBehaviour
                 currentUser.hatID = user.hatID;
                 currentUser.gunID = user.gunID;
                 currentUser.skinID = user.skinID;
+                currentUser.customSkinColor = user.customSkinColor;
                 currentUser.levelsCompleted = user.levelsCompleted;
                 currentUser.totalEnemiesKilled = user.totalEnemiesKilled;
                 currentUser.totalDeaths = user.totalDeaths;
@@ -254,6 +259,7 @@ public class GameManager : MonoBehaviour
                 currentUser.hatID = userBak.hatID;
                 currentUser.gunID = userBak.gunID;
                 currentUser.skinID = userBak.skinID;
+                currentUser.customSkinColor = userBak.customSkinColor;
                 currentUser.levelsCompleted = userBak.levelsCompleted;
                 currentUser.totalEnemiesKilled = userBak.totalEnemiesKilled;
                 currentUser.totalDeaths = userBak.totalDeaths;
@@ -284,6 +290,7 @@ public class GameManager : MonoBehaviour
         currentUser.totalDeaths = 0;
         currentUser.totalGemsCollected = 0;
         currentUser.totalPlaytime = 0;
+        currentUser.customSkinColor.Clear();
 
         currentUser.ownedHats.Add(1111);
         currentUser.hatID = 1111;
@@ -291,6 +298,7 @@ public class GameManager : MonoBehaviour
         currentUser.gunID = 1111;
         currentUser.ownedSkins.Add(1111);
         currentUser.skinID = 1111;
+        currentUser.customSkinColor = new List<float> { 1, 1, 1, 1, 1, 1 };
     }
 
     public void DeleteUserData(int user)
@@ -349,6 +357,7 @@ public class GameData
     public bool showPerformanceData;
     public float aimSensitivity; 
     public float cursorSensitivity; 
+    public bool controllerVibration;
     public bool postProcessing;
     public bool distortionEffects;
     public bool weatherEffects;
@@ -367,6 +376,7 @@ public class User
     public int hatID = 1111;
     public int gunID = 1111;
 	public int skinID = 1111;
+    public List<float> customSkinColor = new List<float> { 1, 1, 1, 1, 1, 1 };
 	public int levelsCompleted = 1;
     public string hash;
     public int totalEnemiesKilled;

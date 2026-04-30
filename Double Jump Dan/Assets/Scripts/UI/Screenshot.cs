@@ -31,7 +31,7 @@ public class Screenshot : MonoBehaviour
             return;
         }
         
-        if(player.dead || LevelLoadingManager.Instance.busy || LevelManager.Instance.FinishedLevel() || gameHUD.paused)
+        if(player.dead || LevelLoadingManager.Instance.Busy || LevelManager.Instance.FinishedLevel() || gameHUD.paused)
             return;
 
         if(gameInputManager.ScreenshotButtonDown())

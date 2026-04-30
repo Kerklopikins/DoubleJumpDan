@@ -74,7 +74,10 @@ public class ShopItem : MonoBehaviour
 				gameObject.GetComponent<Image>().sprite = normalItemBackground;
 
 			itemPicture = transform.Find("Item Image").GetComponent<Image>();
-			descriptionText = transform.Find("Description Text").GetComponent<Text>();
+			
+			//Custom skin
+			if(item.itemID != 9999)
+				descriptionText = transform.Find("Description Text").GetComponent<Text>();
 		}
 
 		if(item.itemType == Item.ItemType.Gun)
@@ -155,7 +158,7 @@ public class ShopItem : MonoBehaviour
 			}
             else if(gameManager.currentUser.hatID != item.itemID)
 				equipButton.interactable = true;
-
+			
 			if(buyButton != null)
 			{
 				if(gameManager.currentUser.ownedHats.Contains(item.itemID))

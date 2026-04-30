@@ -310,7 +310,6 @@ MonoBehaviour:
   destroyedEffect: {fileID: 1610945463146336, guid: 4f9e172b14709754a84fc82b431cafdf,
     type: 3}
   shootSound: {fileID: 8300000, guid: c4a34e9db20a9064daea6433cf2abda1, type: 3}
-  laser: {fileID: 8797595649743259464}
   properties:
     angle: 0
     strength: 0
@@ -668,8 +667,11 @@ MonoBehaviour:
   collisionMask:
     serializedVersion: 2
     m_Bits: 384
+  topWallCheck: {fileID: 0}
   wallCheck: {fileID: 4802443805350584}
   edgeCheck: {fileID: 4129847700978062}
+  farEdgeCheck: {fileID: 0}
+  detectionHeightOffset: 0
   playerRange: 20
   secondsToPauseWhenSeesPlayer: 0.933
   angrySpeed: 5
@@ -679,6 +681,17 @@ MonoBehaviour:
   colliders:
   - {fileID: 61073328586857800}
   - {fileID: 61328417805573206}
+  climbHeight: 1.2
+  climbEndPositionMultiplier: 0
+  decendEndPositionMultiplier: 0
+  climbTiltAngle: 35
+  decendTiltAngle: 35
+  tiltDuration: 0.3
+  climbDuration: 0.5
+  levelDuration: 0.3
+  wallCheckDistance: 0.2
+  climbPivotOffset: {x: 0, y: 0, z: 0}
+  decendPivotOffset: {x: 0, y: 0, z: 0}
 --- !u!114 &114984589792853600
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -691,6 +704,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2faf80997ea14a145a5c61b395648674, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  nonEnemy: 0
   health: 200
   invincible: 0
   healthBar: {fileID: 1950675179973282}
@@ -699,8 +713,8 @@ MonoBehaviour:
   destroyedSound: {fileID: 8300000, guid: e60a74f733716b1409a33d1d2dabf1e2, type: 3}
   destroyedEffect: {fileID: 1680065718586648, guid: d9e423643bc1c854db1359b15757dc56,
     type: 3}
+  spriteMaterials: []
   gemsToGive: 30
-  Gem: {fileID: 5060079438404901527, guid: 3be47dee572b70148b4a245359145a1a, type: 3}
   properties:
     angle: 0
     strength: 1
@@ -710,6 +724,9 @@ MonoBehaviour:
     noisePercent: 0.65
     dampingPercent: 0.25
     rotationPercent: 0
+  lowRumbleAmount: 0.6
+  highRumbleAmount: 1
+  rumbleDuration: 0.5
 --- !u!114 &114592289789486366
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -912,7 +929,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b17e4dda072e9024e966b0b5ffda04d3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  scriptsToCheck: []
+  componentsToCheck: []
   gameObjectsToCheck: []
   onlyCheckChild: 1
 --- !u!1 &1543877770672336

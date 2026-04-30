@@ -22,6 +22,11 @@ public class Health : MonoBehaviour
     
     [Header("Camera Shake")]
     public CameraManager.Properties properties;
+
+    [Header("Controller Rumble")]
+    [SerializeField] float lowRumbleAmount;
+    [SerializeField] float highRumbleAmount;
+    [SerializeField] float rumbleDuration;
     
     public Vector3 effectScale { private get; set; }
     public Vector3 effectRotation { private get; set; }
@@ -130,7 +135,8 @@ public class Health : MonoBehaviour
     {
         health = 0;
         AudioManager.Instance.PlaySound2D(destroyedSound);
-        
+        GameInputManager.Instance.RumbleController(lowRumbleAmount, highRumbleAmount, rumbleDuration);
+
         if(properties.strength > 0)
             CameraManager.Instance.Shake(properties);
 

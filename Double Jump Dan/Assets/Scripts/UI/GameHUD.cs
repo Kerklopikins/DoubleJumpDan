@@ -81,6 +81,7 @@ public class GameHUD: MonoBehaviour
     {
         canPause = true;
         player = LevelManager.Instance.player;
+        player.crosshairs = crosshairs;
         levelNameText.text = SceneManager.GetActiveScene().name + " Completed";
         pauseButtonRect = pauseButton.GetComponent<RectTransform>();
         gameInputManager = GameInputManager.Instance;
@@ -123,7 +124,7 @@ public class GameHUD: MonoBehaviour
     
     bool CanPause()
     {
-        if(player.dead || LevelLoadingManager.Instance.busy || LevelManager.Instance.FinishedLevel() || screenshotScript.frozen || inSettings)
+        if(player.dead || LevelLoadingManager.Instance.Busy || LevelManager.Instance.FinishedLevel() || screenshotScript.frozen || inSettings)
             return false;
         else
             return true;
@@ -136,6 +137,7 @@ public class GameHUD: MonoBehaviour
             Cursor.visible = false;
             cursor.gameObject.SetActive(true);
             crosshairsParent.gameObject.SetActive(true);
+            crosshairs.localScale = Vector3.one;
         }
         else
         {
@@ -184,25 +186,28 @@ public class GameHUD: MonoBehaviour
             }
 
             ///Player Crosshairs
-            Vector2 aimInput = gameInputManager.AimDirection();
-            
-            if(aimInput.magnitude > 0.1f)
+            if(!player.dead)
             {
-                float targetAngle = Mathf.Atan2(aimInput.y, aimInput.x) * Mathf.Rad2Deg;
-                float rotationSpeed = crosshairsSmoothSpeed * aimInput.magnitude;
-                currentAngle = Mathf.LerpAngle(currentAngle, targetAngle, Time.deltaTime * rotationSpeed);
-            }
+                Vector2 aimInput = gameInputManager.AimDirection();
             
-            float angleRad = currentAngle * Mathf.Deg2Rad;
+                if(aimInput.magnitude > 0.1f)
+                {
+                    float targetAngle = Mathf.Atan2(aimInput.y, aimInput.x) * Mathf.Rad2Deg;
+                    float rotationSpeed = crosshairsSmoothSpeed * aimInput.magnitude;
+                    currentAngle = Mathf.LerpAngle(currentAngle, targetAngle, Time.deltaTime * rotationSpeed);
+                }
+                
+                float angleRad = currentAngle * Mathf.Deg2Rad;
 
-            Vector2 direction = new Vector2(Mathf.Cos(angleRad), Mathf.Sin(angleRad));
-            crosshairs.localPosition = direction * maxCrosshairsRadius;
+                Vector2 direction = new Vector2(Mathf.Cos(angleRad), Mathf.Sin(angleRad));
+                crosshairs.localPosition = direction * maxCrosshairsRadius;   
+            }
 
             crosshairsAnimationTimer -= Time.deltaTime;
 
             if(gameInputManager.ShootButton() && CanPause() && !paused)
             {
-                _crosshairsAnimationSpeed = crosshairsAnimationSpeed * 0.5f;
+                _crosshairsAnimationSpeed = crosshairsAnimationSpeed * 0.65f;
                 crosshairsSprite.color = crosshairsRed ? Color.red : Color.yellow;
             }
             else

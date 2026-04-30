@@ -69,6 +69,14 @@ MonoBehaviour:
     hatID: 1111
     gunID: 1111
     skinID: 1111
+    customSkinBodyColor:
+    - 0
+    - 0
+    - 0
+    customSkinArmsLegsColor:
+    - 0
+    - 0
+    - 0
     levelsCompleted: 1
     hash: 
     totalEnemiesKilled: 0
@@ -82,6 +90,9 @@ MonoBehaviour:
   frameRate: -1
   vSync: 1
   showPerformanceData: 0
+  aimSensitivity: 0.5
+  cursorSensitivity: 0.5
+  controllerVibration: 1
   postProcessing: 1
   distortionEffects: 1
   weatherEffects: 1
@@ -141,6 +152,7 @@ MonoBehaviour:
   - {fileID: 6818989807714921688, guid: 2b227bb8d36a15c449f95f718bfb6c03, type: 3}
   - {fileID: 8234014750230064463, guid: 66f789b21f130fe4b9d3499aa390b196, type: 3}
   - {fileID: -2723251288489872911, guid: 4c78c6affa932b34284a95809c172e5b, type: 3}
+  - {fileID: -1973979827161561548, guid: bbf23f114433a774381d4e8aa4c4d905, type: 3}
 --- !u!114 &7572623741210936183
 MonoBehaviour:
   m_ObjectHideFlags: 0
