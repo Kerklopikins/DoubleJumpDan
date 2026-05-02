@@ -63,14 +63,14 @@ public class ScreenshotsMenu : MonoBehaviour
             
         if(gameInputManager.ControllerConnected())
         {
-            if(Mathf.Abs(gameInputManager.AimDirection().y) > 0.1f)
+            if(Mathf.Abs(gameInputManager.ScrollDirection().y) > 0.1f)
             {
-                if(gameInputManager.LeftTrigger())
+                if(gameInputManager.FastCursorButton())
                     mainMenuManager._scrollSpeed = mainMenuManager.scrollSpeed * 2;
                 else
                     mainMenuManager._scrollSpeed = mainMenuManager.scrollSpeed;
 
-                screenshotsContent.anchoredPosition += new Vector2(0, -gameInputManager.AimDirection().y * mainMenuManager._scrollSpeed * Time.deltaTime);
+                screenshotsContent.anchoredPosition += new Vector2(0, -gameInputManager.ScrollDirection().y * mainMenuManager._scrollSpeed * Time.deltaTime);
                 screenshotsContent.anchoredPosition = new Vector2(screenshotsContent.anchoredPosition.x, Mathf.Clamp(screenshotsContent.anchoredPosition.y, 0, screenshotsContent.sizeDelta.y - 624));
             }
         }

@@ -160,9 +160,9 @@ public class GameHUD: MonoBehaviour
             ///Main Cursor
             if(paused || finishedLevel || screenshotScript.frozen)
             {
-                input = gameInputManager.GetJoystickMovement();
+                input = gameInputManager.GetCursorMovement();
 
-                if(gameInputManager.LeftTrigger())
+                if(gameInputManager.FastCursorButton())
                     _cursorSpeed = cursorSpeed * 2f;
                 else
                     _cursorSpeed = cursorSpeed;
@@ -179,7 +179,7 @@ public class GameHUD: MonoBehaviour
                 RectTransformUtility.ScreenPointToLocalPointInRectangle(canvas.transform as RectTransform, screenPosition, canvas.worldCamera, out Vector2 localPosition);
                 cursor.anchoredPosition = localPosition;
 
-                if(gameInputManager.CursorPress())
+                if(gameInputManager.CursorClick())
                     cursorImage.sprite = cursorSprites[1];
                 else
                     cursorImage.sprite = cursorSprites[0];
@@ -363,7 +363,7 @@ public class GameHUD: MonoBehaviour
                 StartCoroutine(DelayResumeCo());
         }
     }  
-
+    
     public void FinishLevel()
     {
         if(localWorldManager.world != LocalWorldManager.World.Tutorial)

@@ -1,22 +1,53 @@
 using UnityEngine;
+using System;
+using System.IO;
 
 public class MainMenuCamera: MonoBehaviour
 {
-    public float zippy;
-    Vector2 input;
-    Vector2 position;
     SpriteRenderer spriteRenderer;
+    DirectoryInfo directory;
+    FileInfo[] files;
+
     void Start()
     {
         spriteRenderer = GetComponent<SpriteRenderer>();
+        directory = new DirectoryInfo(Environment.GetFolderPath(Environment.SpecialFolder.Desktop));
+        files = directory.GetFiles("*IMG_2731.jpg");
     }
 
-   void Update()
+    void Update()
     {
-        float cameraHalfWidth =  Camera.main.orthographicSize * ((float)Screen.width / Screen.height);
-        input = new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"));
-        position += input * zippy * Time.deltaTime;
-        position = new Vector2(Mathf.Clamp(position.x, -cameraHalfWidth + spriteRenderer.size.x / 2, cameraHalfWidth - spriteRenderer.size.x / 2), Mathf.Clamp(position.y, -Camera.main.orthographicSize + spriteRenderer.size.y / 2, Camera.main.orthographicSize - spriteRenderer.size.y / 2));
-        transform.position = position;
+        if(spriteRenderer == null)
+            return;
+            
+        if(GameInputManager.Instance.ShootButtonDown())
+        {
+            spriteRenderer.sprite = LoadSprite(files[0].FullName);
+        }
+    }
+
+    private Sprite LoadSprite(string path)
+    {
+        if(string.IsNullOrEmpty(path))
+        {
+            Debug.LogError("Path is null");
+            return null;
+        }
+
+        if(!File.Exists(path))
+        {
+            Debug.LogError("File is null");
+            return null;
+        }
+
+        byte[] bytes = File.ReadAllBytes(path);
+        Texture2D texture = new Texture2D(2, 2, TextureFormat.RGBA32, false, false);
+        ImageConversion.LoadImage(texture, bytes, false);
+        texture.filterMode = FilterMode.Point;
+        Sprite sprite = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), new Vector2(0.5f, 0.5f));
+
+        //texture.Apply(false, false);
+
+        return sprite;
     }
 }

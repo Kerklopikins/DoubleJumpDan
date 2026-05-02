@@ -108,11 +108,11 @@ public class ShopManager : MonoBehaviour
 
         if(gameInputManager.ControllerConnected() && uIScreenManager.currentOpenPanel == shopAnimator && uIScreenManager.transitionTimer <= 0)
         {
-            if(Mathf.Abs(gameInputManager.AimDirection().x) > 0.1f)
+            if(Mathf.Abs(gameInputManager.ScrollDirection().x) > 0.1f)
             {
                 //scrollViewMoved = true;
 
-                if(gameInputManager.LeftTrigger())
+                if(gameInputManager.FastCursorButton())
                     mainMenuManager._scrollSpeed = mainMenuManager.scrollSpeed * 2;
                 else
                     mainMenuManager._scrollSpeed = mainMenuManager.scrollSpeed;
@@ -120,15 +120,15 @@ public class ShopManager : MonoBehaviour
                 switch(currentShopTab)
                 {   
                     case CurrentShopTab.Guns:
-                        gunsContent.anchoredPosition += new Vector2(-gameInputManager.AimDirection().x * mainMenuManager._scrollSpeed * Time.deltaTime, 0);
+                        gunsContent.anchoredPosition += new Vector2(-gameInputManager.ScrollDirection().x * mainMenuManager._scrollSpeed * Time.deltaTime, 0);
                         gunsContent.anchoredPosition = new Vector2(Mathf.Clamp(gunsContent.anchoredPosition.x, -gunsContent.sizeDelta.x + (itemWidth * 3) - 4, 0), gunsContent.anchoredPosition.y);
                         break;
                     case CurrentShopTab.Hats:
-                        hatsContent.anchoredPosition += new Vector2(-gameInputManager.AimDirection().x * mainMenuManager._scrollSpeed * Time.deltaTime, 0);      
+                        hatsContent.anchoredPosition += new Vector2(-gameInputManager.ScrollDirection().x * mainMenuManager._scrollSpeed * Time.deltaTime, 0);      
                         hatsContent.anchoredPosition = new Vector2(Mathf.Clamp(hatsContent.anchoredPosition.x, -hatsContent.sizeDelta.x + (itemWidth * 3) - 4, 0), hatsContent.anchoredPosition.y);
                         break;
                     case CurrentShopTab.Skins:
-                        skinsContent.anchoredPosition += new Vector2(-gameInputManager.AimDirection().x * mainMenuManager._scrollSpeed * Time.deltaTime, 0);      
+                        skinsContent.anchoredPosition += new Vector2(-gameInputManager.ScrollDirection().x * mainMenuManager._scrollSpeed * Time.deltaTime, 0);      
                         skinsContent.anchoredPosition = new Vector2(Mathf.Clamp(skinsContent.anchoredPosition.x, -skinsContent.sizeDelta.x + (itemWidth * 3) - 4, 0), skinsContent.anchoredPosition.y);
                         break;
                 }
@@ -335,8 +335,8 @@ public class ShopManager : MonoBehaviour
     public void EquipItem(ShopItem shopItem)
 	{
         itemManager.EquipItem(shopItem);
+        SetCustomSkinSliderData();
         UpdateCustomSkinSliders();
-
         OnShopItemsChanged?.Invoke();
     }
 
@@ -461,7 +461,7 @@ public class ShopManager : MonoBehaviour
         rgbValuesText[1].text = Mathf.RoundToInt(255 * sliders[3].value).ToString() + "   " + Mathf.RoundToInt(255 * sliders[4].value).ToString() + "   " + Mathf.RoundToInt(255 * sliders[5].value).ToString();
     }
 
-    public void SaveCustomSkin()
+    void SetCustomSkinSliderData()
     {
         gameManager.currentUser.customSkinColor[0] = sliders[0].value;
         gameManager.currentUser.customSkinColor[1] = sliders[1].value;
@@ -469,7 +469,11 @@ public class ShopManager : MonoBehaviour
         gameManager.currentUser.customSkinColor[3] = sliders[3].value;
         gameManager.currentUser.customSkinColor[4] = sliders[4].value;
         gameManager.currentUser.customSkinColor[5] = sliders[5].value;
+    }
 
+    public void SaveShopData()
+    {
+        SetCustomSkinSliderData();
         gameManager.SaveUserData();
     }
 
@@ -478,7 +482,7 @@ public class ShopManager : MonoBehaviour
         gameManager.currentUser.gems += 1000;
         gameManager.currentUser.totalGemsCollected += 1000;
         RefreshGemsText();
-        gameManager.SaveUserData();
+        SaveShopData();
 
 		RefreshShop();
     }
@@ -503,8 +507,8 @@ public class ShopManager : MonoBehaviour
                 gameManager.currentUser.ownedSkins.Add(skin.itemID);
         }
 		
+        SaveShopData();
         RefreshShop();
-		gameManager.SaveUserData();
     }
 
 	public void FlashGemsText()

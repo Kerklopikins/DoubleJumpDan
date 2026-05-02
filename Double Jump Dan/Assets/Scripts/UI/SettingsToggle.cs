@@ -6,7 +6,7 @@ public class SettingsToggle : MonoBehaviour, IPointerClickHandler
     [SerializeField] SettingsManager settingsManager;
     [SerializeField] SettingType settingType;
     
-    public enum SettingType { PostProcessing, DistortionEffects, WeatherEffects, Fullscreen, VSync, ShowFPS, ControllerVibration }
+    public enum SettingType { PostProcessing, DistortionEffects, WeatherEffects, Fullscreen, VSync, ShowFPS, ControllerVibration, JoystickSwap, UseDPad }
     GameManager gameManager;
 
     void Start()
@@ -38,6 +38,12 @@ public class SettingsToggle : MonoBehaviour, IPointerClickHandler
             break;
             case SettingType.ControllerVibration:
             ToggleControllerVibration();
+            break;
+            case SettingType.JoystickSwap:
+            ToggleJoystickSwap();
+            break;
+            case SettingType.UseDPad:
+            ToggleUseDPad();
             break;
         }
 	}
@@ -84,5 +90,15 @@ public class SettingsToggle : MonoBehaviour, IPointerClickHandler
 
         if(gameManager.controllerVibration)
             GameInputManager.Instance.RumbleController(0.9f, 0.9f, 0.5f);
+    }
+
+    void ToggleJoystickSwap()
+    {
+        gameManager.swapJoysticks = !gameManager.swapJoysticks;
+    }
+
+    void ToggleUseDPad()
+    {
+        gameManager.useDPad = !gameManager.useDPad;
     }
 }

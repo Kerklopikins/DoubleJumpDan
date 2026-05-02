@@ -204,7 +204,7 @@ public class Player: MonoBehaviour
     {
         if(rb2D.velocity.y <= -25)
             rb2D.velocity = new Vector2(rb2D.velocity.x, -25);
-
+        
         float targetVelocityX = input.x * speed;
         float smoothedX = Mathf.SmoothDamp(rb2D.velocity.x, targetVelocityX, ref velocityXSmoothing, (grounded) ? accelerationTimeGrounded : accelerationTimeInAir);
 

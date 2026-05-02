@@ -4721,6 +4721,16 @@ MonoBehaviour:
   showFPSToggle: {fileID: 0}
   aimSensitivitySlider: {fileID: 0}
   cursorSensitivitySlider: {fileID: 0}
+  controllerVibrationToggle: {fileID: 0}
+  swapJoysticksToggle: {fileID: 0}
+  moveAction: {fileID: 5931795334615063197, guid: ed60705c2a4334745adad52aa57e9f07,
+    type: 3}
+  aimAction: {fileID: -2134882837010191189, guid: ed60705c2a4334745adad52aa57e9f07,
+    type: 3}
+  moveBindingIndex: 0
+  aimBindingIndex: 0
+  keyboardButtons: []
+  controllerButtons: []
 --- !u!1 &6483978792700977743
 GameObject:
   m_ObjectHideFlags: 0

@@ -46,7 +46,7 @@ public class ExitUIArea : MonoBehaviour
 
     void Update()
     { 
-        if(levelLoadingManager.Busy)
+        if(levelLoadingManager.Busy || gameInputManager.rebinding)
             return;
             
         if(uIScreenManager.transitionTimer <= 0)
@@ -66,7 +66,7 @@ public class ExitUIArea : MonoBehaviour
                                     settingsManager.SaveSettings();
 
                                 if(shopManager != null)
-                                    shopManager.SaveCustomSkin();
+                                    shopManager.SaveShopData();
                             }
                             break;
                         case PanelType.Mini:
@@ -78,7 +78,7 @@ public class ExitUIArea : MonoBehaviour
                                     settingsManager.SaveSettings();
 
                                 if(shopManager != null)
-                                    shopManager.SaveCustomSkin();
+                                    shopManager.SaveShopData();
                             }
                             break;
                     }

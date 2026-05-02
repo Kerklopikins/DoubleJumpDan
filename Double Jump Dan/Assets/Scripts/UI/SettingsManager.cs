@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
@@ -29,21 +30,44 @@ public class SettingsManager : MonoBehaviour
     [SerializeField] Slider aimSensitivitySlider;
     [SerializeField] Slider cursorSensitivitySlider;
     [SerializeField] Toggle controllerVibrationToggle;
-    
+    [SerializeField] Toggle swapJoysticksToggle;
+    [SerializeField] Toggle useDPadToggle;
+
+    [Header("Input Settings")]  
+    [SerializeField] Button inputSettingsButton;
+    [SerializeField] AudioClip buttonClickSound;
+    [SerializeField] GameObject inputSettingsGameObject;
+    [SerializeField] ScrollRect inputSettingsScrollRect;
+    [SerializeField] RectTransform inputSettingsContent;
+    [SerializeField] Button[] keyboardButtons;
+    [SerializeField] Button[] controllerButtons;
+    [SerializeField] InputRebindingButton[] inputRebindingButtons;
+
     public MainMenuManager mainMenuManager { get; private set; }
     List<Vector2> screenResolutions = new List<Vector2>();
     List<int> frameRates = new List<int>();
     GameManager gameManager;
     GameHUD gameHUD;
+    GameInputManager gameInputManager;
+    LevelLoadingManager levelLoadingManager;
+    bool inMainMenu;
 
     void Start()
     {
         gameManager = GameManager.Instance;
+        gameInputManager = GameInputManager.Instance;
+        levelLoadingManager = LevelLoadingManager.Instance;
+        gameInputManager.OnRebind += Rebind;
 
         if(GetComponent<MainMenuManager>() != null)
+        {
+            inMainMenu = true;            
             mainMenuManager = GetComponent<MainMenuManager>();
+        }
         else if(GetComponent<GameHUD>() != null)
+        {
             gameHUD = GetComponent<GameHUD>();
+        }
 
         volumeSliders[0].value = gameManager.sfxVolume;
         volumeSliders[1].value = gameManager.musicVolume;
@@ -56,6 +80,8 @@ public class SettingsManager : MonoBehaviour
 
         if(mainMenuManager != null)
         {
+            gameInputManager.OnControllerChanged += OnControllerChanged;
+
             for(int i = 0; i < Screen.resolutions.Length; i++)
             {
                 if(Screen.resolutions[i].width >= 512)
@@ -105,10 +131,27 @@ public class SettingsManager : MonoBehaviour
             aimSensitivitySlider.value = gameManager.aimSensitivity;
             cursorSensitivitySlider.value = gameManager.cursorSensitivity;
             controllerVibrationToggle.isOn = gameManager.controllerVibration;
+            swapJoysticksToggle.isOn = gameManager.swapJoysticks;
+            useDPadToggle.isOn = gameManager.useDPad;
 
             postProcessingToggle.isOn = gameManager.postProcessing;
             distortionEffectsToggle.isOn = gameManager.distortionEffects;
             weatherEffectsToggle.isOn = gameManager.weatherEffects;
+
+            if(gameInputManager.ControllerConnected())
+            {
+                inputSettingsScrollRect.inertia = false;
+
+                for(int i = 0; i < keyboardButtons.Length; i++)
+                    keyboardButtons[i].interactable = false;
+            }
+            else
+            {
+                for(int i = 0; i < controllerButtons.Length; i++)
+                    controllerButtons[i].interactable = false;
+            }
+
+            inputSettingsButton.onClick.AddListener(RefreshInputSettings);
         }
         else if(gameHUD != null)
         {
@@ -117,6 +160,88 @@ public class SettingsManager : MonoBehaviour
         }
 
         UpdateFPSText(gameManager.showPerformanceData);
+    }
+
+    void Update()
+    {
+        if(!inMainMenu)
+            return;
+
+        if(inputSettingsGameObject.activeSelf == false || levelLoadingManager.Busy)
+            return;
+            
+        if(gameInputManager.ControllerConnected())
+        {
+            if(Mathf.Abs(gameInputManager.ScrollDirection().y) > 0.1f)
+            {
+                if(gameInputManager.FastCursorButton())
+                    mainMenuManager._scrollSpeed = mainMenuManager.scrollSpeed * 2;
+                else
+                    mainMenuManager._scrollSpeed = mainMenuManager.scrollSpeed;
+
+                inputSettingsContent.anchoredPosition += new Vector2(0, -gameInputManager.ScrollDirection().y * mainMenuManager._scrollSpeed * Time.deltaTime);
+                inputSettingsContent.anchoredPosition = new Vector2(inputSettingsContent.anchoredPosition.x, Mathf.Clamp(inputSettingsContent.anchoredPosition.y, 0, inputSettingsContent.sizeDelta.y - 484));
+            }
+        }
+    }
+
+    void Rebind(bool enabled)
+    {
+        if(enabled)
+        {
+            if(keyboardButtons[0].interactable || controllerButtons[0].interactable)
+                AudioManager.Instance.PlaySound2D(buttonClickSound);
+
+            for(int i = 0; i < keyboardButtons.Length; i++)
+                keyboardButtons[i].interactable = false;
+
+            for(int i = 0; i < controllerButtons.Length; i++)
+                controllerButtons[i].interactable = false;
+        }
+        else
+        {
+            if(gameInputManager.ControllerConnected())
+                OnControllerChanged(true);
+            else
+                OnControllerChanged(false);
+        }
+    }
+
+    public void OnControllerChanged(bool enabled)
+    {
+        if(enabled)
+        {
+            inputSettingsScrollRect.inertia = false;
+
+            for(int i = 0; i < keyboardButtons.Length; i++)
+                keyboardButtons[i].interactable = false;
+
+            for(int i = 0; i < controllerButtons.Length; i++)
+                controllerButtons[i].interactable = true;
+        }
+        else
+        {
+            inputSettingsScrollRect.inertia = true;
+
+            for(int i = 0; i < keyboardButtons.Length; i++)
+                keyboardButtons[i].interactable = true;
+
+            for(int i = 0; i < controllerButtons.Length; i++)
+                controllerButtons[i].interactable = false;
+        }
+    }
+
+    public void RefreshInputSettings()
+    {
+        StartCoroutine(DelayInputSettingsContentCentering());
+    }
+
+    IEnumerator DelayInputSettingsContentCentering()
+    {
+        yield return null;
+        yield return null;
+
+        inputSettingsScrollRect.verticalNormalizedPosition = 1;
     }
 
     public void RefreshFullscreenToggle()
@@ -179,7 +304,15 @@ public class SettingsManager : MonoBehaviour
         aimSensitivitySlider.value = 0.5f;
         cursorSensitivitySlider.value = 0.5f;
         controllerVibrationToggle.isOn = true;
+        swapJoysticksToggle.isOn = false;
+        useDPadToggle.isOn = false;
+
+        gameManager.swapJoysticks = false;
+        gameManager.useDPad = false;
         gameManager.controllerVibration = true;
+
+        for(int i = 0; i < inputRebindingButtons.Length; i++)
+            inputRebindingButtons[i].ResetToDefault();
 
         AdjustCursorSensitivity();
     }
@@ -203,6 +336,7 @@ public class SettingsManager : MonoBehaviour
     {
         gameManager.musicVolume = volumeSliders[1].value;
         gameManager.sfxVolume = volumeSliders[0].value;
+        gameManager.inputBindings = gameInputManager.inputActions.SaveBindingOverridesAsJson();
 
         if(mainMenuManager != null)
         {    

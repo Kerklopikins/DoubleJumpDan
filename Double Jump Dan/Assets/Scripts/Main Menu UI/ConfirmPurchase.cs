@@ -43,9 +43,7 @@ public class ConfirmPurchase : MonoBehaviour
 			gameManager.currentUser.ownedSkins.Add(shopItem.item.itemID);
 		
         ShopManager.Instance.RefreshGemsText();
-
-		gameManager.SaveUserData();
-
         ShopManager.Instance.EquipItem(shopItem);
+        ShopManager.Instance.SaveShopData();
 	}
 }

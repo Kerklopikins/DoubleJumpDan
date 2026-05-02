@@ -72,6 +72,7 @@ public class MainMenuManager : MonoBehaviour
         screenshotsMenuGameObject.SetActive(true);
 
         gameInputManager = GameInputManager.Instance;
+        gameInputManager.OnRebind += Rebind;
 
         initialUserCount = GameManager.Instance.users.Count;
 
@@ -118,6 +119,17 @@ public class MainMenuManager : MonoBehaviour
         }
     }
     
+    void Rebind(bool enabled)
+    {
+        if(gameInputManager.ControllerConnected())
+        {
+            if(enabled)
+                cursor.gameObject.SetActive(false);
+            else
+                cursor.gameObject.SetActive(true);
+        }
+    }
+
     void Update()
     {
         if(!initialized)
@@ -137,11 +149,11 @@ public class MainMenuManager : MonoBehaviour
             return;
         }
         
-        if(gameInputManager.ControllerConnected())
+        if(gameInputManager.ControllerConnected() && !gameInputManager.rebinding)
         {
-            input = gameInputManager.GetJoystickMovement();
+            input = gameInputManager.GetCursorMovement();
 
-            if(gameInputManager.LeftTrigger())
+            if(gameInputManager.FastCursorButton())
                 _cursorSpeed = cursorSpeed * 2f;
             else
                 _cursorSpeed = cursorSpeed;
@@ -157,7 +169,7 @@ public class MainMenuManager : MonoBehaviour
             RectTransformUtility.ScreenPointToLocalPointInRectangle(canvas.transform as RectTransform, screenPosition, canvas.worldCamera, out Vector2 localPosition);
             cursor.anchoredPosition = localPosition;
 
-            if(gameInputManager.CursorPress())
+            if(gameInputManager.CursorClick())
                 cursorImage.sprite = cursorSprites[1];
             else
                 cursorImage.sprite = cursorSprites[0];

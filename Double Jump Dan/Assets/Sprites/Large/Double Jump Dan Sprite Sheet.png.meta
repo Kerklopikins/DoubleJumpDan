@@ -7303,6 +7303,48 @@ TextureImporter:
       indices: 
       edges: []
       weights: []
+    - serializedVersion: 2
+      name: Custom Skin Eyes 2
+      rect:
+        serializedVersion: 2
+        x: 35
+        y: 206
+        width: 12
+        height: 6
+      alignment: 9
+      pivot: {x: 0.5, y: 0.33333334}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: bb5fa99355c6da647a93064904f108fe
+      internalID: 63460481
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Custom Skin Eyes 3
+      rect:
+        serializedVersion: 2
+        x: 32
+        y: 196
+        width: 4
+        height: 4
+      alignment: 9
+      pivot: {x: 0.25, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: e9254e99a4ed7944582f57af95558f49
+      internalID: 1161670492
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
     outline: []
     physicsShape: []
     bones: []
@@ -7405,6 +7447,8 @@ TextureImporter:
       Custom Skin Arm 1: 1597590126
       Custom Skin Body: -1535349455
       Custom Skin Eyes: -115065162
+      Custom Skin Eyes 2: 63460481
+      Custom Skin Eyes 3: 1161670492
       Custom Skin Jump: 1824282275
       Custom Skin Legs 1: -2051350964
       Custom Skin Legs 2: 1064876400

@@ -13,8 +13,8 @@ public class GameManager : MonoBehaviour
     public Sprite[] gemSprites;
 
     //Game Data
-    public User currentUser;
-    public List<User> users = new List<User>();
+    [HideInInspector] public User currentUser;
+    [HideInInspector] public List<User> users = new List<User>();
     [HideInInspector] public float sfxVolume = 1;
     [HideInInspector] public float musicVolume = 1;
 	[HideInInspector] public int screenResolution = -1;
@@ -24,6 +24,9 @@ public class GameManager : MonoBehaviour
     [HideInInspector] public float aimSensitivity = 0.5f; 
     [HideInInspector] public float cursorSensitivity = 0.5f; 
     [HideInInspector] public bool controllerVibration = true;
+    [HideInInspector] public bool swapJoysticks = false;
+    [HideInInspector] public bool useDPad = false;
+    [HideInInspector] public string inputBindings = "";
     [HideInInspector] public bool postProcessing = true;
     [HideInInspector] public bool distortionEffects = true;
     [HideInInspector] public bool weatherEffects = true;
@@ -136,6 +139,9 @@ public class GameManager : MonoBehaviour
         gameData.aimSensitivity = aimSensitivity;
         gameData.cursorSensitivity = cursorSensitivity;
         gameData.controllerVibration = controllerVibration;
+        gameData.swapJoysticks = swapJoysticks;
+        gameData.useDPad = useDPad;
+        gameData.inputBindings = inputBindings;
         gameData.postProcessing = postProcessing;
         gameData.distortionEffects = distortionEffects;
         gameData.weatherEffects = weatherEffects;
@@ -170,6 +176,9 @@ public class GameManager : MonoBehaviour
             aimSensitivity = gameData.aimSensitivity;
             cursorSensitivity = gameData.cursorSensitivity;
             controllerVibration = gameData.controllerVibration;
+            swapJoysticks = gameData.swapJoysticks;
+            useDPad = gameData.swapJoysticks;
+            inputBindings = gameData.inputBindings;
             postProcessing = gameData.postProcessing;
             distortionEffects = gameData.distortionEffects;
             weatherEffects = gameData.weatherEffects;
@@ -358,6 +367,9 @@ public class GameData
     public float aimSensitivity; 
     public float cursorSensitivity; 
     public bool controllerVibration;
+    public bool swapJoysticks;
+    public bool useDPad;
+    public string inputBindings;
     public bool postProcessing;
     public bool distortionEffects;
     public bool weatherEffects;

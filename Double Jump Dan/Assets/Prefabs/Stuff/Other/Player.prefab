@@ -180,8 +180,6 @@ MonoBehaviour:
   - {fileID: 1988238480280883612}
   - {fileID: 5589356521370744775}
   - {fileID: 2873361677740460964}
-  body: {fileID: 8571632691665241738}
-  legs: {fileID: 6883594347840536964}
   properties:
     angle: 0
     strength: 1
@@ -217,7 +215,7 @@ Animator:
   m_GameObject: {fileID: 1236982683668524}
   m_Enabled: 1
   m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 9100000, guid: 540481eddc9caf64bba65c4e575685de, type: 2}
+  m_Controller: {fileID: 9100000, guid: 2ccc055e7b999124c90c251fe69ba22b, type: 2}
   m_CullingMode: 0
   m_UpdateMode: 0
   m_ApplyRootMotion: 0

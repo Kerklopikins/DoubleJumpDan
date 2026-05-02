@@ -8,10 +8,12 @@ public class GameInputManager : MonoBehaviour
 {
     public static GameInputManager Instance;
 
-    [SerializeField] InputActionAsset inputActions;
-    
+    public InputActionAsset inputActions;
+
     public float HorizontalInputSensitivity { get; private set; }
     public float VerticalInputSensitivity { get; private set; }
+    public event Action<bool> OnRebind;
+    public bool rebinding { get; set; }
     public InputMode inputMode { get; private set; }
     public enum InputMode { KeyboardAndMouse, Controller }
     public event Action<bool> OnControllerChanged;
@@ -28,21 +30,34 @@ public class GameInputManager : MonoBehaviour
     InputAction aim;
     InputAction click;
     InputAction point;
-    InputAction joystickMove;
-    InputAction leftTrigger;
+    InputAction cursorMove;
+    InputAction scrolling;
+    InputAction fastCursor;
     InputAction leftBumper;
     InputAction rightBumper;
-    InputAction cursorPress;
+    InputAction cursorClick;
     Camera _camera;
     Coroutine rumbleCoroutine;
     public static bool IsControllerConnected;
     Gamepad currentGamepad;
     GameManager gameManager;
     float currentRumbleAmount;
-
+    string defaultMovePath;
+    string defaultAimPath;
+    
     void Awake()
     {
         Instance = this;
+    }
+
+    void Start()
+    {
+        gameManager = GameManager.Instance;
+        
+        string rebinds = gameManager.inputBindings;
+
+        if(!string.IsNullOrEmpty(rebinds))
+            inputActions.LoadBindingOverridesFromJson(rebinds);
 
         move = inputActions.FindAction("Move");
         jump = inputActions.FindAction("Jump");
@@ -56,12 +71,16 @@ public class GameInputManager : MonoBehaviour
         screenshot = inputActions.FindAction("Screenshot");
         devMode = inputActions.FindAction("Dev Mode");
         click = inputActions.FindAction("Click");
-        joystickMove = inputActions.FindAction("Joystick Move");
+        cursorMove = inputActions.FindAction("Cursor Move");
+        scrolling = inputActions.FindAction("Scrolling");
         point = inputActions.FindAction("Point");
-        leftTrigger = inputActions.FindAction("Left Trigger");
+        fastCursor = inputActions.FindAction("Fast Cursor");
         leftBumper = inputActions.FindAction("Left Bumper");
         rightBumper = inputActions.FindAction("Right Bumper");
-        cursorPress = inputActions.FindAction("Cursor Press");
+        cursorClick = inputActions.FindAction("Click");
+
+        defaultMovePath = move.bindings[0].effectivePath;
+        defaultAimPath = aim.bindings[0].effectivePath;
 
         move.Enable();
         jump.Enable();
@@ -75,21 +94,17 @@ public class GameInputManager : MonoBehaviour
         devMode.Enable();
         aim.Enable();
         click.Enable();
-        joystickMove.Enable();
+        cursorMove.Enable();
+        scrolling.Enable();
         point.Enable();
-        leftTrigger.Enable();
+        fastCursor.Enable();
         leftBumper.Enable();
         rightBumper.Enable();
-        cursorPress.Enable();
+        cursorClick.Enable();
 
         HorizontalInputSensitivity = 0.2f;
         VerticalInputSensitivity = 0.5f;
-    }
 
-    void Start()
-    {
-        gameManager = GameManager.Instance;
-        
         if(!gameManager.InMainMenu())
             _camera = LevelManager.Instance.mainCamera;
         else
@@ -101,6 +116,21 @@ public class GameInputManager : MonoBehaviour
             SetInput(InputMode.KeyboardAndMouse);
 
         RumbleController(0, 0, 0);
+        UpdateJoystickSwap();
+    }
+
+    public void UpdateJoystickSwap()
+    {        
+        if(gameManager.swapJoysticks)
+        {
+            move.ApplyBindingOverride(0, defaultAimPath);
+            aim.ApplyBindingOverride(0, defaultMovePath);
+        }
+        else
+        {
+            move.RemoveBindingOverride(0);
+            aim.RemoveBindingOverride(0);
+        }
     }
 
     public bool ControllerConnected()
@@ -108,8 +138,17 @@ public class GameInputManager : MonoBehaviour
         return IsControllerConnected;
     }
 
+    public void Rebind(bool enabled)
+    {
+        rebinding = enabled;
+        OnRebind?.Invoke(enabled);
+    }
+
     void Update()
     {
+        if(rebinding)
+            return;
+
         if(Gamepad.current != null)
         {
             currentGamepad = Gamepad.current;
@@ -173,9 +212,14 @@ public class GameInputManager : MonoBehaviour
         return move.ReadValue<Vector2>().y;
     }
 
-    public Vector2 GetJoystickMovement()
+    public Vector2 GetCursorMovement()
     {
-        return joystickMove.ReadValue<Vector2>();
+        return cursorMove.ReadValue<Vector2>();
+    }
+
+    public Vector2 ScrollDirection()
+    {
+        return scrolling.ReadValue<Vector2>();
     }
 
     public Vector2 AimDirection()
@@ -284,17 +328,17 @@ public class GameInputManager : MonoBehaviour
             return false;
     }
 
-    public bool CursorPress()
+    public bool CursorClick()
     {
-        if(cursorPress.IsPressed())
+        if(cursorClick.IsPressed())
             return true;
         else
             return false;
     }
 
-    public bool LeftTrigger()
+    public bool FastCursorButton()
     {
-        if(leftTrigger.IsPressed())
+        if(fastCursor.IsPressed())
             return true;
         else
             return false;
@@ -338,6 +382,10 @@ public class GameInputManager : MonoBehaviour
         currentRumbleAmount = low + high;
         Gamepad.current.SetMotorSpeeds(low, high);
         yield return new WaitForSecondsRealtime(duration);
+
+        if(Gamepad.current == null)
+            yield break;
+            
         Gamepad.current.SetMotorSpeeds(0, 0);
         currentRumbleAmount = 0;
     }

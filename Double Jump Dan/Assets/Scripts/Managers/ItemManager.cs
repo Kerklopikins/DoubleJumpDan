@@ -100,8 +100,6 @@ public class ItemManager : MonoBehaviour
 				gameManager.currentUser.skinID = shopItem.item.itemID;
 				break;
 		}
-       
-        gameManager.SaveUserData();
 	}
 
 	Vector3 CorrectedItemScale(Transform itemScale)
