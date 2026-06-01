@@ -243,12 +243,14 @@ public class LightningGun : MonoBehaviour
             yield return null;
         }
 
+        transform.localEulerAngles = initialRot;
         gunInfo.Reload();
         reloading = false;
 
         yield return null;
     }
 
+    #if UNITY_EDITOR
     void OnDrawGizmos()
     {
         if(lightningSpawnPoint == null)
@@ -273,4 +275,5 @@ public class LightningGun : MonoBehaviour
 
         Gizmos.DrawWireSphere(spawnPosition, 0.25f);
     }
+    #endif
 }

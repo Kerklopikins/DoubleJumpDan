@@ -2,24 +2,41 @@ using System.Linq;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.InputSystem;
-////TODO: support multi-object editing
 
-/// <summary>
-/// A custom inspector for <see cref="RebindActionUI"/> which provides a more convenient way for
-/// picking the binding which to rebind.
-/// </summary>
 [CustomEditor(typeof(InputRebindingButton))]
-public class InputRebindingButtonEditor : UnityEditor.Editor
+public class InputRebindingButtonEditor : Editor
 {
+    SerializedProperty m_ActionProperty;
+    SerializedProperty m_BindingIdProperty;
+    SerializedProperty m_ActionLabelProperty;
+    SerializedProperty m_BindingTextProperty;
+    SerializedProperty m_ControlImageProperty;
+    SerializedProperty m_CompositeControlImages;
+    SerializedProperty m_RebindTextProperty;
+    SerializedProperty rebindCancelTimerTextProperty;
+    SerializedProperty m_RebindStartEventProperty;
+    SerializedProperty m_RebindStopEventProperty;
+    SerializedProperty m_UpdateBindingUIEventProperty;
+    SerializedProperty m_DisplayStringOptionsProperty;
+
+    GUIContent m_BindingLabel = new GUIContent("Binding");
+    GUIContent m_DisplayOptionsLabel = new GUIContent("Display Options");
+    GUIContent m_UILabel = new GUIContent("UI");
+    GUIContent m_EventsLabel = new GUIContent("Events");
+    GUIContent[] m_BindingOptions;
+    string[] m_BindingOptionValues;
+    int m_SelectedBindingOption;
+
     protected void OnEnable()
     {
         m_ActionProperty = serializedObject.FindProperty("m_Action");
         m_BindingIdProperty = serializedObject.FindProperty("m_BindingId");
         m_ActionLabelProperty = serializedObject.FindProperty("m_ActionLabel");
         m_BindingTextProperty = serializedObject.FindProperty("m_BindingText");
-        m_ControllerButtonImageProperty = serializedObject.FindProperty("m_ControllerButtonImage");
-        m_RebindOverlayProperty = serializedObject.FindProperty("m_RebindOverlay");
+        m_ControlImageProperty = serializedObject.FindProperty("m_ControlImage");
+        m_CompositeControlImages = serializedObject.FindProperty("m_CompositeControlImages");
         m_RebindTextProperty = serializedObject.FindProperty("m_RebindText");
+        rebindCancelTimerTextProperty = serializedObject.FindProperty("rebindCancelTimerText");
         m_UpdateBindingUIEventProperty = serializedObject.FindProperty("m_UpdateBindingUIEvent");
         m_RebindStartEventProperty = serializedObject.FindProperty("m_RebindStartEvent");
         m_RebindStopEventProperty = serializedObject.FindProperty("m_RebindStopEvent");
@@ -62,9 +79,10 @@ public class InputRebindingButtonEditor : UnityEditor.Editor
         {
             EditorGUILayout.PropertyField(m_ActionLabelProperty);
             EditorGUILayout.PropertyField(m_BindingTextProperty);
-            EditorGUILayout.PropertyField(m_ControllerButtonImageProperty);
-            EditorGUILayout.PropertyField(m_RebindOverlayProperty);
+            EditorGUILayout.PropertyField(m_ControlImageProperty);
+            EditorGUILayout.PropertyField(m_CompositeControlImages);
             EditorGUILayout.PropertyField(m_RebindTextProperty);
+            EditorGUILayout.PropertyField(rebindCancelTimerTextProperty);
         }
 
         // Events section.
@@ -155,27 +173,7 @@ public class InputRebindingButtonEditor : UnityEditor.Editor
         }
     }
 
-    private SerializedProperty m_ActionProperty;
-    private SerializedProperty m_BindingIdProperty;
-    private SerializedProperty m_ActionLabelProperty;
-    private SerializedProperty m_BindingTextProperty;
-    private SerializedProperty m_ControllerButtonImageProperty;
-    private SerializedProperty m_RebindOverlayProperty;
-    private SerializedProperty m_RebindTextProperty;
-    private SerializedProperty m_RebindStartEventProperty;
-    private SerializedProperty m_RebindStopEventProperty;
-    private SerializedProperty m_UpdateBindingUIEventProperty;
-    private SerializedProperty m_DisplayStringOptionsProperty;
-
-    private GUIContent m_BindingLabel = new GUIContent("Binding");
-    private GUIContent m_DisplayOptionsLabel = new GUIContent("Display Options");
-    private GUIContent m_UILabel = new GUIContent("UI");
-    private GUIContent m_EventsLabel = new GUIContent("Events");
-    private GUIContent[] m_BindingOptions;
-    private string[] m_BindingOptionValues;
-    private int m_SelectedBindingOption;
-
-    private static class Styles
+    static class Styles
     {
         public static GUIStyle boldLabel = new GUIStyle("MiniBoldLabel");
     }

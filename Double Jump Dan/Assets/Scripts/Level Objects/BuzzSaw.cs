@@ -1,5 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
+using UnityEngine.SceneManagement;
+
 
 #if UNITY_EDITOR
 using UnityEditor;
@@ -110,6 +112,9 @@ public class BuzzSaw : MonoBehaviour
     
     void Resize()
     {
+        if(sawSprite == null)
+            return;
+
         if(size == 1)
         {
             sawSprite.sprite = sawSprites[0];     
@@ -122,9 +127,14 @@ public class BuzzSaw : MonoBehaviour
         }
     }
 
+    Vector2 SnapVector(Vector2 v)
+    {
+        return new Vector2(Mathf.Round(v.x), Mathf.Round(v.y));
+    }
+
+    #if UNITY_EDITOR
     void OnValidate()
     {
-#if UNITY_EDITOR
         if(lastAdjustment != size)
             EditorApplication.delayCall += Resize;
 
@@ -140,17 +150,10 @@ public class BuzzSaw : MonoBehaviour
             if(points[i] == Vector2.zero)
                 points[i] = new Vector2(transform.position.x, transform.position.y);
         }
-#endif
-    }
-
-    private Vector2 SnapVector(Vector2 v)
-    {
-        return new Vector2(Mathf.Round(v.x), Mathf.Round(v.y));
     }
 
     void OnDrawGizmos()
     {
-#if UNITY_EDITOR
         Vector3 boxSize;
         Vector2 guiOffset;
 
@@ -197,7 +200,6 @@ public class BuzzSaw : MonoBehaviour
 
         if(loop && points.Count > 0)
             Gizmos.DrawLine(new Vector3(points[points.Count - 1].x, points[points.Count - 1].y, 0), new Vector3(points[0].x, points[0].y, 0));
-#endif
-
     }
+    #endif
 }

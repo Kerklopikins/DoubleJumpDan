@@ -27,12 +27,14 @@ public class Parallax : MonoBehaviour
         OffsetBackground();
     }
 
+    #if UNITY_EDITOR
     void OnValidate()
     {
         if(!Application.isPlaying)
             transform.position = new Vector2(startingOffsetX, transform.position.y);
     }
-
+    #endif
+    
     public void OffsetBackground()
     {
         float cameraSize = _camera.orthographicSize * ((float)Screen.width / Screen.height);

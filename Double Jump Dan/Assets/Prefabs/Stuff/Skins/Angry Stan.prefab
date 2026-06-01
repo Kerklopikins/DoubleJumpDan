@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 4445698611817820}
   - component: {fileID: 95564168219559970}
   - component: {fileID: -1073785821297341855}
+  - component: {fileID: 3227087822028145526}
   m_Layer: 0
   m_Name: Angry Stan
   m_TagString: Untagged
@@ -73,3 +74,16 @@ MonoBehaviour:
   description: Dan's angry brother.
   picture: {fileID: 21300154, guid: fd62903050e1ca349bba8b53f64cbbda, type: 3}
   premiumItem: 0
+--- !u!114 &3227087822028145526
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1863906000987150}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2a154ea4747eb5f4ba10e9064891ba4f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  eyeType: 1

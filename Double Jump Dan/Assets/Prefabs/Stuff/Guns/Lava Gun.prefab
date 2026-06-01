@@ -57,6 +57,10 @@ MonoBehaviour:
   burstsPerMagazine: 0
   burstCoolDownTime: 0
   aimPointOffset: 0.5625
+  restingAngleOffset: 3.943
+  lowRumbleAmount: 0
+  highRumbleAmount: 0
+  rumbleDuration: 0
 --- !u!212 &212793488218939944
 SpriteRenderer:
   m_ObjectHideFlags: 0

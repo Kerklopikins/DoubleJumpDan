@@ -101,10 +101,11 @@ public class CameraManager : MonoBehaviour
 
     public void Shake(Properties properties)
     {
-        if (currentShakeCoroutine != null)
-        {
+        if(!GameManager.Instance.cameraShake)
+            return;
+            
+        if(currentShakeCoroutine != null)
             StopCoroutine(currentShakeCoroutine);
-        }
 
         currentShakeCoroutine = ShakeCo(properties);
         StartCoroutine(currentShakeCoroutine);

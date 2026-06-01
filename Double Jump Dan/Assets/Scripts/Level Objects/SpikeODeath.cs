@@ -31,21 +31,6 @@ public class SpikeODeath : MonoBehaviour
 		SetSize();
     }
 
-    void OnValidate()
-    {
-    #if UNITY_EDITOR
-        if(!editorMode)
-            return;
-            
-        length = (int)Mathf.Round(length / 2) * 2;
-
-        if(lastAdjustment != length)
-            EditorApplication.delayCall += SetSize;
-        
-        lastAdjustment = length;
-    #endif
-    }
-
     void SetSize()
     {
         localStartPosition = transform.localPosition;
@@ -108,6 +93,20 @@ public class SpikeODeath : MonoBehaviour
         transform.localPosition = localStartPosition + offset;
     }
 
+    #if UNITY_EDITOR
+    void OnValidate()
+    {
+        if(!editorMode)
+            return;
+            
+        length = (int)Mathf.Round(length / 2) * 2;
+
+        if(lastAdjustment != length)
+            EditorApplication.delayCall += SetSize;
+        
+        lastAdjustment = length;
+    }
+
     void OnDrawGizmos()
     {
         int _length = length + 2;
@@ -129,4 +128,5 @@ public class SpikeODeath : MonoBehaviour
         Vector3 offset = new Vector3(0, _length * 0.5f - 1, 0);
         Gizmos.DrawCube(offset, new Vector3(1, _length, 1));
     }
+    #endif
 }

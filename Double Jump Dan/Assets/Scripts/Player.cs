@@ -6,11 +6,15 @@ using System.Collections.Generic;
 public class Player: MonoBehaviour
 {
     [Header("Movement")]
-    public float speed;
+    public float walkSpeed = 10;
+    public float sprintSpeed = 13;
     public float accelerationTimeGrounded;
     public float accelerationTimeInAir;
     public float jumpHeight;
     [SerializeField] float coyoteTime;
+    [SerializeField] Transform body;
+    [SerializeField] Vector2 bodyRotateMinMax;
+    [SerializeField] float bodyRotateSpeed;
 
     [Header("Health")]
     public int health;
@@ -27,15 +31,16 @@ public class Player: MonoBehaviour
     public Transform aimPoint;
 
     [Header("Eye Movement")]
-    public Transform pupilsParent;
-    public Vector2 maxPupilsOffset;
-    public float horizontalSensitivity;
-    public float verticalSensitivity;
-    public float minThreshold;
-    public float maxThreshold;
-    public float maxMouseDistance = 5;
-    public float smoothSpeed;
-    public Transform eyeBrow;
+    [SerializeField] Transform pupilsParent;
+    [SerializeField] Vector2 pupilsParentStartPosition;
+    [SerializeField] Vector2 maxPupilsOffset;
+    [SerializeField] float horizontalSensitivity;
+    [SerializeField] float verticalSensitivity;
+    [SerializeField] float minThreshold;
+    [SerializeField] float maxThreshold;
+    [SerializeField] float maxMouseDistance = 5;
+    [SerializeField] float smoothSpeed;
+    [SerializeField] Transform eyeBrow;
 
     [Header("Effects")]
     [SerializeField] GameObject destroyedEffect;
@@ -73,8 +78,10 @@ public class Player: MonoBehaviour
     public event Action OnPlayerTeleported;
 
     //Physics
+    float _speed;
     public bool grounded { get; private set; }
     public float fallButtonTimer { get; set; }
+    public int direction { get; private set; }
     float velocityXSmoothing;
     bool doubleJump;
     float _fallTimer;
@@ -86,20 +93,24 @@ public class Player: MonoBehaviour
     float _knockBackInputDelayTimer;
     bool wasGroundedLastFrame;
     float previousVelocityY;
-    int direction = 1;
     
     //Input
-    Vector2 input;
-    int xInput;
-    int yInput;
+    Vector2 input; //For movement
+    int xInput; //For movement
+    int yInput; //For movement
     Vector3 lastAimDirection; //For arm
     Vector3 difference; //For arm
     public Transform crosshairs { get; set; }
     bool teleporting = false;
+    float bodyTargetRotation;
+    float currentBodyRotation;
+
+    //Animation
+    float walkAnimationSpeed; //For speeding up when sprinting
+    float walkAnimationT; //For speeding up when sprinting
 
     //Rotating Eyes
-    Vector3 pupilsParentStartPosition;
-    Vector3 eyeBrowStartPosition;
+    Vector2 eyeBrowStartPosition;
     Vector3 eyeLookDirection;
     float targetX;
     float targetY;
@@ -117,27 +128,30 @@ public class Player: MonoBehaviour
     float finalPositionX;
     bool firstFinishJump;
 
+    //Flash
+    WaitForSeconds flashSpeed = new WaitForSeconds(0.07f);
+
     //Game HUD
     public bool gameHUDPaused { get; set; }
     public bool gameHUDFrozen { get; set; }
 
     //Wee effect
-    float weeEffectFallThreshold = 2.5f;
+    float weeEffectFallThreshold = 2.5f; //How long to fall until wee is activated
     bool animatedWee;
     bool canAnimateWee = true;
 
     //Camera
-    public bool canFollow { get; set; }
+    public bool canFollow { get; set; } //Called when killed or finished level
 
     //References
+    GameManager gameManager;
     Rigidbody2D rb2D;
     GameInputManager gameInputManager;
     Animator animator;
     Collider2D _collider2D;
-    GameObject parts;
     ShadowDanTracer shadowDanTracer;
     MaterialPropertyBlock materialPropertyBlock;
-        
+    
     void Awake()
     {
         lives = 3;
@@ -149,9 +163,11 @@ public class Player: MonoBehaviour
         rb2D = GetComponent<Rigidbody2D>();
         animator = GetComponent<Animator>();
         _collider2D = GetComponent<Collider2D>();
+        gameManager = GameManager.Instance;
+
+        direction = 1;
 
         canFollow = true;
-        parts = transform.Find("Legs").gameObject;
         _coyoteTime = coyoteTime;       
         doubleJumpTimer = 0.15f;
         _fallTimer = weeEffectFallThreshold;
@@ -159,9 +175,27 @@ public class Player: MonoBehaviour
         shadowDanTracer.enabled = false;
         materialPropertyBlock = new MaterialPropertyBlock();
 
-        pupilsParentStartPosition = pupilsParent.localPosition;
         eyeBrowStartPosition = eyeBrow.localPosition;
         gameInputManager = GameInputManager.Instance;
+        
+        if(gameManager.lockAiming)
+            pupilsParent.localPosition = new Vector3(pupilsParentStartPosition.x + maxPupilsOffset.x, pupilsParentStartPosition.y -maxPupilsOffset.y, 0);
+
+        CheckForUpgrades();
+    }
+
+    void CheckForUpgrades()
+    {
+        //The Red Cross
+        if(gameManager.currentUser.equippedUpgrades.Contains(6487))
+        {
+            health += health / 2;
+            _health = health;
+        }
+
+        //The Golden Heart
+        if(gameManager.currentUser.equippedUpgrades.Contains(5480))
+            lives = 4;
     }
 
     void Update()
@@ -205,7 +239,7 @@ public class Player: MonoBehaviour
         if(rb2D.velocity.y <= -25)
             rb2D.velocity = new Vector2(rb2D.velocity.x, -25);
         
-        float targetVelocityX = input.x * speed;
+        float targetVelocityX = input.x * _speed;
         float smoothedX = Mathf.SmoothDamp(rb2D.velocity.x, targetVelocityX, ref velocityXSmoothing, (grounded) ? accelerationTimeGrounded : accelerationTimeInAir);
 
         /////MAKE SURE THIS ISNT MESSING ANYTHING UP
@@ -243,6 +277,8 @@ public class Player: MonoBehaviour
         {
             rb2D.velocity = new Vector2(rb2D.velocity.x, jumpHeight);
             doubleJumpTimer = 0.15f;
+            
+            GameManager.Instance.currentUser.totalJumps += 1;
         }
 
         doubleJumpTimer -= Time.deltaTime;
@@ -256,6 +292,8 @@ public class Player: MonoBehaviour
             doubleJumpParticles.Play();
             rb2D.velocity = new Vector2(rb2D.velocity.x, jumpHeight);
             doubleJump = true;
+
+            GameManager.Instance.currentUser.totalJumps += 1;
         }
     }
 
@@ -301,6 +339,20 @@ public class Player: MonoBehaviour
         isGrounded = _grounded;
     }
 
+    public void AddVelocity(Vector2 direction, int force)
+    {
+        rb2D.velocity = direction * force;
+    }
+
+    public void CancelYVelocity()
+    {
+        rb2D.velocity = new Vector2(rb2D.velocity.x, 0);
+    }
+
+    #endregion
+    
+    #region RotateArm
+
     void RotateArm()
     {
         if(gameInputManager.ControllerConnected() && crosshairs != null)
@@ -310,12 +362,10 @@ public class Player: MonoBehaviour
         }
         else
         {
-            Vector3 realMousePosition = gameInputManager.GetRealMousePosition();
-            float mouseDistance = Vector2.Distance(transform.position, realMousePosition);
-
-            if(mouseDistance > 2)
+            //Mouse distance
+            if(Vector2.Distance(transform.position, gameInputManager.GetRealMousePosition()) > 2)
             {
-                difference = realMousePosition - aimPoint.position;
+                difference = gameInputManager.GetRealMousePosition() - aimPoint.position;
                 difference.Normalize();
                 
                 lastAimDirection = difference;
@@ -326,18 +376,7 @@ public class Player: MonoBehaviour
             }
         }
 
-        float rotZ = Mathf.Atan2(difference.y, difference.x) * Mathf.Rad2Deg;
-        armTwo.rotation = Quaternion.Slerp(armTwo.rotation, Quaternion.Euler(0, 0, rotZ + 90), Time.deltaTime * 10);       
-    }
-
-    public void AddVelocity(Vector2 direction, int force)
-    {
-        rb2D.velocity = direction * force;
-    }
-
-    public void CancelYVelocity()
-    {
-        rb2D.velocity = new Vector2(rb2D.velocity.x, 0);
+        armTwo.rotation = Quaternion.Slerp(armTwo.rotation, Quaternion.Euler(0, 0, (Mathf.Atan2(difference.y, difference.x) * Mathf.Rad2Deg) + 90), Time.deltaTime * 10);       
     }
 
     #endregion
@@ -377,18 +416,28 @@ public class Player: MonoBehaviour
 
         input = new Vector2(xInput, yInput);
 
-        if(!gameInputManager.StrafeButton())
-        {
-            if(input.x > 0)
-                direction = 1;
-            else if(input.x < 0)
-                direction = -1;
+        if(gameInputManager.SprintButton() && grounded)
+            _speed = sprintSpeed;
+        else
+            _speed = walkSpeed;
 
-            transform.localScale = new Vector3(direction, 1, 1);
+        if(input.x > 0)
+            direction = 1;
+        else if(input.x < 0)
+            direction = -1;
+
+        transform.localScale = new Vector3(direction, 1, 1);   
+        
+        if(!gameManager.lockAiming)
+        {
+            RotateArm();
+            RotateEyes();
+        }
+        else
+        {
+            armTwo.rotation = Quaternion.Euler(0, 0, direction == 1 ? 90 : -90); 
         }
 
-        RotateArm();
-        RotateEyes();
         Jump();
     }
 
@@ -417,7 +466,7 @@ public class Player: MonoBehaviour
 
     #endregion
 
-    #region Effects
+    #region RotateEyes
     void RotateEyes()
     {
         if(gameInputManager.ControllerConnected())
@@ -433,9 +482,8 @@ public class Player: MonoBehaviour
         }
         
         eyeLookDirection = new Vector3(eyeLookDirection.x * transform.localScale.x, eyeLookDirection.y, 0);
-        float distance = eyeLookDirection.magnitude;
         
-        float t = Mathf.Clamp01(distance / maxMouseDistance);
+        float t = Mathf.Clamp01(eyeLookDirection.magnitude / maxMouseDistance);
         float thresholdX = Mathf.Lerp(minThreshold, maxThreshold, t) + maxPupilsOffset.x;
         float thresholdY = Mathf.Lerp(minThreshold, maxThreshold, t) + maxPupilsOffset.y;
         
@@ -455,16 +503,63 @@ public class Player: MonoBehaviour
             targetY = -maxPupilsOffset.y;
         else
             targetY = -maxPupilsOffset.y;
-
-        Vector3 targetPosition = pupilsParentStartPosition + new Vector3(targetX, targetY, 0);
-        Vector3 eyebrowTargetPosition = eyeBrowStartPosition + new Vector3(0, targetY, 0);
         
-        pupilsParent.localPosition = Vector3.Lerp(pupilsParent.localPosition, targetPosition, Time.deltaTime * smoothSpeed);
+        pupilsParent.localPosition = Vector2.Lerp(pupilsParent.localPosition, pupilsParentStartPosition + new Vector2(targetX, targetY), Time.deltaTime * smoothSpeed);
                 
-        if(eyeBrow.gameObject.activeSelf)
-            eyeBrow.localPosition = Vector3.Lerp(eyeBrow.localPosition, eyebrowTargetPosition, Time.deltaTime * smoothSpeed);    
+        if(eyeBrow.gameObject.activeInHierarchy)
+            eyeBrow.localPosition = Vector2.Lerp(eyeBrow.localPosition, eyeBrowStartPosition + new Vector2(0, targetY), Time.deltaTime * smoothSpeed);    
     }
+    #endregion
 
+    //#region RotateBody
+    //void RotateBody()
+    //{
+        //if(gameInputManager.ControllerConnected() && crosshairs != null)
+        //{            
+            //difference = crosshairs.position - transform.position;
+            //difference.Normalize();
+        //}
+        //else
+        //{
+            //float mouseDistance = Vector2.Distance(transform.position, gameInputManager.GetRealMousePosition());
+            
+            //if(mouseDistance > 2)
+            //{
+                //difference = gameInputManager.GetRealMousePosition() - transform.position;
+                //difference.Normalize();
+            //}
+            //else
+            //{
+                //difference = Vector3.zero;
+            //}
+        //}
+        
+        //float localDirectionX = direction > 0 ? difference.x : -difference.x;
+        //float rotZ = Mathf.Atan2(-difference.y, localDirectionX) * Mathf.Rad2Deg;
+        //float rotZOffset;
+
+        //if(difference.x != 0 || difference.y != 0)
+        //{
+            //if(gameInputManager.GetRealMousePosition().x > transform.position.x && direction == -1)
+                //rotZOffset = 0;
+            //else if(gameInputManager.GetRealMousePosition().x < transform.position.x && direction == 1)
+                //rotZOffset = 0;
+            //else
+                //rotZOffset = transform.lossyScale.x > 0 ? -rotZ : rotZ;
+        //}
+        //else
+        //{
+            //rotZOffset = 0;
+        //}
+
+        //rotZOffset = Math.Clamp(rotZOffset, bodyRotateMinMax.x, bodyRotateMinMax.y);
+        //currentBodyRotation = Mathf.Lerp(currentBodyRotation, rotZOffset, bodyRotateSpeed * Time.deltaTime);
+
+        //body.rotation = Quaternion.Euler(0, 0, currentBodyRotation);
+    //}
+    //#endregion
+
+    #region AnimationAndWalkEffects
     void SetAnimationsAndWalkEffects()
     {
         float velocityXAbs = Mathf.Abs(rb2D.velocity.x);
@@ -477,7 +572,7 @@ public class Player: MonoBehaviour
 
         animator.SetBool("Grounded", grounded);
         
-        if(weeSprite.gameObject.activeSelf)
+        if(weeSprite.gameObject.activeInHierarchy)
             weeSprite.sprite = weeSprites[transform.localScale.x > 0 ? 1 : 0];
             
         if(!grounded)
@@ -504,6 +599,44 @@ public class Player: MonoBehaviour
                 animatedWee = false;
             }
         }
+        
+        if((velocityXAbs - 0.1f) > walkSpeed && velocityXAbs < sprintSpeed)
+        {
+            walkAnimationT = Mathf.InverseLerp(walkSpeed, sprintSpeed, velocityXAbs);
+            walkAnimationSpeed = Mathf.Lerp(1, 1.45f, walkAnimationT);
+            
+            if(grounded)
+                bodyTargetRotation = gameInputManager.SprintButton() ? bodyRotateMinMax.x : 0;
+            else
+                bodyTargetRotation = 0;
+        }
+        else if((velocityXAbs - 0.1f) < walkSpeed || velocityXAbs == walkSpeed)
+        {
+            walkAnimationSpeed = 1;
+
+            if(grounded)
+            {
+                if(input.y > 0.1f)
+                    bodyTargetRotation = bodyRotateMinMax.y;
+                else if(input.y < -0.1f)
+                    bodyTargetRotation = bodyRotateMinMax.x;        
+                else
+                    bodyTargetRotation = 0;
+            }
+            else
+            {
+                bodyTargetRotation = 0;
+            }
+        }
+        else
+        {
+            walkAnimationSpeed = 1.45f;
+            bodyTargetRotation = grounded ? bodyRotateMinMax.x : 0;
+        }
+
+        animator.SetFloat("Walk Speed", walkAnimationSpeed);
+        currentBodyRotation = Mathf.Lerp(currentBodyRotation, direction == 1 ? bodyTargetRotation : -bodyTargetRotation, bodyRotateSpeed * Time.deltaTime);
+        body.rotation = Quaternion.Euler(0, 0, currentBodyRotation);     
 
         if(grounded)
         {
@@ -517,7 +650,10 @@ public class Player: MonoBehaviour
             animator.SetFloat("Speed", 0);
         }
     }
+    
+    #endregion
 
+    #region WeeEffect
     IEnumerator AnimateWeeEffect(int direction)
     {
         canAnimateWee = false;
@@ -549,18 +685,24 @@ public class Player: MonoBehaviour
 
         canAnimateWee = true;
     }
+    
+    #endregion
 
+    #region LandParticles
     void TriggerLandParticles(float impactSpeed)
     {
         float t = Mathf.Clamp01((impactSpeed - 1f) / 24f);
 
-        int burstAmount = Mathf.RoundToInt(Mathf.Lerp(1, 15, t));
+        //Burst amount
+        landParticles.Emit(Mathf.RoundToInt(Mathf.Lerp(1, 15, t)));
 
-        landParticles.Emit(burstAmount);
-
-        var shape = landParticles.shape;
+        ParticleSystem.ShapeModule shape = landParticles.shape;
         shape.radius = Mathf.Lerp(0.5f, 1, t);
     }
+
+    #endregion
+
+    #region DamageFlashing
 
     IEnumerator Flash()
     {
@@ -568,19 +710,13 @@ public class Player: MonoBehaviour
         {
             ApplySpriteMaterialProperties(1);
 
-            yield return new WaitForSeconds(0.07f);
+            yield return flashSpeed;
 
             if(!dead)
                 ApplySpriteMaterialProperties(0);
 
-            yield return new WaitForSeconds(0.07f);
+            yield return flashSpeed;
         }
-    }
-
-    public void EnableShadowDanTracer()
-    {
-        if(!shadowDanTracer.enabled)
-            shadowDanTracer.enabled = true;
     }
 
     void ApplySpriteMaterialProperties(float flashAmount)
@@ -618,7 +754,7 @@ public class Player: MonoBehaviour
 
     #endregion
 
-    #region HealthAndDamage
+    #region Health
     public void GiveHealth(int healthToGive)
     {
         _health = _health + healthToGive;
@@ -626,10 +762,12 @@ public class Player: MonoBehaviour
         if(_health >= health)
             _health = health;
 
-        if(OnPlayerHealthChange != null)
-            OnPlayerHealthChange();
+        OnPlayerHealthChange?.Invoke();
     }
 
+    #endregion
+
+    #region DamageAndDeath
     public void TakeDamage(int damage, float inputDelay, bool giveKnockBack, int xKnockBack, int yKnockBack, float xOffset, Transform otherTransform, bool rotationBasedKnockBack, int knockBack, float rotationOffset)
     {
         if(invincible || _hurtTimer > 0)
@@ -699,9 +837,7 @@ public class Player: MonoBehaviour
 
         _hurtTimer = hurtTimer;
     }
-    #endregion
 
-    #region KillingAndRespawning
     public void Kill()
     {
         dead = true;        
@@ -760,6 +896,9 @@ public class Player: MonoBehaviour
             StartCoroutine(RespawnCo());
     }
 
+    #endregion
+    
+    #region Respawning
     IEnumerator RespawnCo()
     {
         LevelManager.Instance.Respawn();
@@ -768,8 +907,14 @@ public class Player: MonoBehaviour
         ApplySpriteMaterialProperties(1, 0, 0);
 
         animator.enabled = true;
-        pupilsParent.localPosition = new Vector3(pupilsParentStartPosition.x + maxPupilsOffset.x, pupilsParentStartPosition.y -maxPupilsOffset.y, 0);
+        pupilsParent.localPosition = new Vector2(pupilsParentStartPosition.x + maxPupilsOffset.x, pupilsParentStartPosition.y -maxPupilsOffset.y);
+        eyeBrow.localPosition = new Vector2(eyeBrowStartPosition.x, eyeBrowStartPosition.y - maxPupilsOffset.y);
+        
         rb2D.position = transform.position;
+
+        bodyTargetRotation = 0;
+        currentBodyRotation = 0;
+        body.localEulerAngles = Vector3.zero;
 
         float inTime = 0;
         float duration = 0.75f;
@@ -806,7 +951,6 @@ public class Player: MonoBehaviour
         direction = 1;
         _knockBackInputDelayTimer = 0;
         canFollow = true;
-        parts.SetActive(true);
         walkParticles.Play();
 
         _health = health;
@@ -819,7 +963,7 @@ public class Player: MonoBehaviour
     
     #endregion    
 
-    #region Misc
+    #region Teleporting
     public void Teleporting()
     {
         teleporting = true;
@@ -836,6 +980,9 @@ public class Player: MonoBehaviour
         teleporting = false;
     }
 
+    #endregion
+
+    #region FinishLevel
     void FinishLevel()
     {
         invincible = true;
@@ -899,9 +1046,17 @@ public class Player: MonoBehaviour
 
     #endregion
 
+    public void EnableShadowDanTracer()
+    {
+        if(!shadowDanTracer.enabled)
+            shadowDanTracer.enabled = true;
+    }
+
+    #if UNITY_EDITOR
     void OnDrawGizmos()
     {
         Gizmos.color = new Color(0, 0, 1, 0.5f);
         Gizmos.DrawCube(groundCheck.position + groundCheckOffset, groundCheckSize);
     }
+    #endif
 }

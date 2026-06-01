@@ -8,6 +8,8 @@ public class ConfirmPurchase : MonoBehaviour
 	[SerializeField] Image itemBackground;
 	[SerializeField] Sprite normalItemBackground;
 	[SerializeField] Sprite premiumItemBackground;
+    [SerializeField] Sprite upgradeBackground;
+    [SerializeField] Sprite customSkinItemBackground;
 
     public ShopItem shopItem { get; set; }
     GameManager gameManager;
@@ -17,12 +19,24 @@ public class ConfirmPurchase : MonoBehaviour
         gameManager = GameManager.Instance;
     }
 
-	public void Open(Image _itemImage, string confirmPurchaseString, bool premiumItem)
+	public void Open(Image _itemImage, string confirmPurchaseString, bool premiumItem, bool isUpgrade, bool isCustomSkin)
 	{
         itemImage.rectTransform.sizeDelta = new Vector2(_itemImage.rectTransform.sizeDelta.x * 2, _itemImage.rectTransform.sizeDelta.y * 2);
         itemImage.sprite = _itemImage.sprite;
         confirmPurchaseText.text = confirmPurchaseString;
 
+        if(isCustomSkin)
+        {
+            itemBackground.sprite = customSkinItemBackground;
+            return;
+        }
+
+        if(isUpgrade)
+        {
+            itemBackground.sprite = upgradeBackground;
+            return;
+        }
+        
 		if(premiumItem)
 			itemBackground.sprite = premiumItemBackground;
 		else
@@ -41,9 +55,17 @@ public class ConfirmPurchase : MonoBehaviour
 
 		if(shopItem.item.itemType == Item.ItemType.Skin)
 			gameManager.currentUser.ownedSkins.Add(shopItem.item.itemID);
+
+        if(shopItem.item.itemType == Item.ItemType.Upgrade)
+			gameManager.currentUser.ownedUpgrades.Add(shopItem.item.itemID);
 		
         ShopManager.Instance.RefreshGemsText();
-        ShopManager.Instance.EquipItem(shopItem);
+
+        if(shopItem.item.itemType != Item.ItemType.Upgrade)
+            ShopManager.Instance.EquipItem(shopItem);
+        else
+            ShopManager.Instance.EquipUpgrade(shopItem, true);
+            
         ShopManager.Instance.SaveShopData();
 	}
 }

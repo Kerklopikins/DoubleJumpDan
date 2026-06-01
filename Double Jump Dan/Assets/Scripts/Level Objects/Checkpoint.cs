@@ -73,6 +73,7 @@ public class Checkpoint : MonoBehaviour
         }        
     }   
 
+    #if UNITY_EDITOR
     void OnDrawGizmos()
     {
         Gizmos.color = Color.cyan;
@@ -83,4 +84,5 @@ public class Checkpoint : MonoBehaviour
         //Gizmos.DrawSphere(new Vector3(transform.position.x - xDistance, transform.position.y, 0), 0.1f);
         //Gizmos.DrawSphere(new Vector3(transform.position.x + xDistance, transform.position.y, 0), 0.1f);
     }
+    #endif
 }

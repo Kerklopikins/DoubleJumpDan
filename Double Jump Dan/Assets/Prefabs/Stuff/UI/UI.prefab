@@ -333,8 +333,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 0}
-  m_AnchoredPosition: {x: 36, y: 20}
-  m_SizeDelta: {x: -88, y: 20}
+  m_AnchoredPosition: {x: 41, y: 20}
+  m_SizeDelta: {x: -98, y: 20}
   m_Pivot: {x: 0.5, y: 0}
 --- !u!114 &2892143496019173780
 MonoBehaviour:
@@ -583,11 +583,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a4f32547d0d7448419723ba9f25387a4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  selectableType: 0
   buttonClick: {fileID: 8300000, guid: ac4173569b265894084d96f2d97f7354, type: 3}
   textStartingColor: {r: 0, g: 0, b: 0, a: 1}
   disabledColor: {r: 0, g: 0, b: 0, a: 1}
+  hasText: 1
   dontChangeText: 0
-  eventSystem: {fileID: 0}
 --- !u!1 &1887981986289074023
 GameObject:
   m_ObjectHideFlags: 0
@@ -1036,7 +1037,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0, g: 0, b: 0, a: 0.45490196}
+  m_Color: {r: 0, g: 0, b: 0, a: 0.6}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -1856,11 +1857,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a4f32547d0d7448419723ba9f25387a4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  selectableType: 0
   buttonClick: {fileID: 0}
   textStartingColor: {r: 0, g: 0, b: 0, a: 1}
   disabledColor: {r: 0, g: 0, b: 0, a: 1}
+  hasText: 1
   dontChangeText: 0
-  eventSystem: {fileID: 0}
 --- !u!1 &3904151127784917744
 GameObject:
   m_ObjectHideFlags: 0
@@ -1910,6 +1912,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0bbb1c5cff26ad94785e424e11a92120, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  levelType: 0
   enableTestingMode: 1
   devModeUI: {fileID: 8535972965492407640}
   messageText: {fileID: 359853121327668085}
@@ -2050,7 +2053,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0, g: 0, b: 0, a: 0.4509804}
+  m_Color: {r: 0, g: 0, b: 0, a: 0.6}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -2445,8 +2448,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 96}
-  m_SizeDelta: {x: 200, y: 60}
+  m_AnchoredPosition: {x: 0, y: 72}
+  m_SizeDelta: {x: 240, y: 64}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &8338770092340900347
 CanvasRenderer:
@@ -2555,11 +2558,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a4f32547d0d7448419723ba9f25387a4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  selectableType: 0
   buttonClick: {fileID: 0}
   textStartingColor: {r: 0, g: 0, b: 0, a: 1}
   disabledColor: {r: 0, g: 0, b: 0, a: 1}
+  hasText: 1
   dontChangeText: 0
-  eventSystem: {fileID: 949886930248056791}
 --- !u!1 &4229870963978879391
 GameObject:
   m_ObjectHideFlags: 0
@@ -2777,7 +2781,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0, g: 0, b: 0, a: 0.45490196}
+  m_Color: {r: 0, g: 0, b: 0, a: 0.6}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -3046,11 +3050,11 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 4690654427003434323}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 1, y: 1}
-  m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -20, y: -16}
-  m_SizeDelta: {x: 40, y: 52}
-  m_Pivot: {x: 1, y: 1}
+  m_AnchorMin: {x: 1, y: 0}
+  m_AnchorMax: {x: 1, y: 0}
+  m_AnchoredPosition: {x: -22, y: 22}
+  m_SizeDelta: {x: 40, y: 56}
+  m_Pivot: {x: 1, y: 0}
 --- !u!222 &2161926268151393756
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -3294,11 +3298,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a4f32547d0d7448419723ba9f25387a4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  selectableType: 0
   buttonClick: {fileID: 8300000, guid: ac4173569b265894084d96f2d97f7354, type: 3}
   textStartingColor: {r: 0, g: 0, b: 0, a: 1}
   disabledColor: {r: 0, g: 0, b: 0, a: 1}
+  hasText: 1
   dontChangeText: 0
-  eventSystem: {fileID: 0}
 --- !u!1 &5036110835132775755
 GameObject:
   m_ObjectHideFlags: 0
@@ -3583,7 +3588,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0, g: 0, b: 0, a: 0.45490196}
+  m_Color: {r: 0, g: 0, b: 0, a: 0.6}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -3791,7 +3796,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 8, y: 0}
+  m_AnchoredPosition: {x: 8, y: 8}
   m_SizeDelta: {x: 250, y: 70}
   m_Pivot: {x: 0, y: 0}
 --- !u!222 &318370167730951322
@@ -3829,7 +3834,7 @@ MonoBehaviour:
     m_BestFit: 0
     m_MinSize: 2
     m_MaxSize: 61
-    m_Alignment: 3
+    m_Alignment: 6
     m_AlignByGeometry: 0
     m_RichText: 0
     m_HorizontalOverflow: 0
@@ -3983,10 +3988,10 @@ RectTransform:
   m_Father: {fileID: 3572864656164838402}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 15, y: 121.34}
-  m_SizeDelta: {x: 400, y: 508.71}
-  m_Pivot: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 1}
+  m_AnchoredPosition: {x: 15, y: 53.170006}
+  m_SizeDelta: {x: 440, y: -136.34001}
+  m_Pivot: {x: 0, y: 0.5}
 --- !u!222 &8856920743771919859
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -4008,7 +4013,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 0.9960785, g: 0.9960785, b: 0, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -4017,7 +4022,7 @@ MonoBehaviour:
       m_Calls: []
   m_FontData:
     m_Font: {fileID: 10102, guid: 0000000000000000e000000000000000, type: 0}
-    m_FontSize: 20
+    m_FontSize: 25
     m_FontStyle: 1
     m_BestFit: 0
     m_MinSize: 1
@@ -4028,53 +4033,55 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: '<size=30>Commands</size>
+  m_Text: '<size=30>Commands</size> (not case sensitive)
 
-    /timescale
+    Timescale
 
-    /speed <size=15>default
-    10</size>
+    Speed
+    <size=20>default 10</size>
 
-    /accel air <size=15>default 0.4</size>
+    SprintSpeed <size=20>default 14</size>
 
-    /accel grnd <size=15>default
-    0.2</size>
+    AccelAir
+    <size=20>default 0.4</size>
 
-    /jmp hght <size=15>default 22</size>
+    AccelGrnd <size=20>default 0.2</size>
 
-    /gravity <size=15>default
-    1</size>
+    JmpHght
+    <size=20>default 22</size>
 
-    /invincble <size=15>bool</size>
+    Gravity <size=20>default 1</size>
 
-    /load scene <size=15>int</size>
+    Invincble
+    <size=20>bool</size>
 
-    /max
-    lives
+    LoadScene <size=20>int</size>
 
-    /gameover
+    Heal
 
-    /kill all
+    Gameover
 
-    /day
+    KillAll
 
-    /sunset
+    Day
 
-    /night
+    Sunset
 
-    /sunrise
+    Night
 
-    /overcast
+    Sunrise
 
-    /dust
-    enabled <size=15>bool</size>
+    Overcast
 
-    /snow enabled<size=15>bool</size>
+    DustEnabled
+    <size=20>bool</size>
 
-    /clouds
-    enabled <size=15>bool</size>
+    SnowEnabled <size=20>bool</size>
 
-    /resize'
+    CloudsEnabled
+    <size=20>bool</size>
+
+    Resize'
 --- !u!114 &9197964882623369625
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4127,8 +4134,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: -96}
-  m_SizeDelta: {x: 200, y: 60}
+  m_AnchoredPosition: {x: 0, y: -144}
+  m_SizeDelta: {x: 240, y: 64}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &8012200547036914520
 CanvasRenderer:
@@ -4237,11 +4244,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a4f32547d0d7448419723ba9f25387a4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  selectableType: 0
   buttonClick: {fileID: 8300000, guid: ac4173569b265894084d96f2d97f7354, type: 3}
   textStartingColor: {r: 0, g: 0, b: 0, a: 1}
   disabledColor: {r: 0, g: 0, b: 0, a: 1}
+  hasText: 1
   dontChangeText: 0
-  eventSystem: {fileID: 949886930248056791}
 --- !u!1 &5691939455689098478
 GameObject:
   m_ObjectHideFlags: 0
@@ -4472,8 +4480,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 0}
-  m_AnchoredPosition: {x: 36, y: 68}
-  m_SizeDelta: {x: -88, y: 20}
+  m_AnchoredPosition: {x: 41, y: 68}
+  m_SizeDelta: {x: -98, y: 20}
   m_Pivot: {x: 0.5, y: 0}
 --- !u!114 &8468481865513492490
 MonoBehaviour:
@@ -4703,34 +4711,158 @@ MonoBehaviour:
   volumeSliders:
   - {fileID: 8468481865513492490}
   - {fileID: 2892143496019173780}
+  fpsTracker: {fileID: 5053226157781651256}
   postProcessingToggle: {fileID: 0}
   distortionEffectsToggle: {fileID: 0}
   weatherEffectsToggle: {fileID: 0}
-  fpsTracker: {fileID: 5053226157781651256}
-  resettedGameImage: {fileID: 0}
-  screenResolutionSlider: {fileID: 0}
-  screenResolutionText: {fileID: 0}
   fullscreenToggle: {fileID: 0}
+  vSyncToggle: {fileID: 0}
+  cameraShakeToggle: {fileID: 0}
+  showFPSToggle: {fileID: 0}
+  controllerVibrationToggle: {fileID: 0}
+  swapJoysticksToggle: {fileID: 0}
+  useDPadToggle: {fileID: 0}
+  lockAimingToggle: {fileID: 0}
   frameRateSlider: {fileID: 0}
   frameRateText: {fileID: 0}
   frameRateTitleText: {fileID: 0}
   frameRateSliderFill: {fileID: 0}
-  sliderFillSprites: []
   changeFrameRateButton: {fileID: 0}
-  vSyncToggle: {fileID: 0}
-  showFPSToggle: {fileID: 0}
+  monitorChangedText: {fileID: 0}
+  moniterChangedGameObject: {fileID: 0}
+  screenResolutionSlider: {fileID: 0}
+  screenResolutionText: {fileID: 0}
+  sliderFillSprites: []
+  sliderBackgroundSprites: []
+  toggleSelectedSprites: []
+  resettedGameImage: {fileID: 0}
+  inputSettingsButton: {fileID: 0}
   aimSensitivitySlider: {fileID: 0}
   cursorSensitivitySlider: {fileID: 0}
-  controllerVibrationToggle: {fileID: 0}
-  swapJoysticksToggle: {fileID: 0}
-  moveAction: {fileID: 5931795334615063197, guid: ed60705c2a4334745adad52aa57e9f07,
-    type: 3}
-  aimAction: {fileID: -2134882837010191189, guid: ed60705c2a4334745adad52aa57e9f07,
-    type: 3}
-  moveBindingIndex: 0
-  aimBindingIndex: 0
+  buttonClickSound: {fileID: 0}
+  inputSettingsGameObject: {fileID: 0}
+  inputSettingsScrollRect: {fileID: 0}
+  inputSettingsContent: {fileID: 0}
+  inputRebindingButtons: []
   keyboardButtons: []
   controllerButtons: []
+  toggleSelectedImages: []
+  sliderBackgroundImages: []
+  controllerSlidersFills: []
+  rebindOverlayAnimator: {fileID: 0}
+  dPadText: {fileID: 0}
+  keyboardMouse:
+    mouseLeftButton: {fileID: 0}
+    mouseRightButton: {fileID: 0}
+    mouseMiddleButton: {fileID: 0}
+    a: {fileID: 0}
+    b: {fileID: 0}
+    c: {fileID: 0}
+    d: {fileID: 0}
+    e: {fileID: 0}
+    f: {fileID: 0}
+    g: {fileID: 0}
+    h: {fileID: 0}
+    i: {fileID: 0}
+    j: {fileID: 0}
+    k: {fileID: 0}
+    l: {fileID: 0}
+    m: {fileID: 0}
+    n: {fileID: 0}
+    o: {fileID: 0}
+    p: {fileID: 0}
+    q: {fileID: 0}
+    r: {fileID: 0}
+    s: {fileID: 0}
+    t: {fileID: 0}
+    u: {fileID: 0}
+    v: {fileID: 0}
+    w: {fileID: 0}
+    x: {fileID: 0}
+    y: {fileID: 0}
+    z: {fileID: 0}
+    one: {fileID: 0}
+    two: {fileID: 0}
+    three: {fileID: 0}
+    four: {fileID: 0}
+    five: {fileID: 0}
+    six: {fileID: 0}
+    seven: {fileID: 0}
+    eight: {fileID: 0}
+    nine: {fileID: 0}
+    zero: {fileID: 0}
+    shift: {fileID: 0}
+    ctrl: {fileID: 0}
+    command: {fileID: 0}
+    alt: {fileID: 0}
+    upArrow: {fileID: 0}
+    downArrow: {fileID: 0}
+    leftArrow: {fileID: 0}
+    rightArrow: {fileID: 0}
+    enter: {fileID: 0}
+    backspace: {fileID: 0}
+    space: {fileID: 0}
+    tab: {fileID: 0}
+    slash: {fileID: 0}
+    period: {fileID: 0}
+    comma: {fileID: 0}
+    quote: {fileID: 0}
+    semicolon: {fileID: 0}
+    leftBracket: {fileID: 0}
+    rightBracket: {fileID: 0}
+    backslash: {fileID: 0}
+    fOne: {fileID: 0}
+    fTwo: {fileID: 0}
+    fThree: {fileID: 0}
+    fFour: {fileID: 0}
+    fFive: {fileID: 0}
+    fSix: {fileID: 0}
+    fSeven: {fileID: 0}
+    fEight: {fileID: 0}
+    fNine: {fileID: 0}
+    fTen: {fileID: 0}
+    fEleven: {fileID: 0}
+    fTwelve: {fileID: 0}
+  xbox:
+    buttonSouth: {fileID: 0}
+    buttonNorth: {fileID: 0}
+    buttonEast: {fileID: 0}
+    buttonWest: {fileID: 0}
+    startButton: {fileID: 0}
+    selectButton: {fileID: 0}
+    leftTrigger: {fileID: 0}
+    rightTrigger: {fileID: 0}
+    leftShoulder: {fileID: 0}
+    rightShoulder: {fileID: 0}
+    dpad: {fileID: 0}
+    dpadUp: {fileID: 0}
+    dpadDown: {fileID: 0}
+    dpadLeft: {fileID: 0}
+    dpadRight: {fileID: 0}
+    leftStick: {fileID: 0}
+    rightStick: {fileID: 0}
+    leftStickPress: {fileID: 0}
+    rightStickPress: {fileID: 0}
+  playStation:
+    buttonSouth: {fileID: 0}
+    buttonNorth: {fileID: 0}
+    buttonEast: {fileID: 0}
+    buttonWest: {fileID: 0}
+    startButton: {fileID: 0}
+    selectButton: {fileID: 0}
+    leftTrigger: {fileID: 0}
+    rightTrigger: {fileID: 0}
+    leftShoulder: {fileID: 0}
+    rightShoulder: {fileID: 0}
+    dpad: {fileID: 0}
+    dpadUp: {fileID: 0}
+    dpadDown: {fileID: 0}
+    dpadLeft: {fileID: 0}
+    dpadRight: {fileID: 0}
+    leftStick: {fileID: 0}
+    rightStick: {fileID: 0}
+    leftStickPress: {fileID: 0}
+    rightStickPress: {fileID: 0}
 --- !u!1 &6483978792700977743
 GameObject:
   m_ObjectHideFlags: 0
@@ -5012,8 +5144,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 32}
-  m_SizeDelta: {x: 200, y: 60}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 240, y: 64}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &6757735976021973223
 CanvasRenderer:
@@ -5122,11 +5254,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a4f32547d0d7448419723ba9f25387a4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  selectableType: 0
   buttonClick: {fileID: 8300000, guid: ac4173569b265894084d96f2d97f7354, type: 3}
   textStartingColor: {r: 0, g: 0, b: 0, a: 1}
   disabledColor: {r: 0, g: 0, b: 0, a: 1}
+  hasText: 1
   dontChangeText: 0
-  eventSystem: {fileID: 949886930248056791}
 --- !u!1 &6835256633048327041
 GameObject:
   m_ObjectHideFlags: 0
@@ -5316,8 +5449,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 0}
-  m_AnchoredPosition: {x: -314, y: 58}
-  m_SizeDelta: {x: -652, y: 40}
+  m_AnchoredPosition: {x: -307, y: 58}
+  m_SizeDelta: {x: -646, y: 40}
   m_Pivot: {x: 0.5, y: 0}
 --- !u!222 &6809295663707313416
 CanvasRenderer:
@@ -5349,7 +5482,7 @@ MonoBehaviour:
       m_Calls: []
   m_FontData:
     m_Font: {fileID: 12800000, guid: 93a712c666b3543419dcd4954846c32c, type: 3}
-    m_FontSize: 25
+    m_FontSize: 28
     m_FontStyle: 0
     m_BestFit: 0
     m_MinSize: 0
@@ -5569,8 +5702,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 0}
-  m_AnchoredPosition: {x: -314, y: 10}
-  m_SizeDelta: {x: -652, y: 40}
+  m_AnchoredPosition: {x: -307, y: 10}
+  m_SizeDelta: {x: -646, y: 40}
   m_Pivot: {x: 0.5, y: 0}
 --- !u!222 &1343740659560006068
 CanvasRenderer:
@@ -5602,7 +5735,7 @@ MonoBehaviour:
       m_Calls: []
   m_FontData:
     m_Font: {fileID: 12800000, guid: 93a712c666b3543419dcd4954846c32c, type: 3}
-    m_FontSize: 25
+    m_FontSize: 28
     m_FontStyle: 0
     m_BestFit: 0
     m_MinSize: 0
@@ -5666,8 +5799,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: -32}
-  m_SizeDelta: {x: 200, y: 60}
+  m_AnchoredPosition: {x: 0, y: -72}
+  m_SizeDelta: {x: 240, y: 64}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &8485004988695352937
 CanvasRenderer:
@@ -5776,11 +5909,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a4f32547d0d7448419723ba9f25387a4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  selectableType: 0
   buttonClick: {fileID: 0}
   textStartingColor: {r: 0, g: 0, b: 0, a: 1}
   disabledColor: {r: 0, g: 0, b: 0, a: 1}
+  hasText: 1
   dontChangeText: 0
-  eventSystem: {fileID: 949886930248056791}
 --- !u!1 &8370930816429549491
 GameObject:
   m_ObjectHideFlags: 0
@@ -6019,11 +6153,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a4f32547d0d7448419723ba9f25387a4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  selectableType: 0
   buttonClick: {fileID: 0}
   textStartingColor: {r: 0, g: 0, b: 0, a: 1}
   disabledColor: {r: 0, g: 0, b: 0, a: 1}
+  hasText: 0
   dontChangeText: 0
-  eventSystem: {fileID: 0}
 --- !u!1 &8519946716657908781
 GameObject:
   m_ObjectHideFlags: 0
@@ -6279,7 +6414,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_FirstSelected: {fileID: 0}
-  m_sendNavigationEvents: 1
+  m_sendNavigationEvents: 0
   m_DragThreshold: 5
 --- !u!114 &1212450516880624968
 MonoBehaviour:
@@ -6357,7 +6492,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 172}
+  m_AnchoredPosition: {x: 0, y: 152}
   m_SizeDelta: {x: 280, y: 80}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &5653516684169812831
@@ -6403,7 +6538,7 @@ MonoBehaviour:
     m_LineSpacing: 1
   m_Text: 'Paused
 
-    <size=25>Level 1</size>'
+    <size=25>Level</size>'
 --- !u!114 &7827457744911383792
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6720,11 +6855,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a4f32547d0d7448419723ba9f25387a4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  selectableType: 0
   buttonClick: {fileID: 8300000, guid: ac4173569b265894084d96f2d97f7354, type: 3}
   textStartingColor: {r: 0, g: 0, b: 0, a: 1}
   disabledColor: {r: 0, g: 0, b: 0, a: 1}
+  hasText: 1
   dontChangeText: 0
-  eventSystem: {fileID: 0}
 --- !u!1 &9191115374194093345
 GameObject:
   m_ObjectHideFlags: 0

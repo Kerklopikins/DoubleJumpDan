@@ -167,6 +167,7 @@ public class GrenadeLauncher : MonoBehaviour
             yield return null;
         }
 
+        transform.localEulerAngles = initialRot;
         gunInfo.Reload();
         reloading = false;
 
@@ -178,6 +179,7 @@ public class GrenadeLauncher : MonoBehaviour
         transform.localPosition = Vector3.SmoothDamp(transform.localPosition, startingPosition, ref recoilSmoothDampVelocity, recoilMoveSettleTime);
     }
     
+    #if UNITY_EDITOR
     void OnDrawGizmos()
     {
         if(grenadeFirePoint == null)
@@ -202,4 +204,5 @@ public class GrenadeLauncher : MonoBehaviour
 
         Gizmos.DrawWireSphere(spawnPosition, 0.25f);
     }
+    #endif
 }

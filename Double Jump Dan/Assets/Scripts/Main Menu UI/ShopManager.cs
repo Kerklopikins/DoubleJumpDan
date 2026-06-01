@@ -15,43 +15,49 @@ public class ShopManager : MonoBehaviour
     public ScrollRect gunScrollRect;
     public ScrollRect hatScrollRect;
     public ScrollRect skinScrollRect;
+    public ScrollRect upgradesScrollRect;
+
     public Vector2 minMaxVisibilityDistance;
     public ItemManager itemManager;
     [SerializeField] float itemWidth;
     [SerializeField] RectTransform gunsContent;
     [SerializeField] RectTransform hatsContent;
     [SerializeField] RectTransform skinsContent;
-    [SerializeField] Button skinsButton;
-    [SerializeField] Button hatsButton;
+    [SerializeField] RectTransform upgradesContent;
+
     [SerializeField] Button gunsButton;
+    [SerializeField] Button hatsButton;
+    [SerializeField] Button skinsButton;
+    [SerializeField] Button upgradesButton;
+
     [SerializeField] AudioClip shopTabSwitchSound;
 
     [Header("Custom Skin")]
-    [SerializeField] Image bodyImage;
-    [SerializeField] Image armsLegsImage;
-    [SerializeField] Slider[] sliders;
-    [SerializeField] Image[] sliderHandles;
-    [SerializeField] Image[] sliderFills;
-    [SerializeField] Sprite[] sliderFillSprites;
-    [SerializeField] Text[] rgbValuesText;
+    [SerializeField] Button changeSkinColorButton;
+    [SerializeField] ColorPicker bodyColorPicker;
+    [SerializeField] ColorPicker armsAndLegsColorPicker;
+    [SerializeField] Image[] eyes;
+    [SerializeField] Sprite[] eyeSprites;
 
-    public event Action OnShopItemsChanged;
+    public event Action<bool> OnShopItemsChanged;
     public event Action OnShopTabsChanged;
     public RectTransform currentGunRect { get; set; }
     public RectTransform currentHatRect { get; set; }
     public RectTransform currentSkinRect { get; set; }
     CurrentShopTab currentShopTab = CurrentShopTab.Guns;
-    public enum CurrentShopTab { Guns, Hats, Skins }
+    public enum CurrentShopTab { Guns, Hats, Skins, Upgrades }
     GameManager gameManager;
     GameInputManager gameInputManager;
     MainMenuManager mainMenuManager;
-    int shopTabIndex = 2;
+    int shopTabIndex = 0;
     float shopTabTransitionTimer;
     UIScreenManager uIScreenManager;
     Animator shopAnimator;
     UIArea gunsArea;
     UIArea hatsArea;
     UIArea skinsArea;
+    UIArea upgradesArea;
+    ExitUIArea exitUIArea;
     //bool scrollViewMoved;
     //int gunsCount;
     //int hatsCount;
@@ -62,6 +68,7 @@ public class ShopManager : MonoBehaviour
     {
         Instance = this;       
     }
+
     void Start()
     {
         gameManager = GameManager.Instance;
@@ -71,6 +78,7 @@ public class ShopManager : MonoBehaviour
         shopAnimator = shop.GetComponent<Animator>();
 
         gameInputManager.OnControllerChanged += OnControllerChanged;
+        gameInputManager.OnKeyboardOnlyInputChanged += OnKeyboardOnlyInputChanged;
 
         if(gameInputManager.ControllerConnected())
         {
@@ -78,19 +86,26 @@ public class ShopManager : MonoBehaviour
             hatScrollRect.inertia = false;
             skinScrollRect.inertia = false;
         }
+        
+        changeSkinColorButton.onClick.AddListener(RefreshHexData);
 
         skinsButton.onClick.AddListener(SwitchToSkinTab);
         hatsButton.onClick.AddListener(SwitchToHatTab);
         gunsButton.onClick.AddListener(SwitchToGunTab);
-        
-        skinsArea = skinsButton.GetComponent<UIArea>();
-        hatsArea = hatsButton.GetComponent<UIArea>();
+        upgradesButton.onClick.AddListener(SwitchToUpgradeTab);
+
         gunsArea = gunsButton.GetComponent<UIArea>();
-    
+        hatsArea = hatsButton.GetComponent<UIArea>();
+        skinsArea = skinsButton.GetComponent<UIArea>();
+        upgradesArea = upgradesButton.GetComponent<UIArea>();
+
         gunsButton.interactable = false;
+        exitUIArea = shop.GetComponent<ExitUIArea>();
 
-        UpdateCustomSkinSliders();
+        bodyColorPicker.Initialize();
+        armsAndLegsColorPicker.Initialize();
 
+        UpdateCustomSkinData(true);
         //UpdateCustomSkinBody();
         //UpdateCustomSkinArmsLegs();
         //gunsCount = itemManager.guns.Count - 1;
@@ -100,19 +115,46 @@ public class ShopManager : MonoBehaviour
 
     void Update()
     {        
-        if(shop.activeSelf == false)
+        if(shop.activeInHierarchy == false)
             return;
 
         if(shopTabTransitionTimer > 0)
-            shopTabTransitionTimer -= Time.deltaTime;
-
-        if(gameInputManager.ControllerConnected() && uIScreenManager.currentOpenPanel == shopAnimator && uIScreenManager.transitionTimer <= 0)
         {
-            if(Mathf.Abs(gameInputManager.ScrollDirection().x) > 0.1f)
+            exitUIArea.CanExit = false;
+            shopTabTransitionTimer -= Time.deltaTime;
+        }
+        else
+        {
+            exitUIArea.CanExit = true;
+        }
+
+        if(gameInputManager.ControllerConnected())
+            ScrollContent(gameInputManager.ControllerScrolling(), gameInputManager.ControllerFastCursor());
+        else if(gameInputManager.KeyboardOnly())
+            ScrollContent(gameInputManager.KeyboardScrolling(), gameInputManager.KeyboardFastCursor());  
+    }   
+
+    //void ScrollItems(int itemCount, RectTransform content)
+    //{            
+        //currentItemIndex = Mathf.Clamp(currentItemIndex, 0, itemCount - 2);
+        //content.anchoredPosition = new Vector2(-(currentItemIndex * itemWidth), content.anchoredPosition.y);      
+    //}
+    
+    //public void UpdateScrollIndex(int index, int itemCount)
+    //{
+        //currentItemIndex = index - 2;
+        //currentItemIndex = Mathf.Clamp(currentItemIndex, 0, itemCount - 2);
+    //}
+    
+    void ScrollContent(Vector2 input, bool fastCursor)
+    {
+        if(uIScreenManager.currentOpenPanel == shopAnimator && uIScreenManager.transitionTimer <= 0)
+        {
+            if(Mathf.Abs(input.x) > 0.1f)
             {
                 //scrollViewMoved = true;
 
-                if(gameInputManager.FastCursorButton())
+                if(fastCursor)
                     mainMenuManager._scrollSpeed = mainMenuManager.scrollSpeed * 2;
                 else
                     mainMenuManager._scrollSpeed = mainMenuManager.scrollSpeed;
@@ -120,16 +162,20 @@ public class ShopManager : MonoBehaviour
                 switch(currentShopTab)
                 {   
                     case CurrentShopTab.Guns:
-                        gunsContent.anchoredPosition += new Vector2(-gameInputManager.ScrollDirection().x * mainMenuManager._scrollSpeed * Time.deltaTime, 0);
+                        gunsContent.anchoredPosition += new Vector2(-input.x * mainMenuManager._scrollSpeed * Time.deltaTime, 0);
                         gunsContent.anchoredPosition = new Vector2(Mathf.Clamp(gunsContent.anchoredPosition.x, -gunsContent.sizeDelta.x + (itemWidth * 3) - 4, 0), gunsContent.anchoredPosition.y);
                         break;
                     case CurrentShopTab.Hats:
-                        hatsContent.anchoredPosition += new Vector2(-gameInputManager.ScrollDirection().x * mainMenuManager._scrollSpeed * Time.deltaTime, 0);      
+                        hatsContent.anchoredPosition += new Vector2(-input.x * mainMenuManager._scrollSpeed * Time.deltaTime, 0);      
                         hatsContent.anchoredPosition = new Vector2(Mathf.Clamp(hatsContent.anchoredPosition.x, -hatsContent.sizeDelta.x + (itemWidth * 3) - 4, 0), hatsContent.anchoredPosition.y);
                         break;
                     case CurrentShopTab.Skins:
-                        skinsContent.anchoredPosition += new Vector2(-gameInputManager.ScrollDirection().x * mainMenuManager._scrollSpeed * Time.deltaTime, 0);      
+                        skinsContent.anchoredPosition += new Vector2(-input.x * mainMenuManager._scrollSpeed * Time.deltaTime, 0);      
                         skinsContent.anchoredPosition = new Vector2(Mathf.Clamp(skinsContent.anchoredPosition.x, -skinsContent.sizeDelta.x + (itemWidth * 3) - 4, 0), skinsContent.anchoredPosition.y);
+                        break;
+                    case CurrentShopTab.Upgrades:
+                        upgradesContent.anchoredPosition += new Vector2(-input.x * mainMenuManager._scrollSpeed * Time.deltaTime, 0);      
+                        upgradesContent.anchoredPosition = new Vector2(Mathf.Clamp(upgradesContent.anchoredPosition.x, -upgradesContent.sizeDelta.x + (itemWidth * 3) - 4, 0), upgradesContent.anchoredPosition.y);
                         break;
                 }
             }
@@ -140,17 +186,17 @@ public class ShopManager : MonoBehaviour
                 {
                     shopTabIndex--;
                     
-                    if(shopTabIndex == -1)
-                        shopTabIndex = 2;
+                    if(shopTabIndex < 0)
+                        shopTabIndex = 3;
 
                     SwitchShopTabs();
                 }
-
+                
                 if(gameInputManager.RightBumperDown())
                 {                    
                     shopTabIndex++;
                     
-                    if(shopTabIndex == 3)
+                    if(shopTabIndex > 3)
                         shopTabIndex = 0;
 
                     SwitchShopTabs();
@@ -160,9 +206,9 @@ public class ShopManager : MonoBehaviour
             //if(gameInputManager.LeftBumperDown())
             //{
                 //if(!scrollViewMoved)
-               // {               
+            // {               
                     //currentItemIndex--;
-               // }
+            // }
                 //else 
                 //{
                     //CenterScrollRectsAndUpdateScrollIndex();
@@ -208,21 +254,8 @@ public class ShopManager : MonoBehaviour
                 //}
             //}
         }
-    
-    }   
+    }
 
-    //void ScrollItems(int itemCount, RectTransform content)
-    //{            
-        //currentItemIndex = Mathf.Clamp(currentItemIndex, 0, itemCount - 2);
-        //content.anchoredPosition = new Vector2(-(currentItemIndex * itemWidth), content.anchoredPosition.y);      
-    //}
-    
-    //public void UpdateScrollIndex(int index, int itemCount)
-    //{
-        //currentItemIndex = index - 2;
-        //currentItemIndex = Mathf.Clamp(currentItemIndex, 0, itemCount - 2);
-    //}
-    
     public void OnControllerChanged(bool enabled)
     {
         if(enabled)
@@ -230,12 +263,35 @@ public class ShopManager : MonoBehaviour
             gunScrollRect.inertia = false;
             hatScrollRect.inertia = false;
             skinScrollRect.inertia = false;
+            upgradesScrollRect.inertia = false;
         }
         else
         {
             gunScrollRect.inertia = true;
             hatScrollRect.inertia = true;
             skinScrollRect.inertia = true;
+            upgradesScrollRect.inertia = true;
+        }
+    }
+
+    public void OnKeyboardOnlyInputChanged(bool keyboardOnly)
+    {
+        if(!gameInputManager.ControllerConnected())
+        {
+            if(keyboardOnly)
+            {
+                gunScrollRect.inertia = false;
+                hatScrollRect.inertia = false;
+                skinScrollRect.inertia = false;
+                upgradesScrollRect.inertia = false;
+            }
+            else
+            {
+                gunScrollRect.inertia = true;
+                hatScrollRect.inertia = true;
+                skinScrollRect.inertia = true;
+                upgradesScrollRect.inertia = true;
+            }
         }
     }
 
@@ -249,74 +305,91 @@ public class ShopManager : MonoBehaviour
         switch(shopTabIndex)
         {
             case 0:
-                skinsButton.interactable = false;
-                hatsButton.interactable = true;
-                gunsButton.interactable = true;
-
-                if(currentShopTab != CurrentShopTab.Skins)
-                {
-                    currentShopTab = CurrentShopTab.Skins;
-                    
-                    skinsArea.OpenArea(true);
-                    hatsArea.OpenArea(false);
-                    gunsArea.OpenArea(false);
-
-                    AudioManager.Instance.PlaySound2D(shopTabSwitchSound);
-                    ResetShopTabTransitionTimer();
-                    RefreshShopScrollRects();
-                }
-                break;
-            case 1:
-                skinsButton.interactable = true;
-                hatsButton.interactable = false;
-                gunsButton.interactable = true;
-
-                if(currentShopTab != CurrentShopTab.Hats)
-                {
-                    currentShopTab = CurrentShopTab.Hats;
-
-                    skinsArea.OpenArea(false);
-                    hatsArea.OpenArea(true);
-                    gunsArea.OpenArea(false);
-
-                    AudioManager.Instance.PlaySound2D(shopTabSwitchSound);
-                    ResetShopTabTransitionTimer();
-                    RefreshShopScrollRects();
-                }
-                break;
-            case 2:
-                skinsButton.interactable = true;
-                hatsButton.interactable = true;
                 gunsButton.interactable = false;
+                hatsButton.interactable = true;
+                skinsButton.interactable = true;
+                upgradesButton.interactable = true;
 
                 if(currentShopTab != CurrentShopTab.Guns)
                 {
                     currentShopTab = CurrentShopTab.Guns;
 
-                    skinsArea.OpenArea(false);
-                    hatsArea.OpenArea(false);
                     gunsArea.OpenArea(true);
+                    hatsArea.OpenArea(false);
+                    skinsArea.OpenArea(false);
+                    upgradesArea.OpenArea(false);
 
                     AudioManager.Instance.PlaySound2D(shopTabSwitchSound);
                     ResetShopTabTransitionTimer();
                     RefreshShopScrollRects();
                 }
-                break;
+            break;
+            case 1:
+                gunsButton.interactable = true;
+                hatsButton.interactable = false;
+                skinsButton.interactable = true;
+                upgradesButton.interactable = true;
+
+                if(currentShopTab != CurrentShopTab.Hats)
+                {
+                    currentShopTab = CurrentShopTab.Hats;
+
+                    gunsArea.OpenArea(false);
+                    hatsArea.OpenArea(true);
+                    skinsArea.OpenArea(false);
+                    upgradesArea.OpenArea(false);
+
+                    AudioManager.Instance.PlaySound2D(shopTabSwitchSound);
+                    ResetShopTabTransitionTimer();
+                    RefreshShopScrollRects();
+                }
+            break;            
+            case 2:
+                gunsButton.interactable = true;
+                hatsButton.interactable = true;
+                skinsButton.interactable = false;
+                upgradesButton.interactable = true;
+
+                if(currentShopTab != CurrentShopTab.Skins)
+                {
+                    currentShopTab = CurrentShopTab.Skins;
+                    
+                    gunsArea.OpenArea(false);
+                    hatsArea.OpenArea(false);
+                    skinsArea.OpenArea(true);
+                    upgradesArea.OpenArea(false);
+
+                    AudioManager.Instance.PlaySound2D(shopTabSwitchSound);
+                    ResetShopTabTransitionTimer();
+                    RefreshShopScrollRects();
+                }
+            break;
+            case 3:
+                gunsButton.interactable = true;
+                hatsButton.interactable = true;
+                skinsButton.interactable = true;
+                upgradesButton.interactable = false;
+                
+                if(currentShopTab != CurrentShopTab.Upgrades)
+                {
+                    currentShopTab = CurrentShopTab.Upgrades;
+                    
+                    gunsArea.OpenArea(false);
+                    hatsArea.OpenArea(false);
+                    skinsArea.OpenArea(false);
+                    upgradesArea.OpenArea(true);
+
+                    AudioManager.Instance.PlaySound2D(shopTabSwitchSound);
+                    ResetShopTabTransitionTimer();
+                    //RefreshShopScrollRects();
+                }
+            break;
         }
     }
 
     public void SwitchToGunTab()
     {
         if(gunsButton.interactable && shopTabTransitionTimer <= 0)
-        {
-            shopTabIndex = 2;
-            SwitchShopTabs();
-        }
-    }
-
-    public void SwitchToSkinTab()
-    {
-        if(skinsButton.interactable && shopTabTransitionTimer <= 0)
         {
             shopTabIndex = 0;
             SwitchShopTabs();
@@ -332,19 +405,43 @@ public class ShopManager : MonoBehaviour
         }
     }
 
+    public void SwitchToSkinTab()
+    {
+        if(skinsButton.interactable && shopTabTransitionTimer <= 0)
+        {
+            shopTabIndex = 2;
+            SwitchShopTabs();
+        }
+    }
+
+    public void SwitchToUpgradeTab()
+    {
+        if(upgradesButton.interactable && shopTabTransitionTimer <= 0)
+        {
+            shopTabIndex = 3;
+            SwitchShopTabs();
+        }
+    }
+
     public void EquipItem(ShopItem shopItem)
 	{
         itemManager.EquipItem(shopItem);
-        SetCustomSkinSliderData();
-        UpdateCustomSkinSliders();
-        OnShopItemsChanged?.Invoke();
+        SetCustomSkinColorData();
+        UpdateCustomSkinData(false);
+        OnShopItemsChanged?.Invoke(false);
+    }
+    
+    public void EquipUpgrade(ShopItem shopItem, bool equipped)
+	{
+        itemManager.EquipUpgrade(shopItem, equipped);
+        OnShopItemsChanged?.Invoke(true);
     }
 
     public void RefreshShop()
     {
         RefreshGemsText();
-        UpdateCustomSkinSliders();
-        OnShopItemsChanged?.Invoke();  
+        UpdateCustomSkinData(true);
+        OnShopItemsChanged?.Invoke(false);  
     }
 
     public void RefreshShopScrollRects()
@@ -393,87 +490,72 @@ public class ShopManager : MonoBehaviour
     public void RefreshGemsText()
     {
         if(gameManager.currentUser.gems != 1)
-            gemsText.text = "<color=yellow>" + gameManager.currentUser.gems.ToString() + "</color>" + "\nGems";
+            gemsText.text = "<color=yellow><size=28>" + gameManager.currentUser.gems.ToString() + "</size></color>" + "\nGems";
 		else
-            gemsText.text = "<color=yellow>" + gameManager.currentUser.gems.ToString() + "</color>" + "\nGem";
+            gemsText.text = "<color=yellow><size=28>" + gameManager.currentUser.gems.ToString() + "</size></color>" + "\nGem";
     }
+
     public void RefreshGemsText(string text)
     {
         gemsText.text = text;
     }
 
-    void UpdateCustomSkinSliders()
+    void RefreshHexData()
+    {
+        bodyColorPicker.RefreshHexData();
+        armsAndLegsColorPicker.RefreshHexData();
+    }
+
+    void UpdateCustomSkinData(bool updateColor)
     {
         //Custom skin
         if(gameManager.currentUser.skinID == 9999)
-        {
-            for(int i = 0; i < sliderFills.Length; i++)
-            {
-                sliders[i].interactable = true;
-                sliderFills[i].sprite = sliderFillSprites[0];
-            }
-        }
+            changeSkinColorButton.interactable = true;
         else
-        {
-            for(int i = 0; i < sliderFills.Length; i++)
-            {
-                sliders[i].interactable = false;
-                sliderFills[i].sprite = sliderFillSprites[1];
-            }
-        }
+            changeSkinColorButton.interactable = false;
 
-        sliders[0].value = gameManager.currentUser.customSkinColor[0];
-        sliders[1].value = gameManager.currentUser.customSkinColor[1];
-        sliders[2].value = gameManager.currentUser.customSkinColor[2];
+        if(!updateColor)
+            return;
 
-        sliders[3].value = gameManager.currentUser.customSkinColor[3];
-        sliders[4].value = gameManager.currentUser.customSkinColor[4];
-        sliders[5].value = gameManager.currentUser.customSkinColor[5];
-
-        UpdateCustomSkinBody();
-        UpdateCustomSkinArmsLegs();
+        for(int i = 0; i < eyes.Length; i++)
+            eyes[i].sprite = eyeSprites[(int)gameManager.currentUser.customSkinData[6]];
+        
+        bodyColorPicker.UpdateCurrentColor(gameManager.currentUser.customSkinData[0], gameManager.currentUser.customSkinData[1],gameManager.currentUser.customSkinData[2]);
+        armsAndLegsColorPicker.UpdateCurrentColor(gameManager.currentUser.customSkinData[3], gameManager.currentUser.customSkinData[4],gameManager.currentUser.customSkinData[5]);
     }
     
-    public void UpdateCustomSkinBody()
+    void SetCustomSkinColorData()
     {
-        bodyImage.color = new Color(sliders[0].value, sliders[1].value, sliders[2].value, 1);
-
-        sliderHandles[0].color = new Color(sliders[0].value, 0, 0, 1);
-        sliderHandles[1].color = new Color(0, sliders[1].value, 0, 1);
-        sliderHandles[2].color = new Color(0, 0, sliders[2].value, 1);
-        sliderFills[0].color = new Color(sliders[0].value, 0, 0, 1);
-        sliderFills[1].color = new Color(0, sliders[1].value, 0, 1);
-        sliderFills[2].color = new Color(0, 0, sliders[2].value, 1);
-
-        rgbValuesText[0].text = Mathf.RoundToInt(255 * sliders[0].value).ToString() + "   " + Mathf.RoundToInt(255 * sliders[1].value).ToString() + "   " + Mathf.RoundToInt(255 * sliders[2].value).ToString();
+        gameManager.currentUser.customSkinData[0] = bodyColorPicker.currentHue;
+        gameManager.currentUser.customSkinData[1] = bodyColorPicker.currentSaturation;
+        gameManager.currentUser.customSkinData[2] = bodyColorPicker.currentValue;
+        gameManager.currentUser.customSkinData[3] = armsAndLegsColorPicker.currentHue;
+        gameManager.currentUser.customSkinData[4] = armsAndLegsColorPicker.currentSaturation;
+        gameManager.currentUser.customSkinData[5] = armsAndLegsColorPicker.currentValue;
     }
 
-    public void UpdateCustomSkinArmsLegs()
+    public void ChangeEyes(int amount)
     {
-        armsLegsImage.color = new Color(sliders[3].value, sliders[4].value, sliders[5].value, 1);
-        sliderHandles[3].color = new Color(sliders[3].value, 0, 0, 1);
-        sliderHandles[4].color = new Color(0, sliders[4].value, 0, 1);
-        sliderHandles[5].color = new Color(0, 0, sliders[5].value, 1);
-        sliderFills[3].color = new Color(sliders[3].value, 0, 0, 1);
-        sliderFills[4].color = new Color(0, sliders[4].value, 0, 1);
-        sliderFills[5].color = new Color(0, 0, sliders[5].value, 1);
+        gameManager.currentUser.customSkinData[6] += amount;    
+        
+        if(amount > 0)
+        {
+            if(gameManager.currentUser.customSkinData[6] > eyeSprites.Length - 1)
+                gameManager.currentUser.customSkinData[6] = 0;   
+        }
+        else if(amount < 0)
+        {
+            if(gameManager.currentUser.customSkinData[6] < 0)
+                gameManager.currentUser.customSkinData[6] = eyeSprites.Length - 1;
+        }
 
-        rgbValuesText[1].text = Mathf.RoundToInt(255 * sliders[3].value).ToString() + "   " + Mathf.RoundToInt(255 * sliders[4].value).ToString() + "   " + Mathf.RoundToInt(255 * sliders[5].value).ToString();
-    }
-
-    void SetCustomSkinSliderData()
-    {
-        gameManager.currentUser.customSkinColor[0] = sliders[0].value;
-        gameManager.currentUser.customSkinColor[1] = sliders[1].value;
-        gameManager.currentUser.customSkinColor[2] = sliders[2].value;
-        gameManager.currentUser.customSkinColor[3] = sliders[3].value;
-        gameManager.currentUser.customSkinColor[4] = sliders[4].value;
-        gameManager.currentUser.customSkinColor[5] = sliders[5].value;
+        for(int i = 0; i < eyes.Length; i++)
+            eyes[i].sprite = eyeSprites[(int)gameManager.currentUser.customSkinData[6]];
     }
 
     public void SaveShopData()
     {
-        SetCustomSkinSliderData();
+        SetCustomSkinColorData();
         gameManager.SaveUserData();
     }
 
@@ -506,6 +588,12 @@ public class ShopManager : MonoBehaviour
             if(!gameManager.currentUser.ownedSkins.Contains(skin.itemID))            
                 gameManager.currentUser.ownedSkins.Add(skin.itemID);
         }
+
+        foreach(var upgrade in itemManager.upgrades)
+        {
+            if(!gameManager.currentUser.ownedUpgrades.Contains(upgrade.itemID))            
+                gameManager.currentUser.ownedUpgrades.Add(upgrade.itemID);
+        }
 		
         SaveShopData();
         RefreshShop();
@@ -522,16 +610,16 @@ public class ShopManager : MonoBehaviour
 		for(int i = 0; i < 3; i++)
 		{
 			if(gameManager.currentUser.gems != 1)
-				RefreshGemsText("<color=red>" + gameManager.currentUser.gems.ToString() + "</color>" + "<color=red>\nGems</color>");
+				RefreshGemsText("<color=red><size=28>" + gameManager.currentUser.gems.ToString() + "</size></color>" + "<color=red>\nGems</color>");
 			else
-				RefreshGemsText("<color=red>" + gameManager.currentUser.gems.ToString() + "</color>" + "<color=red>\nGem</color>");
+				RefreshGemsText("<color=red><size=28>" + gameManager.currentUser.gems.ToString() + "</size></color>" + "<color=red>\nGem</color>");
 
 			yield return new WaitForSeconds(0.07f);
 
 			if(gameManager.currentUser.gems != 1)
-				RefreshGemsText("<color=yellow>" + gameManager.currentUser.gems.ToString() + "</color>" + "<color=white>\nGems</color>");
+				RefreshGemsText("<color=yellow><size=28>" + gameManager.currentUser.gems.ToString() + "</size></color>" + "<color=white>\nGems</color>");
 			else
-				RefreshGemsText("<color=yellow>" + gameManager.currentUser.gems.ToString() + "</color>" + "<color=white>\nGem</color>");
+				RefreshGemsText("<color=yellow><size=28>" + gameManager.currentUser.gems.ToString() + "</size></color>" + "<color=white>\nGem</color>");
 
 			yield return new WaitForSeconds(0.07f);
 		}

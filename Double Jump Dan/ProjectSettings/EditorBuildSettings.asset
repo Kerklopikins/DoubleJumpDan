@@ -12,7 +12,7 @@ EditorBuildSettings:
     path: Assets/Scenes/Main Menu.unity
     guid: 38c60bb092a029540974df3ce922d461
   - enabled: 1
-    path: Assets/Scenes/Tutorial.unity
+    path: Assets/Scenes/Testing Zone.unity
     guid: ba1c2ccad909f8244af23fb997325e05
   - enabled: 1
     path: Assets/Scenes/Desert/Level 1.unity

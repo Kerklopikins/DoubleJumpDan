@@ -17,7 +17,6 @@ public class LavaGun : MonoBehaviour
     ParticleSystem.EmissionModule lavaEmission;
     bool reloading;
     GunInfo gunInfo;
-    int collisionMask;
     GameInputManager gameInputManager;
 
     void Start()
@@ -113,6 +112,7 @@ public class LavaGun : MonoBehaviour
             yield return null;
         }
 
+        transform.localEulerAngles = initialRot;
         gunInfo.Reload();
         reloading = false;
 
@@ -128,6 +128,7 @@ public class LavaGun : MonoBehaviour
            // other.GetComponent<Player>().TakeDamage(gunInfo.damage, 0, false, 0, 0, 0, transform, false, 0, 0);
     }
 
+    #if UNITY_EDITOR
     void OnDrawGizmos()
     {
         if(firePoint == null)
@@ -152,4 +153,5 @@ public class LavaGun : MonoBehaviour
 
         Gizmos.DrawWireSphere(spawnPosition, 0.25f);
     }
+    #endif
 }

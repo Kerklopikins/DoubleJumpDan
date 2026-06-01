@@ -61,9 +61,11 @@ public class HornyToadAI : MonoBehaviour
         rb2D.velocity = new Vector2(direction.x * speed, rb2D.velocity.y);
     }
 
+    #if UNITY_EDITOR
     void OnDrawGizmos()
     {
         Gizmos.color = new Color(1, 0, 0, 0.25f);
         Gizmos.DrawWireSphere(transform.position, playerRange);
     }
+    #endif
 }

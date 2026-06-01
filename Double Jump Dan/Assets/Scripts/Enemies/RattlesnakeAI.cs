@@ -57,9 +57,11 @@ public class RattlesnakeAI : MonoBehaviour
 		}
 	}
 
+	#if UNITY_EDITOR
 	void OnDrawGizmos()
 	{
 		Gizmos.color = Color.red;
 		Gizmos.DrawWireSphere(transform.position, strikeRange);
 	}
+	#endif
 }

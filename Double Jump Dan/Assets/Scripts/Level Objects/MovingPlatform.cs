@@ -187,34 +187,18 @@ public class MovingPlatform : MonoBehaviour
 			{
 				smoke.Clear();
 				smoke.Play();
+				
+				currentPoint = points[0];
 				transform.position = points[0];
+				direction = 1;
+				pointIndex = 0;
+
 				canMove = false;
 			}	
 		}
 	}
 	
-	void OnValidate()
-	{
-#if UNITY_EDITOR
-		EditorApplication.delayCall += SetSize;
-
-		if(points == null)
-			return;
-			
-		for(int i = 0; i < points.Count; i++)
-		{
-			if(!Application.isPlaying && i == 0)
-            	points[0] = transform.position;
-		
-			points[i] = SnapVector(points[i]);
-
-			if(points[i] == new Vector2(0, roundingYOffset))
-				points[i] = new Vector2(transform.position.x, transform.position.y);
-        }
-#endif
-    }
-
-	private Vector2 SnapVector(Vector2 v)
+	Vector2 SnapVector(Vector2 v)
 	{
 		return new Vector2(Mathf.Round(v.x), Mathf.Round(v.y - roundingYOffset) + roundingYOffset);
 	}
@@ -248,9 +232,28 @@ public class MovingPlatform : MonoBehaviour
         isQuitting = true;
     }
 
+	#if UNITY_EDITOR
+	void OnValidate()
+	{
+		EditorApplication.delayCall += SetSize;
+
+		if(points == null)
+			return;
+			
+		for(int i = 0; i < points.Count; i++)
+		{
+			if(!Application.isPlaying && i == 0)
+            	points[0] = transform.position;
+		
+			points[i] = SnapVector(points[i]);
+
+			if(points[i] == new Vector2(0, roundingYOffset))
+				points[i] = new Vector2(transform.position.x, transform.position.y);
+        }
+    }
+	
     void OnDrawGizmos()
     {
-#if UNITY_EDITOR
 		Gizmos.color = Color.cyan;
 		Gizmos.DrawWireCube(new Vector3(transform.position.x, transform.position.y - 0.25f, 0), Vector3.one * 2);
 
@@ -279,7 +282,6 @@ public class MovingPlatform : MonoBehaviour
 		
 		if(loop && points.Count > 0)
             Gizmos.DrawLine(new Vector3(points[points.Count - 1].x, points[points.Count - 1].y - 0.25f, 0), new Vector3(points[0].x, points[0].y - 0.25f, 0));
-#endif
-
     }
+	#endif
 }

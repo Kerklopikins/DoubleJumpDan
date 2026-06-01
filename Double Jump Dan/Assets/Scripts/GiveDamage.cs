@@ -64,6 +64,7 @@ public class GiveDamage : MonoBehaviour
         player.TakeDamage(damage, inputDelay, giveKnockBack, knockBackX, knockBackY, xOffset, otherTransform, _rotationBasedKnockBack, _knockBack, _rotationOffset);
     }
 
+    #if UNITY_EDITOR
     void OnDrawGizmos()
     {
         if(offsetAdjustmentMode)
@@ -73,4 +74,5 @@ public class GiveDamage : MonoBehaviour
             Gizmos.DrawWireSphere(new Vector3(transform.position.x + xKnockBackOffset, transform.position.y, 0), 0.125f);
         }
     }
+    #endif
 }

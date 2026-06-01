@@ -310,6 +310,8 @@ public class BasicEnemyAI : MonoBehaviour
                 triggeredWatchOut = false;
         }
     }
+
+    #if UNITY_EDITOR
     void OnDrawGizmos()
     {
         if(groundCheck != null)
@@ -321,4 +323,5 @@ public class BasicEnemyAI : MonoBehaviour
         Gizmos.color = new Color(1, 0, 0, 0.25f);
         Gizmos.DrawWireSphere(transform.position, playerRange);
     }
+    #endif
 }

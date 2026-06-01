@@ -92,6 +92,12 @@ public class Portal : MonoBehaviour
         cameraManager.SnapCamera(cameraManager.transform.position);
     }
 
+    Vector3 SnapVector(Vector3 v)
+    {
+        return new Vector3(Mathf.Round(v.x), Mathf.Round(v.y), v.z);
+    }
+    
+    #if UNITY_EDITOR
     void OnValidate()
     {
         transportPoint = SnapVector(transportPoint);
@@ -99,16 +105,9 @@ public class Portal : MonoBehaviour
         if(transportPoint == Vector3.zero)
             transportPoint = new Vector3(transform.position.x, transform.position.y, 0);
     }
-
-    private Vector3 SnapVector(Vector3 v)
-    {
-        return new Vector3(Mathf.Round(v.x), Mathf.Round(v.y), v.z);
-    }
-
+    
     void OnDrawGizmos()
-    {
-#if UNITY_EDITOR
-        
+    {        
         //Gizmos.color = Color.red;
         //Gizmos.DrawSphere(new Vector3(transform.position.x - xDistance, transform.position.y, 0), 0.1f);
         //Gizmos.DrawSphere(new Vector3(transform.position.x + xDistance, transform.position.y, 0), 0.1f);
@@ -126,7 +125,6 @@ public class Portal : MonoBehaviour
         style.fontStyle = FontStyle.Bold;
 
         Handles.Label(transportPoint, "Teleport Point", style);
-#endif
-
     }
+    #endif
 }

@@ -7,7 +7,7 @@ using System.Collections;
 public class ScreenshotsMenu : MonoBehaviour
 {
     [SerializeField] GameObject screenshots;
-    [SerializeField] Button screenshotMenuButton;
+    [SerializeField] Text titleText;
     [SerializeField] Image screenshotButton;
     [SerializeField] GameObject noScreenshotsText;
     [SerializeField] ScrollRect screenshotsScrollRect;
@@ -22,57 +22,89 @@ public class ScreenshotsMenu : MonoBehaviour
     UIScreenManager uiScreenManager;
     GameInputManager gameInputManager;
     MainMenuManager mainMenuManager;
-    bool loadedScreenshots;
     DirectoryInfo directory;
     FileInfo[] files;
     public int screenshotsCount { get; private set; }
+    float verticalNormalizePosition = 1;
+    bool checkedNormalizedPosition;
 
     void Awake()
     {
-        if(!Directory.Exists(Environment.GetFolderPath(Environment.SpecialFolder.MyPictures) + "/Double Jump Dan"))
-        {
-            mainMenuManager.screenshotsCount = 0;
-            noScreenshotsText.SetActive(true);
-        }
-        else
+        mainMenuManager = GetComponent<MainMenuManager>();
+
+        if(Directory.Exists(Environment.GetFolderPath(Environment.SpecialFolder.MyPictures) + "/Double Jump Dan"))
         {
             directory = new DirectoryInfo(Environment.GetFolderPath(Environment.SpecialFolder.MyPictures) + "/Double Jump Dan");
             files = directory.GetFiles("*.jpg");
             screenshotsCount = files.Length;
+
+            if(screenshotsCount == 0)
+            {
+                mainMenuManager.screenshotsCount = 0;
+                noScreenshotsText.SetActive(true);
+                titleText.text = "No Screenshots";
+            }
+            else
+            {
+                if(screenshotsCount == 1)
+                    titleText.text = "1 Screenshot";
+                else if(screenshotsCount > 1)
+                    titleText.text = screenshotsCount + " Screenshots";
+            }
+        }
+        else
+        {
+            mainMenuManager.screenshotsCount = 0;
+            noScreenshotsText.SetActive(true);
+            titleText.text = "No Screenshots";
         }
     }
+
     void Start()
     {
         uiScreenManager = GetComponent<UIScreenManager>();
         gameInputManager = GameInputManager.Instance;
-        mainMenuManager = GetComponent<MainMenuManager>();
 
-        screenshotMenuButton.onClick.AddListener(RefreshScreenshots);
         gameInputManager.OnControllerChanged += OnControllerChanged;
+        gameInputManager.OnKeyboardOnlyInputChanged += OnKeyboardOnlyInputChanged;
 
         if(gameInputManager.ControllerConnected())
             screenshotsScrollRect.inertia = false;
 
-        MaybeLoadScreenshots();
+        if(screenshotsCount > 0)
+            MaybeLoadScreenshots();
     }
 
     void Update()
     {
-        if(screenshots.activeSelf == false)
-            return;
-            
-        if(gameInputManager.ControllerConnected())
+        if(screenshots.activeInHierarchy == false)
         {
-            if(Mathf.Abs(gameInputManager.ScrollDirection().y) > 0.1f)
-            {
-                if(gameInputManager.FastCursorButton())
-                    mainMenuManager._scrollSpeed = mainMenuManager.scrollSpeed * 2;
-                else
-                    mainMenuManager._scrollSpeed = mainMenuManager.scrollSpeed;
+            checkedNormalizedPosition = false;
+            return;
+        }
+        else if(screenshots.activeInHierarchy && !checkedNormalizedPosition)
+        {
+            StartCoroutine(DelayContentReposition(verticalNormalizePosition));
+            checkedNormalizedPosition = true;
+        }
+        
+        if(gameInputManager.ControllerConnected())
+            ScrollContent(gameInputManager.ControllerScrolling(), gameInputManager.ControllerFastCursor());  
+        else if(gameInputManager.KeyboardOnly())
+            ScrollContent(gameInputManager.KeyboardScrolling(), gameInputManager.KeyboardFastCursor());  
+    }
 
-                screenshotsContent.anchoredPosition += new Vector2(0, -gameInputManager.ScrollDirection().y * mainMenuManager._scrollSpeed * Time.deltaTime);
-                screenshotsContent.anchoredPosition = new Vector2(screenshotsContent.anchoredPosition.x, Mathf.Clamp(screenshotsContent.anchoredPosition.y, 0, screenshotsContent.sizeDelta.y - 624));
-            }
+    void ScrollContent(Vector2 input, bool fastCursor)
+    {
+        if(Mathf.Abs(input.y) > 0.1f)
+        {
+            if(fastCursor)
+                mainMenuManager._scrollSpeed = mainMenuManager.scrollSpeed * 2;
+            else
+                mainMenuManager._scrollSpeed = mainMenuManager.scrollSpeed;
+
+            screenshotsContent.anchoredPosition += new Vector2(0, -input.y * mainMenuManager._scrollSpeed * Time.deltaTime);
+            screenshotsContent.anchoredPosition = new Vector2(screenshotsContent.anchoredPosition.x, Mathf.Clamp(screenshotsContent.anchoredPosition.y, 0, screenshotsContent.sizeDelta.y - 624));
         }
     }
 
@@ -84,17 +116,34 @@ public class ScreenshotsMenu : MonoBehaviour
             screenshotsScrollRect.inertia = true;
     }
     
-    public void RefreshScreenshots()
+    public void OnKeyboardOnlyInputChanged(bool keyboardOnly)
     {
-        StartCoroutine(DelayContentCentering());
+        if(!gameInputManager.ControllerConnected())
+        {
+            if(keyboardOnly)
+                screenshotsScrollRect.inertia = false;
+            else
+                screenshotsScrollRect.inertia = true;
+        }
     }
 
-    IEnumerator DelayContentCentering()
+    public void OpenScreenshotsViewerPanel()
+    {
+        verticalNormalizePosition = screenshotsScrollRect.verticalNormalizedPosition;
+        uiScreenManager.OpenPanel(screenshotViewerAnimator);
+    }
+    
+    public void RefreshScreenshots()
+    {
+        verticalNormalizePosition = 1;
+    }
+
+    IEnumerator DelayContentReposition(float normalizedPosition)
     {
         yield return null;
         yield return null;
 
-        screenshotsScrollRect.verticalNormalizedPosition = 1;
+        screenshotsScrollRect.verticalNormalizedPosition = normalizedPosition;
     }
 
     public void Initialize()
@@ -103,7 +152,7 @@ public class ScreenshotsMenu : MonoBehaviour
         contentSizeFitter.enabled = false;
     }
 
-    private Sprite LoadSprite(string path)
+    Sprite LoadSprite(string path)
     {
         if(string.IsNullOrEmpty(path))
         {
@@ -123,25 +172,11 @@ public class ScreenshotsMenu : MonoBehaviour
         texture.filterMode = FilterMode.Point;
         Sprite sprite = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), new Vector2(0.5f, 0.5f));
 
-        //texture.Apply(false, false);
-
         return sprite;
     }
 
-    public void MaybeLoadScreenshots()
+    void MaybeLoadScreenshots()
     {
-		if(noScreenshotsText.activeInHierarchy)
-			return;
-		
-        if(loadedScreenshots)
-            return;
-
-        if(files.Length == 0)
-        {
-            noScreenshotsText.SetActive(true);
-            return;
-        }
-
         for(int i = 0; i < files.Length; i++)
         {
             Image _image = Instantiate(screenshotButton, Vector3.zero, Quaternion.identity, screenshotsContent.transform);
@@ -152,12 +187,7 @@ public class ScreenshotsMenu : MonoBehaviour
             _image.sprite = LoadSprite(files[i].FullName);
             ScreenshotButton button = _image.GetComponent<ScreenshotButton>();
             button.screenshotsMenu = this;
-            button.uiScreenManager = uiScreenManager;
             mainMenuManager.screenshotsCount += 1;
-            //_image.GetComponentInChildren<Text>().text = files[i].CreationTime.Month + "-" + files[i].CreationTime.Day + "-" + files[i].CreationTime.Year;
-            //_image.name = files[i].ToString();
         }
-
-        loadedScreenshots = true;
     }
 }

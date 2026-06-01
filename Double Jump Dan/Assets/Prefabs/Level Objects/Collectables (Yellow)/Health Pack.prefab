@@ -214,6 +214,7 @@ MonoBehaviour:
   healthPackSprite: {fileID: 424682}
   collectEffect: {fileID: 7668993879813929799}
   collectSound: {fileID: 8300000, guid: fd0a76fd15fc3d942b50aa84cd773db2, type: 3}
+  defaultSprite: {fileID: 824108254, guid: a84efda117f28ec47ace744a727c2bed, type: 3}
 --- !u!114 &114630477860454698
 MonoBehaviour:
   m_ObjectHideFlags: 0

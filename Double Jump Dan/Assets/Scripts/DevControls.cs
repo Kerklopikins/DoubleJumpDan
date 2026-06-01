@@ -4,9 +4,11 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
+using UnityEngine.InputSystem;
 
 public class DevControls : MonoBehaviour
-{
+{   
+    [SerializeField] LevelType levelType;
     [SerializeField] bool enableTestingMode;
     
     [SerializeField] GameObject devModeUI;
@@ -21,22 +23,24 @@ public class DevControls : MonoBehaviour
     bool searched;
     GameHUD gameHUD;
     Screenshot screenshot;
-    bool checkedFocus;
     float timeScale = 1;
     List<TimeOfDayMaterialChanger> timeMatChangers;
     List<Health> healths;
     Vector2 lastScreenSize;
     float screenSizeCheckTimer;
-
+    public enum LevelType { Normal, MainMenu }
     void Start()
     {
-        if(enableTestingMode)
+        if(levelType == LevelType.Normal)
         {
-            worldManager = WorldManager.Instance;
-            Transform backgroundParent = GameObject.Find("Level Objects").transform.Find("Background");
+            if(enableTestingMode)
+            {
+                worldManager = WorldManager.Instance;
+                Transform backgroundParent = GameObject.Find("Level Objects").transform.Find("Background");
 
-            for(int i = 0; i < backgroundParent.childCount; i++)
-                parallaxes.Add(backgroundParent.GetChild(i).GetComponent<Parallax>());
+                for(int i = 0; i < backgroundParent.childCount; i++)
+                    parallaxes.Add(backgroundParent.GetChild(i).GetComponent<Parallax>());
+            }
         }
     }
 
@@ -46,64 +50,72 @@ public class DevControls : MonoBehaviour
             return;
 
 #if UNITY_EDITOR
-
-        if(screenSizeCheckTimer > 0)
-            screenSizeCheckTimer -= Time.deltaTime;
-        else
+        if(levelType == LevelType.Normal)
         {
-            Vector2 currentScreenSize = new Vector2(Screen.width, Screen.height);
-
-            if(currentScreenSize != lastScreenSize)
+            if(screenSizeCheckTimer > 0)
+                screenSizeCheckTimer -= Time.deltaTime;
+            else
             {
-                lastScreenSize = currentScreenSize;
-                ResizeBGAndPosUI();
-            }
+                Vector2 currentScreenSize = new Vector2(Screen.width, Screen.height);
 
-            screenSizeCheckTimer = 0.5f;
-        }        
+                if(currentScreenSize != lastScreenSize)
+                {
+                    lastScreenSize = currentScreenSize;
+                    ResizeBGAndPosUI();
+                }
+
+                screenSizeCheckTimer = 0.5f;
+            }  
+        } 
 #endif
-        if(GameInputManager.Instance.DevModeButtonDown())
-        {
-            if(!searched)
+        if(Keyboard.current.leftShiftKey.IsPressed() && Keyboard.current.qKey.wasPressedThisFrame)
+        {   
+            if(levelType == LevelType.Normal)
             {
-                itemManager = GameObject.FindWithTag("Managers").GetComponent<ItemManager>();
-                player = GameObject.FindWithTag("Player").GetComponent<Player>();
-                gameHUD = GameObject.Find("Game HUD").GetComponent<GameHUD>();
-                screenshot = GetComponentInChildren<Screenshot>();
+                if(!searched)
+                {
+                    itemManager = GameObject.FindWithTag("Managers").GetComponent<ItemManager>();
+                    player = GameObject.FindWithTag("Player").GetComponent<Player>();
+                    gameHUD = GameObject.Find("Game HUD").GetComponent<GameHUD>();
+                    screenshot = GetComponentInChildren<Screenshot>();
 
-                timeMatChangers = new List<TimeOfDayMaterialChanger>(FindObjectsByType<TimeOfDayMaterialChanger>(FindObjectsInactive.Include, FindObjectsSortMode.None));
+                    timeMatChangers = new List<TimeOfDayMaterialChanger>(FindObjectsByType<TimeOfDayMaterialChanger>(FindObjectsInactive.Include, FindObjectsSortMode.None));
 
-                searched = true;
+                    searched = true;
+                }
             }
             
             enteredDevMode = !enteredDevMode;
             devModeUI.SetActive(enteredDevMode);
-            messageText.text = "Entered Dev Mode";
-            StartCoroutine(ClearMessageText());
-        }
-        
-        if(enteredDevMode)
-        {
-            if(textField.isFocused)
+
+            if(levelType == LevelType.Normal)
             {
-                gameHUD.enabled = false;
-                screenshot.enabled = false;
-                player.enabled = false;
-                Time.timeScale = 0;
-                checkedFocus = false;
-            }
-            else
-            {
-                if(!checkedFocus)
+                if(enteredDevMode)
+                {
+                    textField.Select();
+                    gameHUD.enabled = false;
+                    screenshot.enabled = false;
+                    player.enabled = false;
+                    Time.timeScale = 0;
+                }
+                else
                 {
                     gameHUD.enabled = true;
                     screenshot.enabled = true;
                     player.enabled = true;
                     Time.timeScale = timeScale;
-                    checkedFocus = true;
                 }
+                
+                messageText.text = "Entered Dev Mode";
+                StartCoroutine(ClearMessageText());   
             }
+        }
+        
+        if(levelType == LevelType.MainMenu)
+            return;
 
+        if(enteredDevMode)
+        {
             if(textField.text.Length > 0 && GameInputManager.Instance.ReturnButtonDown())
             {
                 string commandString = textField.text;
@@ -114,50 +126,56 @@ public class DevControls : MonoBehaviour
                 else
                     value = 0;
 
-                if(commandString.Contains("/timescale"))
+                if(commandString.ToLower().Contains("timescale"))
                 {
                     value = Mathf.Clamp(value, 0, 3);
                     timeScale = value;
                     Time.timeScale = timeScale;
                     messageText.text = "Time Scale set to " + timeScale;
                 }
-                else if(commandString.Contains("/speed"))
+                else if(!commandString.ToLower().Contains("sprint") && commandString.ToLower().Contains("speed"))
                 {
                     value = Mathf.Clamp(value, 0, 60);
-                    player.speed = value;
-                    messageText.text = "Player speed set to: " + value;
+                    player.walkSpeed = value;
+                    messageText.text = "Player walk speed set to: " + value;
                 }
-                else if(commandString.Contains("/accel air"))
+                else if(commandString.ToLower().Contains("sprintspeed"))
+                {
+                    value = Mathf.Clamp(value, 0, 60);
+                    player.sprintSpeed = value;
+                    messageText.text = "Player sprint speed set to: " + value;
+                }
+                else if(commandString.ToLower().Contains("accelair"))
                 {
                     value = Mathf.Clamp(value, 0, 60);
                     player.accelerationTimeInAir = value;
                     messageText.text = "Player acceleration in air set to: " + value;
                 }
-                else if(commandString.Contains("/accel grnd"))
+                else if(commandString.ToLower().Contains("accelgrnd"))
                 {
                     value = Mathf.Clamp(value, 0, 60);
                     player.accelerationTimeGrounded = value;
                     messageText.text = "Player acceleration on ground set to: " + value;
                 }
-                else if(commandString.Contains("/jmp hght"))
+                else if(commandString.ToLower().Contains("jmphght"))
                 {
                     value = Mathf.Clamp(value, 0, 100);
                     player.jumpHeight = value;
                     messageText.text = "Player jump height set to: " + value;
                 }
-                else if(commandString.Contains("/gravity"))
+                else if(commandString.ToLower().Contains("gravity"))
                 {
                     value = Mathf.Clamp(value, 0, 10);
                     player.GetComponent<Rigidbody2D>().gravityScale = value;
                     messageText.text = "Player gravity set to: " + value;
                 }
-                else if(commandString.Contains("/invincible"))
+                else if(commandString.ToLower().Contains("invincible"))
                 {
                     bool invincible;
 
-                    if(commandString.Contains("true"))
+                    if(commandString.ToLower().Contains("true"))
                         invincible = true;
-                    else if(commandString.Contains("false"))
+                    else if(commandString.ToLower().Contains("false"))
                         invincible = false;
                     else
                         invincible = false;
@@ -169,27 +187,28 @@ public class DevControls : MonoBehaviour
                     else
                         messageText.text = "Player invincible is set to false";
                 }
-                else if(commandString.Contains("/load scene"))
+                else if(commandString.ToLower().Contains("loadscene"))
                 {
                     value = Mathf.Clamp(value, 0, SceneManager.sceneCountInBuildSettings - 1);
                     int roundedValue = Mathf.RoundToInt(value);
                     LevelLoadingManager.Instance.LoadScene(roundedValue);
                     messageText.text = "Loading scene";
                 }
-                else if(commandString.Contains("/max lives"))
+                else if(commandString.ToLower().Contains("heal"))
                 {
-                    player.lives = 3;
+                    //The Golden Heart
+                    player.lives = GameManager.Instance.currentUser.equippedUpgrades.Contains(5480) ? 4 : 3;
                     player.GiveHealth(player.health);
                     StatsHUD.Instance.PlayerKilled();
                     messageText.text = "Max lives and health";
                 }
-                else if(commandString.Contains("/gameover"))
+                else if(commandString.ToLower().Contains("gameover"))
                 {
                     player.lives = 1;
                     player.Kill();
                     messageText.text = "Now that wasn't very nice";
                 }
-                else if(commandString.Contains("/kill all"))
+                else if(commandString.ToLower().Contains("killall"))
                 {
                     healths = new List<Health>(FindObjectsByType<Health>(FindObjectsInactive.Exclude, FindObjectsSortMode.None));
 
@@ -201,38 +220,38 @@ public class DevControls : MonoBehaviour
                     healths.Clear();
                     messageText.text = "All enemies killed";
                 }
-                else if(commandString.Contains("/day"))
+                else if(commandString.ToLower().Contains("day"))
                 {
                     ToggleDay();
                     messageText.text = "Time of day set to day";
                 }
-                else if(commandString.Contains("/sunset"))
+                else if(commandString.ToLower().Contains("sunset"))
                 {
                     ToggleSunset();
                     messageText.text = "Time of day set to sunset";
                 }
-                else if(commandString.Contains("/night"))
+                else if(commandString.ToLower().Contains("night"))
                 {
                     ToggleNight();
                     messageText.text = "Time of day set to night";
                 }
-                else if(commandString.Contains("/sunrise"))
+                else if(commandString.ToLower().Contains("sunrise"))
                 {
                     ToggleSunrise();
                     messageText.text = "Time of day set to sunrise";
                 }
-                else if(commandString.Contains("/overcast"))
+                else if(commandString.ToLower().Contains("overcast"))
                 {
                     ToggleOvercast();
                     messageText.text = "Sky set to overcast";
                 }
-                else if(commandString.Contains("/dust enabled"))
+                else if(commandString.ToLower().Contains("dust"))
                 {
                     bool on;
 
-                    if(commandString.Contains("true"))
+                    if(commandString.ToLower().Contains("true"))
                         on = true;
-                    else if(commandString.Contains("false"))
+                    else if(commandString.ToLower().Contains("false"))
                         on = false;
                     else
                         on = false;
@@ -244,13 +263,13 @@ public class DevControls : MonoBehaviour
                     else
                         messageText.text = "Dust disabled";
                 }
-                else if(commandString.Contains("/snow enabled"))
+                else if(commandString.ToLower().Contains("snow"))
                 {
                     bool on;
 
-                    if(commandString.Contains("true"))
+                    if(commandString.ToLower().Contains("true"))
                         on = true;
-                    else if(commandString.Contains("false"))
+                    else if(commandString.ToLower().Contains("false"))
                         on = false;
                     else
                         on = false;
@@ -262,13 +281,13 @@ public class DevControls : MonoBehaviour
                     else
                         messageText.text = "Snow disabled";
                 }
-                else if(commandString.Contains("/clouds enabled"))
+                else if(commandString.ToLower().Contains("clouds"))
                 {
                     bool on;
 
-                    if(commandString.Contains("true"))
+                    if(commandString.ToLower().Contains("true"))
                         on = true;
-                    else if(commandString.Contains("false"))
+                    else if(commandString.ToLower().Contains("false"))
                         on = false;
                     else
                         on = false;
@@ -280,7 +299,7 @@ public class DevControls : MonoBehaviour
                     else
                         messageText.text = "Clouds disabled";
                 }
-                else if(commandString.Contains("/resize"))
+                else if(commandString.ToLower().Contains("resize"))
                 {
                     ResizeBGAndPosUI();
                     messageText.text = "Background, Screen Effects, and UI resized and refreshed";
@@ -358,8 +377,20 @@ public class DevControls : MonoBehaviour
         worldManager.stars.gameObject.SetActive(false);
 
         foreach(TimeOfDayMaterialChanger changer in timeMatChangers)
-            if(changer.gameObject.activeSelf)
-                changer.UpdateMaterialColor();
+        {
+            if(changer != null)
+            {
+                if(changer.gameObject.activeInHierarchy)
+                    changer.UpdateMaterialColor();
+            }
+            else
+            {
+                timeMatChangers.Remove(changer);
+            }
+        }
+
+        ParticleSystemRenderer cloudParticleSystemRenderer = worldManager.clouds.GetComponent<ParticleSystemRenderer>();
+        cloudParticleSystemRenderer.material.color = new Color(worldManager.mainMaterial.color.r, worldManager.mainMaterial.color.g, worldManager.mainMaterial.color.b, cloudParticleSystemRenderer.material.color.a);
     }
 
     public void ToggleSunset()
@@ -371,7 +402,7 @@ public class DevControls : MonoBehaviour
         {
             if(changer != null)
             {
-                if(changer.gameObject.activeSelf)
+                if(changer.gameObject.activeInHierarchy)
                     changer.UpdateMaterialColor();
             }
             else
@@ -379,6 +410,9 @@ public class DevControls : MonoBehaviour
                 timeMatChangers.Remove(changer);
             }
         }
+
+        ParticleSystemRenderer cloudParticleSystemRenderer = worldManager.clouds.GetComponent<ParticleSystemRenderer>();
+        cloudParticleSystemRenderer.material.color = new Color(worldManager.sunsetCloudTint.r, worldManager.sunsetCloudTint.g, worldManager.sunsetCloudTint.b, cloudParticleSystemRenderer.material.color.a);
     }
 
     public void ToggleNight()
@@ -390,7 +424,7 @@ public class DevControls : MonoBehaviour
         {
             if(changer != null)
             {
-                if(changer.gameObject.activeSelf)
+                if(changer.gameObject.activeInHierarchy)
                     changer.UpdateMaterialColor();
             }
             else
@@ -398,6 +432,9 @@ public class DevControls : MonoBehaviour
                 timeMatChangers.Remove(changer);
             }
         }
+
+        ParticleSystemRenderer cloudParticleSystemRenderer = worldManager.clouds.GetComponent<ParticleSystemRenderer>();
+        cloudParticleSystemRenderer.material.color = new Color(worldManager.mainMaterial.color.r, worldManager.mainMaterial.color.g, worldManager.mainMaterial.color.b, cloudParticleSystemRenderer.material.color.a);
     }
 
     public void ToggleSunrise()
@@ -409,7 +446,7 @@ public class DevControls : MonoBehaviour
         {
             if(changer != null)
             {
-                if(changer.gameObject.activeSelf)
+                if(changer.gameObject.activeInHierarchy)
                     changer.UpdateMaterialColor();
             }
             else
@@ -417,6 +454,9 @@ public class DevControls : MonoBehaviour
                 timeMatChangers.Remove(changer);
             }
         }
+        
+        ParticleSystemRenderer cloudParticleSystemRenderer = worldManager.clouds.GetComponent<ParticleSystemRenderer>();
+        cloudParticleSystemRenderer.material.color = new Color(worldManager.sunriseCloudTint.r, worldManager.sunriseCloudTint.g, worldManager.sunriseCloudTint.b, cloudParticleSystemRenderer.material.color.a);
     }
 
     public void ToggleOvercast()
@@ -427,7 +467,7 @@ public class DevControls : MonoBehaviour
         {
             if(changer != null)
             {
-                if(changer.gameObject.activeSelf)
+                if(changer.gameObject.activeInHierarchy)
                     changer.UpdateMaterialColor();
             }
             else
@@ -436,9 +476,12 @@ public class DevControls : MonoBehaviour
             }
         }
 
-        messageText.text = "Overcast toggled";
+        ParticleSystemRenderer cloudParticleSystemRenderer = worldManager.clouds.GetComponent<ParticleSystemRenderer>();
+        cloudParticleSystemRenderer.material.color = new Color(worldManager.mainMaterial.color.r, worldManager.mainMaterial.color.g, worldManager.mainMaterial.color.b, cloudParticleSystemRenderer.material.color.a);
+
         StartCoroutine(ClearMessageText());
     }
+    
     public void ToggleDust(bool on)
     {
         Camera _camera = Camera.main;

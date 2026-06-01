@@ -10,15 +10,19 @@ public class MainMenuBackground : MonoBehaviour
 
     LocalWorldManager localWorldManager;
     WorldManager worldManager;
-
+    
     void Start()
     {
         localWorldManager = GameObject.FindWithTag("Level Managers").GetComponent<LocalWorldManager>();
         worldManager = WorldManager.Instance;
-        worldManager.OnTimeOfDayChanged += OnTimeOfDayChanged;
+
+        if(worldManager.Initiated)
+            UpdateMaterialColor();
+        else
+            worldManager.OnInitialized += UpdateMaterialColor;
     }
 
-    void OnTimeOfDayChanged()
+    void UpdateMaterialColor()
     {
         mountains.material.color = worldManager.mainMaterial.color;
         groundPlane.material.color = worldManager.mainMaterial.color;

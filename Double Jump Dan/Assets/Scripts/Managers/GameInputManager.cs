@@ -2,6 +2,7 @@ using UnityEngine;
 using System;
 using UnityEngine.InputSystem;
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine.InputSystem.Controls;
 
 public class GameInputManager : MonoBehaviour
@@ -13,37 +14,108 @@ public class GameInputManager : MonoBehaviour
     public float HorizontalInputSensitivity { get; private set; }
     public float VerticalInputSensitivity { get; private set; }
     public event Action<bool> OnRebind;
-    public bool rebinding { get; set; }
+    public bool Rebinding { get; set; }
     public InputMode inputMode { get; private set; }
     public enum InputMode { KeyboardAndMouse, Controller }
     public event Action<bool> OnControllerChanged;
+    public event Action<bool> OnKeyboardOnlyInputChanged;
+    DPadUse dPadUse;
+    public enum DPadUse { Move, Aim }
     InputAction move;
     InputAction shoot;
     InputAction reload;
     InputAction jump;
-    InputAction strafe;
+    InputAction sprint;
     InputAction pause;
     InputAction escape;
     InputAction enter;
     InputAction screenshot;
-    InputAction devMode;
     InputAction aim;
     InputAction click;
     InputAction point;
-    InputAction cursorMove;
-    InputAction scrolling;
-    InputAction fastCursor;
     InputAction leftBumper;
     InputAction rightBumper;
-    InputAction cursorClick;
+
+    InputAction controllerCursorMove;
+    InputAction controllerScrolling;
+    InputAction controllerFastCursor;
+
+    InputAction switchKeyboardMode;
+    InputAction keyboardCursorMove;
+    InputAction keyboardScrolling;
+    InputAction keyboardFastCursor;
+
+    InputAction dPad;
     Camera _camera;
     Coroutine rumbleCoroutine;
     public static bool IsControllerConnected;
+    public static bool IsKeyboardOnly;
     Gamepad currentGamepad;
     GameManager gameManager;
     float currentRumbleAmount;
-    string defaultMovePath;
-    string defaultAimPath;
+    
+    public static readonly Dictionary<string, string> DisplayNameOverrides = new()
+    {
+        { "leftButton", "Left Click" },
+        { "rightButton", "Right Click" },
+        { "middleButton", "Middle Mouse Button" },
+        { "leftTrigger", "Left Trigger" },
+        { "rightTrigger", "Right Trigger" },
+        { "leftShoulder", "Left Bumper" },
+        { "rightShoulder", "Right Bumper" },
+        { "leftStickPress", "Left Stick Button" },
+        { "rightStickPress", "Right Stick Button" },
+        { "leftShift", "Left Shift" },
+        { "rightShift", "Right Shift" },
+        { "leftCtrl", "Left Ctrl" },
+        { "rightCtrl", "Right Ctrl" },
+        { "leftAlt", "Left Alt" },
+        { "rightAlt", "Right Alt" },
+        { "leftBracket", "Left Bracket" },
+        { "rightBracket", "Right Bracket" },
+        { "period", "Period" },
+        { "semicolon", "Semicolon" },
+        { "slash", "Slash" },
+        { "backslash", "Backslash" },
+        { "comma", "Comma" },
+        { "quote", "Quote" },
+        { "leftArrow", "Left" },
+        { "rightArrow", "Right" },
+        { "upArrow", "Up" },
+        { "downArrow", "Down" },
+    };
+
+    public static readonly Dictionary<string, string> XboxDisplayNameOverrides = new()
+    {
+        { "buttonSouth", "A" },
+        { "buttonNorth", "Y" },
+        { "buttonWest", "X" },
+        { "buttonEast", "B" },
+        { "leftTrigger", "Left Trigger" },
+        { "rightTrigger", "Right Trigger" },
+        { "leftShoulder", "Left Bumper" },
+        { "rightShoulder", "Right Bumper" },
+        { "leftStickPress", "Left Stick Button" },
+        { "rightStickPress", "Right Stick Button" },
+        { "start", "Menu" },
+        { "select", "View" },
+    };
+
+    public static readonly Dictionary<string, string> PSDisplayNameOverrides = new()
+    {
+        { "buttonSouth", "Cross" },
+        { "buttonNorth", "Triangle" },
+        { "buttonWest", "Circle" },
+        { "buttonEast", "Square" },
+        { "leftTrigger", "Left Trigger" },
+        { "rightTrigger", "Right Trigger" },
+        { "leftShoulder", "Left Bumper" },
+        { "rightShoulder", "Right Bumper" },
+        { "leftStickPress", "Left Stick Button" },
+        { "rightStickPress", "Right Stick Button" },
+        { "start", "Options" },
+        { "select", "Share" },
+    };
     
     void Awake()
     {
@@ -61,7 +133,7 @@ public class GameInputManager : MonoBehaviour
 
         move = inputActions.FindAction("Move");
         jump = inputActions.FindAction("Jump");
-        strafe = inputActions.FindAction("Strafe");
+        sprint = inputActions.FindAction("Sprint");
         shoot = inputActions.FindAction("Shoot");
         reload = inputActions.FindAction("Reload");
         pause = inputActions.FindAction("Pause");
@@ -69,38 +141,48 @@ public class GameInputManager : MonoBehaviour
         enter = inputActions.FindAction("Return");
         aim = inputActions.FindAction("Aim");
         screenshot = inputActions.FindAction("Screenshot");
-        devMode = inputActions.FindAction("Dev Mode");
         click = inputActions.FindAction("Click");
-        cursorMove = inputActions.FindAction("Cursor Move");
-        scrolling = inputActions.FindAction("Scrolling");
         point = inputActions.FindAction("Point");
-        fastCursor = inputActions.FindAction("Fast Cursor");
         leftBumper = inputActions.FindAction("Left Bumper");
         rightBumper = inputActions.FindAction("Right Bumper");
-        cursorClick = inputActions.FindAction("Click");
+        dPad = inputActions.FindAction("D Pad");
 
-        defaultMovePath = move.bindings[0].effectivePath;
-        defaultAimPath = aim.bindings[0].effectivePath;
+        controllerCursorMove = inputActions.FindAction("Cursor Move Controller");
+        controllerScrolling = inputActions.FindAction("Scrolling Controller");
+        controllerFastCursor = inputActions.FindAction("Fast Cursor Controller");
+
+        switchKeyboardMode = inputActions.FindAction("Switch Keyboard Mode");
+        keyboardCursorMove = inputActions.FindAction("Cursor Move Keyboard");
+        keyboardScrolling = inputActions.FindAction("Scrolling Keyboard");
+        keyboardFastCursor = inputActions.FindAction("Fast Cursor Keyboard");
+
+        //defaultMovePath = move.bindings[0].effectivePath;
+        //defaultAimPath = aim.bindings[0].effectivePath;
 
         move.Enable();
         jump.Enable();
-        strafe.Enable();
+        sprint.Enable();
         shoot.Enable();
         reload.Enable();
         pause.Enable();
         escape.Enable();
         enter.Enable();
         screenshot.Enable();
-        devMode.Enable();
         aim.Enable();
         click.Enable();
-        cursorMove.Enable();
-        scrolling.Enable();
         point.Enable();
-        fastCursor.Enable();
         leftBumper.Enable();
         rightBumper.Enable();
-        cursorClick.Enable();
+        dPad.Enable();
+
+        controllerCursorMove.Enable();
+        controllerScrolling.Enable();
+        controllerFastCursor.Enable();
+
+        switchKeyboardMode.Enable();
+        keyboardCursorMove.Enable();
+        keyboardScrolling.Enable();
+        keyboardFastCursor.Enable();
 
         HorizontalInputSensitivity = 0.2f;
         VerticalInputSensitivity = 0.5f;
@@ -115,22 +197,12 @@ public class GameInputManager : MonoBehaviour
         else
             SetInput(InputMode.KeyboardAndMouse);
 
-        RumbleController(0, 0, 0);
-        UpdateJoystickSwap();
-    }
-
-    public void UpdateJoystickSwap()
-    {        
         if(gameManager.swapJoysticks)
-        {
-            move.ApplyBindingOverride(0, defaultAimPath);
-            aim.ApplyBindingOverride(0, defaultMovePath);
-        }
+            dPadUse = DPadUse.Aim;
         else
-        {
-            move.RemoveBindingOverride(0);
-            aim.RemoveBindingOverride(0);
-        }
+            dPadUse = DPadUse.Move;
+
+        RumbleController(0, 0, 0);
     }
 
     public bool ControllerConnected()
@@ -138,17 +210,28 @@ public class GameInputManager : MonoBehaviour
         return IsControllerConnected;
     }
 
+    public bool KeyboardOnly()
+    {
+        return IsKeyboardOnly;
+    }
+
     public void Rebind(bool enabled)
     {
-        rebinding = enabled;
+        Rebinding = enabled;
         OnRebind?.Invoke(enabled);
     }
 
     void Update()
     {
-        if(rebinding)
+        if(Rebinding)
             return;
 
+        if(switchKeyboardMode.WasPressedThisFrame())
+        {   
+            IsKeyboardOnly = !IsKeyboardOnly;
+            OnKeyboardOnlyInputChanged?.Invoke(IsKeyboardOnly);
+        }
+        
         if(Gamepad.current != null)
         {
             currentGamepad = Gamepad.current;
@@ -204,27 +287,123 @@ public class GameInputManager : MonoBehaviour
 
     public float GetHorizontalInput()
     {
-        return move.ReadValue<Vector2>().x;
+        if(ControllerConnected())
+        {
+            if(gameManager.swapJoysticks)
+            {
+                return aim.ReadValue<Vector2>().x;
+            }
+            else
+            {
+                if(dPadUse == DPadUse.Move && gameManager.useDPad)
+                    return dPad.ReadValue<Vector2>().x;
+                else
+                    return move.ReadValue<Vector2>().x;
+            }
+        }
+        else
+        {
+            return move.ReadValue<Vector2>().x;
+        }
     }
 
     public float GetVerticalInput()
     {
-        return move.ReadValue<Vector2>().y;
-    }
-
-    public Vector2 GetCursorMovement()
-    {
-        return cursorMove.ReadValue<Vector2>();
-    }
-
-    public Vector2 ScrollDirection()
-    {
-        return scrolling.ReadValue<Vector2>();
+        if(ControllerConnected())
+        {
+            if(gameManager.swapJoysticks)
+            {
+                return aim.ReadValue<Vector2>().y;
+            }
+            else
+            {
+                if(dPadUse == DPadUse.Move && gameManager.useDPad)
+                    return dPad.ReadValue<Vector2>().y;
+                else
+                    return move.ReadValue<Vector2>().y;
+            }
+        }
+        else
+        {
+            return move.ReadValue<Vector2>().y;
+        }
     }
 
     public Vector2 AimDirection()
     {
-        return aim.ReadValue<Vector2>();
+        if(ControllerConnected())
+        {
+            if(gameManager.swapJoysticks)
+            {
+                if(dPadUse == DPadUse.Aim && gameManager.useDPad)
+                    return dPad.ReadValue<Vector2>();
+                else
+                    return move.ReadValue<Vector2>();
+            }
+            else
+            {
+                return aim.ReadValue<Vector2>();
+            }
+        }
+        else
+        {
+            return Vector2.zero;
+        }
+    }
+
+    public bool Click()
+    {
+        if(click.IsPressed())
+            return true;
+        else
+            return false;
+    }
+
+    public Vector2 ControllerCursorMove()
+    {
+        if(gameManager != null && gameManager.useDPad)
+            return dPad.ReadValue<Vector2>();
+        else
+            return controllerCursorMove.ReadValue<Vector2>();
+    }
+
+    public Vector2 ControllerScrolling()
+    {
+        return controllerScrolling.ReadValue<Vector2>();
+    }
+
+    public bool ControllerFastCursor()
+    {
+        if(controllerFastCursor.IsPressed())
+            return true;
+        else
+            return false;
+    }
+
+    public Vector2 KeyboardCursorMove()
+    {
+        return keyboardCursorMove.ReadValue<Vector2>();
+    }
+
+    public Vector2 KeyboardScrolling()
+    {
+        return keyboardScrolling.ReadValue<Vector2>();
+    }
+
+    public bool KeyboardFastCursor()
+    {
+        if(keyboardFastCursor.IsPressed())
+            return true;
+        else
+            return false;
+    }
+
+    public bool SwitchKeyboardMode()
+    {
+        if(switchKeyboardMode.WasPressedThisFrame())
+            return true;
+        else
+            return false;
     }
 
     public bool JumpButtonDown()
@@ -243,9 +422,9 @@ public class GameInputManager : MonoBehaviour
             return false;
     }
 
-    public bool StrafeButton()
+    public bool SprintButton()
     {
-        if(strafe.IsPressed())
+        if(sprint.IsPressed())
             return true;
         else
             return false;
@@ -320,30 +499,6 @@ public class GameInputManager : MonoBehaviour
         return _camera.ScreenToWorldPoint(Mouse.current.position.ReadValue());
     }
 
-    public bool DevModeButtonDown()
-    {
-        if(devMode.WasPressedThisFrame())
-            return true;
-        else
-            return false;
-    }
-
-    public bool CursorClick()
-    {
-        if(cursorClick.IsPressed())
-            return true;
-        else
-            return false;
-    }
-
-    public bool FastCursorButton()
-    {
-        if(fastCursor.IsPressed())
-            return true;
-        else
-            return false;
-    }
-
     public bool LeftBumperDown()
     {
         if(leftBumper.WasPressedThisFrame())
@@ -385,7 +540,7 @@ public class GameInputManager : MonoBehaviour
 
         if(Gamepad.current == null)
             yield break;
-            
+
         Gamepad.current.SetMotorSpeeds(0, 0);
         currentRumbleAmount = 0;
     }

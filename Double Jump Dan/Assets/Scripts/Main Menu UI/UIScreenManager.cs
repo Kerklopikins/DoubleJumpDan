@@ -1,17 +1,22 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System;
+using UnityEngine.InputSystem.UI;
 
 public class UIScreenManager : MonoBehaviour
 {
     public Animator initiallyOpen;
+    [SerializeField] InputSystemUIInputModule uIModule;
 
     public Animator currentOpenPanel { get; set; }
+    public bool CanExit { get; private set; }
     Animator currentPanel;
     int m_OpenParameterId;
     Transform cursor;
     const string k_OpenTransitionName = "Open";
     const string k_ClosedStateName = "Closed";
     public float transitionTimer { get; set; }
+    bool panelOpen;
 
     void Start()
     {
@@ -22,7 +27,18 @@ public class UIScreenManager : MonoBehaviour
     void Update()
     {
         if(transitionTimer > 0)
+        {
             transitionTimer -= Time.deltaTime;
+        }
+        else
+        {
+            if(!panelOpen)
+            {
+                ToggleMouseInput(true);
+                CanExit = false;    
+                panelOpen = true;
+            }
+        }
     }
 
     IEnumerator StartCo()
@@ -33,12 +49,40 @@ public class UIScreenManager : MonoBehaviour
         OpenPanel(initiallyOpen);
     }
 
+    public void ToggleMouseInput(bool enabled)
+    {        
+        if(enabled)
+        {
+            uIModule.leftClick.action.Enable();
+            uIModule.scrollWheel.action.Enable();
+            CanExit = false;
+        }
+        else
+        {
+            uIModule.leftClick.action.Disable();
+            uIModule.scrollWheel.action.Disable();
+            CanExit = true;
+        }
+    }
+
+    public bool MouseInputDisabled()
+    {
+        if(!uIModule.leftClick.action.enabled
+        && !uIModule.scrollWheel.action.enabled)
+            return true;
+        else
+            return false;
+    }
+
     public void OpenPanel(Animator anim)
     {
         if(currentPanel == anim)
             return;
 
         currentOpenPanel = anim;
+        
+        panelOpen = false;
+        ToggleMouseInput(false);
 
         anim.gameObject.SetActive(true);
         anim.transform.SetAsLastSibling();
@@ -83,6 +127,9 @@ public class UIScreenManager : MonoBehaviour
     public void OpenMiniPanel(Animator animator)
     {
         currentOpenPanel = animator;
+
+        panelOpen = false;
+        ToggleMouseInput(false);
 
         animator.transform.SetAsLastSibling();
         cursor.SetAsLastSibling();

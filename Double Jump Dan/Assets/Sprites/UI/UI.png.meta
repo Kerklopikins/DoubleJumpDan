@@ -317,7 +317,7 @@ TextureImporter:
   spritePivot: {x: 0.5, y: 0.5}
   spritePixelsToUnits: 8
   spriteBorder: {x: 2, y: 2, z: 2, w: 2}
-  spriteGenerateFallbackPhysicsShape: 1
+  spriteGenerateFallbackPhysicsShape: 0
   alphaUsage: 1
   alphaIsTransparency: 1
   spriteTessellationDetail: -1
@@ -369,7 +369,7 @@ TextureImporter:
     allowsAlphaSplitting: 0
     overridden: 0
     androidETC2FallbackOverride: 0
-    forceMaximumCompressionQuality_BC6H_BC7: 1
+    forceMaximumCompressionQuality_BC6H_BC7: 0
   - serializedVersion: 3
     buildTarget: WebGL
     maxTextureSize: 256
@@ -381,7 +381,7 @@ TextureImporter:
     allowsAlphaSplitting: 0
     overridden: 0
     androidETC2FallbackOverride: 0
-    forceMaximumCompressionQuality_BC6H_BC7: 1
+    forceMaximumCompressionQuality_BC6H_BC7: 0
   - serializedVersion: 3
     buildTarget: Server
     maxTextureSize: 256
@@ -394,6 +394,18 @@ TextureImporter:
     overridden: 0
     androidETC2FallbackOverride: 0
     forceMaximumCompressionQuality_BC6H_BC7: 1
+  - serializedVersion: 3
+    buildTarget: iPhone
+    maxTextureSize: 512
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 0
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
   spriteSheet:
     serializedVersion: 2
     sprites:
@@ -407,7 +419,7 @@ TextureImporter:
         height: 4
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
-      border: {x: 2, y: 0, z: 2, w: 0}
+      border: {x: 2, y: 1, z: 2, w: 1}
       outline: []
       physicsShape: []
       tessellationDetail: 0
@@ -419,13 +431,13 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Hearts 1
+      name: Hearts 3
       rect:
         serializedVersion: 2
-        x: 0
-        y: 496
-        width: 31
-        height: 9
+        x: 288
+        y: 500
+        width: 41
+        height: 12
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -443,10 +455,10 @@ TextureImporter:
       name: Hearts 2
       rect:
         serializedVersion: 2
-        x: 0
-        y: 486
-        width: 31
-        height: 9
+        x: 288
+        y: 487
+        width: 41
+        height: 12
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -461,13 +473,13 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Hearts 3
+      name: Hearts 1
       rect:
         serializedVersion: 2
-        x: 0
-        y: 476
-        width: 31
-        height: 9
+        x: 288
+        y: 474
+        width: 41
+        height: 12
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -524,55 +536,13 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Ammo
+      name: Hearts 0
       rect:
         serializedVersion: 2
-        x: 41
-        y: 504
-        width: 11
-        height: 8
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 24305410000000000800000000000000
-      internalID: 21300034
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: UI Gem
-      rect:
-        serializedVersion: 2
-        x: 32
-        y: 502
-        width: 6
-        height: 10
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: c2305410000000000800000000000000
-      internalID: 21300012
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Hearts 4
-      rect:
-        serializedVersion: 2
-        x: 0
-        y: 466
-        width: 31
-        height: 9
+        x: 288
+        y: 461
+        width: 41
+        height: 12
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -591,9 +561,9 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 76
-        y: 499
+        y: 498
         width: 10
-        height: 13
+        height: 14
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -612,9 +582,9 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 87
-        y: 499
+        y: 498
         width: 10
-        height: 13
+        height: 14
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -1221,9 +1191,9 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 156
-        y: 494
-        width: 22
-        height: 18
+        y: 492
+        width: 25
+        height: 20
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -1301,7 +1271,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: UI Gems 1
+      name: UI (Gems 1) 1
       rect:
         serializedVersion: 2
         x: 188
@@ -1322,7 +1292,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: UI Gems 2
+      name: UI (Gems 1) 2
       rect:
         serializedVersion: 2
         x: 188
@@ -1343,7 +1313,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: UI Gems 3
+      name: UI (Gems 1) 3
       rect:
         serializedVersion: 2
         x: 188
@@ -1364,7 +1334,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: UI Gems 4
+      name: UI (Gems 1) 4
       rect:
         serializedVersion: 2
         x: 188
@@ -1385,7 +1355,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: UI Gems 5
+      name: UI (Gems 1) 5
       rect:
         serializedVersion: 2
         x: 188
@@ -1406,7 +1376,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: UI Gems 6
+      name: UI (Gems 1) 6
       rect:
         serializedVersion: 2
         x: 188
@@ -1427,7 +1397,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: UI Gems 7
+      name: UI (Gems 1) 7
       rect:
         serializedVersion: 2
         x: 188
@@ -1448,7 +1418,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: UI Gems 8
+      name: UI (Gems 1) 8
       rect:
         serializedVersion: 2
         x: 188
@@ -1469,7 +1439,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: UI Gems 9
+      name: UI (Gems 1) 9
       rect:
         serializedVersion: 2
         x: 188
@@ -1490,7 +1460,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: UI Gems 10
+      name: UI (Gems 1) 10
       rect:
         serializedVersion: 2
         x: 188
@@ -1511,7 +1481,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: UI Small Gems 1
+      name: UI (Gems 1) Small Gems 1
       rect:
         serializedVersion: 2
         x: 188
@@ -1532,7 +1502,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: UI Small Gems 2
+      name: UI (Gems 1) Small Gems 2
       rect:
         serializedVersion: 2
         x: 188
@@ -1553,7 +1523,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: UI Small Gems 3
+      name: UI (Gems 1) Small Gems 3
       rect:
         serializedVersion: 2
         x: 188
@@ -1574,7 +1544,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: UI Small Gems 4
+      name: UI (Gems 1) Small Gems 4
       rect:
         serializedVersion: 2
         x: 188
@@ -1746,12 +1716,12 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 0
-        y: 249
+        y: 265
         width: 220
-        height: 61
+        height: 45
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 5, z: 0, w: 55}
+      border: {x: 0, y: 5, z: 0, w: 39}
       outline: []
       physicsShape: []
       tessellationDetail: 0
@@ -1767,7 +1737,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 0
-        y: 206
+        y: 222
         width: 70
         height: 42
       alignment: 0
@@ -1788,7 +1758,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 71
-        y: 206
+        y: 222
         width: 70
         height: 42
       alignment: 0
@@ -1809,7 +1779,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 142
-        y: 206
+        y: 222
         width: 70
         height: 42
       alignment: 0
@@ -1851,9 +1821,9 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 98
-        y: 499
+        y: 498
         width: 10
-        height: 13
+        height: 14
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -2015,13 +1985,13 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Custom Skin Eyes
+      name: Custom Skin 2 Eyes
       rect:
         serializedVersion: 2
-        x: 156
-        y: 440
-        width: 10
-        height: 4
+        x: 189
+        y: 409
+        width: 13
+        height: 6
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -2031,27 +2001,6 @@ TextureImporter:
       bones: []
       spriteID: 8cd9b79956718c342ac812a80b0abb88
       internalID: 276398463
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Custom Skin Arms Legs
-      rect:
-        serializedVersion: 2
-        x: 156
-        y: 429
-        width: 20
-        height: 10
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: dab3dce039618b5449d8a13cbb306c39
-      internalID: -1684119947
       vertices: []
       indices: 
       edges: []
@@ -2103,11 +2052,11 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 156
-        y: 412
+        y: 417
         width: 22
         height: 16
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
@@ -2115,6 +2064,1014 @@ TextureImporter:
       bones: []
       spriteID: f7d795b3439659846aae2a62462d6c45
       internalID: -1370817795
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: UI Slider Background White Disabled
+      rect:
+        serializedVersion: 2
+        x: 33
+        y: 444
+        width: 5
+        height: 5
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 2, y: 2, z: 2, w: 2}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: b593af62f4c84e44cbf28fde94dedde7
+      internalID: 1890983669
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Button Highlighted Disabled
+      rect:
+        serializedVersion: 2
+        x: 54
+        y: 502
+        width: 10
+        height: 10
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 5, y: 5, z: 5, w: 5}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 59a9534ff1bc99448b21e8d2682711a8
+      internalID: 1074629680
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Custom Skin Item Card
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 179
+        width: 70
+        height: 42
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 5, z: 0, w: 36}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 0f6bd2de169ab1c4b8c9d8ae512a984e
+      internalID: 1970290699
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: User Button Normal
+      rect:
+        serializedVersion: 2
+        x: 133
+        y: 353
+        width: 24
+        height: 19
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 19, y: 0, z: 4, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: e9e9030977e1e334495c0afda221e772
+      internalID: 514164031
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: User Button Highlighted
+      rect:
+        serializedVersion: 2
+        x: 133
+        y: 333
+        width: 24
+        height: 19
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 19, y: 0, z: 4, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: f16c45cd8fc75f74a9686f277fc906db
+      internalID: 1645160198
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Custom Skin Background Large
+      rect:
+        serializedVersion: 2
+        x: 71
+        y: 173
+        width: 132
+        height: 48
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 7248d394f165e8c469467e7f56a89177
+      internalID: 610162943
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Custom Skin Background Skinny
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 132
+        width: 163
+        height: 40
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 6c96e1ea76c09114cbf3b00bbb146107
+      internalID: 177321582
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: CC Button Normal
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 113
+        width: 66
+        height: 18
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 4b1902196a8d1314da481eddafccbe42
+      internalID: 2137501361
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: CC Button Highlighted
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 94
+        width: 66
+        height: 18
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: d998accf6c4588346a7c0c68cd5a29b1
+      internalID: -1847321651
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: CC Button Disabled
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 75
+        width: 66
+        height: 18
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 33032d9a1fc72cb46928d66128f75fa0
+      internalID: -888867750
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Color Picker
+      rect:
+        serializedVersion: 2
+        x: 133
+        y: 328
+        width: 4
+        height: 4
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 4158ab7e9248b4f49ad84e6c21ec5322
+      internalID: 1261639410
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Custom Skin Arm 1
+      rect:
+        serializedVersion: 2
+        x: 156
+        y: 434
+        width: 2
+        height: 10
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 96cf83f75486eb94584dbe9599c3dd50
+      internalID: 171070408
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Custom Skin Arm and Legs
+      rect:
+        serializedVersion: 2
+        x: 159
+        y: 434
+        width: 16
+        height: 10
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: d0ffc27b059ab924c8c4e6d00704a587
+      internalID: -667404059
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: CC Done Button Normal
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 56
+        width: 159
+        height: 18
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 4d3a616d45dcce3428a4d71957918aea
+      internalID: 1471284703
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: CC Done Button Highlighted
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 37
+        width: 159
+        height: 18
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 0cb61656fa045b54e8d1fffe69ecd901
+      internalID: 1418969055
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Custom Skin 1 Eye
+      rect:
+        serializedVersion: 2
+        x: 189
+        y: 402
+        width: 13
+        height: 6
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 9f0b59cd4c8ddfe43b13e95e1c43a24f
+      internalID: 234594311
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Custom Skin 3 Eyes
+      rect:
+        serializedVersion: 2
+        x: 188
+        y: 416
+        width: 13
+        height: 6
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: c6438ecb73f03d54c83d76f197173b7e
+      internalID: -1240736738
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Arrow Left Normal
+      rect:
+        serializedVersion: 2
+        x: 67
+        y: 114
+        width: 36
+        height: 17
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 077f4cd71f2686349a5a9eaac6ccc221
+      internalID: -2146230664
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Arrow Right Normal
+      rect:
+        serializedVersion: 2
+        x: 104
+        y: 114
+        width: 36
+        height: 17
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: d2647981a7c6c9a48bd17b5651b1ecd6
+      internalID: -58129674
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Arrow Left Highlighted
+      rect:
+        serializedVersion: 2
+        x: 67
+        y: 96
+        width: 36
+        height: 17
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: ba8ddb83d8d2b574fbb5901ffc90c90c
+      internalID: 1512719246
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Arrow Right Highlighted
+      rect:
+        serializedVersion: 2
+        x: 104
+        y: 96
+        width: 36
+        height: 17
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 8a89d9b2dec998945bd1a5b7f634b4fd
+      internalID: -1134817429
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Hearts Extra 4
+      rect:
+        serializedVersion: 2
+        x: 330
+        y: 500
+        width: 55
+        height: 12
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 8048bfc1d7876034094771a214250769
+      internalID: 1138741196
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: The Red Cross
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 482
+        width: 14
+        height: 14
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 5e1a7f0fadbdc724e8edad9baae61c77
+      internalID: -482706729
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Golden Heart
+      rect:
+        serializedVersion: 2
+        x: 15
+        y: 484
+        width: 13
+        height: 12
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: d44839c839c158e489266adeae4baf8e
+      internalID: -441366072
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: UI Gem 1
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 469
+        width: 7
+        height: 12
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 79a72b955c95a724e868a768bc4f57ff
+      internalID: 979549043
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Hearts Extra 3
+      rect:
+        serializedVersion: 2
+        x: 330
+        y: 487
+        width: 55
+        height: 12
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 83edc225df5895c4ea3eac59771356e5
+      internalID: 1607076724
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Hearts Extra 2
+      rect:
+        serializedVersion: 2
+        x: 330
+        y: 474
+        width: 55
+        height: 12
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 9f2977430b531e54a8876d658c1337b1
+      internalID: -494221929
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Hearts Extra 1
+      rect:
+        serializedVersion: 2
+        x: 330
+        y: 461
+        width: 55
+        height: 12
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 0200eabe0e19b5045a4807b92968e49a
+      internalID: 963098803
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Hearts Extra 0
+      rect:
+        serializedVersion: 2
+        x: 330
+        y: 448
+        width: 55
+        height: 12
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: d35c5164b444dc849a665c0f4f9590c5
+      internalID: 1642104659
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Upgrade Background Large
+      rect:
+        serializedVersion: 2
+        x: 164
+        y: 124
+        width: 132
+        height: 48
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 290687c46e6e94944bceeaa9b6aa1209
+      internalID: -25265181
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Upgrade Item Card
+      rect:
+        serializedVersion: 2
+        x: 204
+        y: 173
+        width: 70
+        height: 42
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 5, z: 0, w: 36}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 5a19f0ce16bb75a4fad94dd63e5ea973
+      internalID: -253210368
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Custom Skin Alien Eye
+      rect:
+        serializedVersion: 2
+        x: 188
+        y: 395
+        width: 13
+        height: 6
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 05be192ea5d43a64d9580d13fff63af7
+      internalID: 337075116
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: UI Gem 2
+      rect:
+        serializedVersion: 2
+        x: 8
+        y: 469
+        width: 7
+        height: 12
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: b63ddf75cde7dbe4bb7af0df8567abbe
+      internalID: 339547876
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: UI (Gems 2) 1
+      rect:
+        serializedVersion: 2
+        x: 238
+        y: 506
+        width: 4
+        height: 6
+      alignment: 4
+      pivot: {x: 0, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 1c75256c584f8c543b407cd8e21df92f
+      internalID: -2014722703
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: UI (Gems 2) 2
+      rect:
+        serializedVersion: 2
+        x: 238
+        y: 499
+        width: 9
+        height: 6
+      alignment: 4
+      pivot: {x: 0, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 52914d574cfc55942922ba1bea695041
+      internalID: -1961267463
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: UI (Gems 2) 3
+      rect:
+        serializedVersion: 2
+        x: 238
+        y: 492
+        width: 14
+        height: 6
+      alignment: 4
+      pivot: {x: 0, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 150ef585646bb7d488d62a0d787edf93
+      internalID: 522641708
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: UI (Gems 2) 4
+      rect:
+        serializedVersion: 2
+        x: 238
+        y: 485
+        width: 19
+        height: 6
+      alignment: 4
+      pivot: {x: 0, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 849f8e7c47fc52043acb8bb890e71f4f
+      internalID: -891454518
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: UI (Gems 2) 5
+      rect:
+        serializedVersion: 2
+        x: 238
+        y: 478
+        width: 24
+        height: 6
+      alignment: 4
+      pivot: {x: 0, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: cbb6a2bbc0d0eeb4ab1b8730fe6f2362
+      internalID: -907389155
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: UI (Gems 2) 6
+      rect:
+        serializedVersion: 2
+        x: 238
+        y: 471
+        width: 29
+        height: 6
+      alignment: 4
+      pivot: {x: 0, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 61b9afaa03997bf4db92066140ceeee1
+      internalID: 1300899435
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: UI (Gems 2) 7
+      rect:
+        serializedVersion: 2
+        x: 238
+        y: 464
+        width: 34
+        height: 6
+      alignment: 4
+      pivot: {x: 0, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: ac364e58807d4a241952a557e0b98e28
+      internalID: 2085340089
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: UI (Gems 2) 8
+      rect:
+        serializedVersion: 2
+        x: 238
+        y: 457
+        width: 39
+        height: 6
+      alignment: 4
+      pivot: {x: 0, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: b5f3768090cf8d8428d8668b5daa7ee6
+      internalID: 32936505
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: UI (Gems 2) 9
+      rect:
+        serializedVersion: 2
+        x: 238
+        y: 450
+        width: 44
+        height: 6
+      alignment: 4
+      pivot: {x: 0, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 537a5bca8d0be034d9db29fa6c83efbd
+      internalID: -1469771282
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: UI (Gems 2) 10
+      rect:
+        serializedVersion: 2
+        x: 238
+        y: 443
+        width: 49
+        height: 6
+      alignment: 4
+      pivot: {x: 0, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 185153a8bd8b4164d912aa9c3869fcc7
+      internalID: 242924132
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: UI (Gems 2) Small Gems 1
+      rect:
+        serializedVersion: 2
+        x: 238
+        y: 438
+        width: 3
+        height: 4
+      alignment: 4
+      pivot: {x: 0, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 5af2ab4c94caaf24f9078fccf652fa9d
+      internalID: -1278017340
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: UI (Gems 2) Small Gems 2
+      rect:
+        serializedVersion: 2
+        x: 238
+        y: 433
+        width: 7
+        height: 4
+      alignment: 4
+      pivot: {x: 0, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 66dea5b8ba69b664b904db36f58314fc
+      internalID: 782391629
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: UI (Gems 2) Small Gems 3
+      rect:
+        serializedVersion: 2
+        x: 238
+        y: 428
+        width: 11
+        height: 4
+      alignment: 4
+      pivot: {x: 0, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 0fa9978d36df973479eddb133cb0f915
+      internalID: 492819811
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: UI (Gems 2) Small Gems 4
+      rect:
+        serializedVersion: 2
+        x: 238
+        y: 423
+        width: 15
+        height: 4
+      alignment: 4
+      pivot: {x: 0, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 34a1f6385b297be4c8fef173a106c98e
+      internalID: -1939853708
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Ammo
+      rect:
+        serializedVersion: 2
+        x: 9
+        y: 497
+        width: 20
+        height: 15
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 9ba6059a8ba57c74a90a84a87b427c80
+      internalID: -594595216
       vertices: []
       indices: 
       edges: []
@@ -2130,18 +3087,40 @@ TextureImporter:
     weights: []
     secondaryTextures: []
     nameFileIdTable:
-      Ammo: 21300034
+      Ammo: -594595216
       Angry Stan: 21300154
+      Arrow Left Highlighted: 1512719246
+      Arrow Left Normal: -2146230664
+      Arrow Right Highlighted: -1134817429
+      Arrow Right Large: -2084786314
+      Arrow Right Normal: -58129674
       Back Arrow: 21300100
       Button Disabled: 21300088
       Button Highlighted: 21300032
+      Button Highlighted Disabled: 1074629680
       Button Normal: 21300028
+      CC Button Disabled: -888867750
+      CC Button Highlighted: -1847321651
+      CC Button Normal: 2137501361
+      CC Done Button Highlighted: 1418969055
+      CC Done Button Normal: 1471284703
       Checker Dan: 1658762095
+      Color Picker: 1261639410
       Crosshairs: -257651865
       Custom Skin: -1370817795
+      Custom Skin 1 Eye: 234594311
+      Custom Skin 2 Eyes: 276398463
+      Custom Skin 3 Eyes: -1240736738
+      Custom Skin Alien Eye: 337075116
+      Custom Skin Arm 1: 171070408
+      Custom Skin Arm 2: -1800834369
+      Custom Skin Arm and Legs: -667404059
       Custom Skin Arms Legs: -1684119947
+      Custom Skin Background Large: 610162943
+      Custom Skin Background Narrow: 1705257709
+      Custom Skin Background Skinny: 177321582
       Custom Skin Body: 202766226
-      Custom Skin Eyes: 276398463
+      Custom Skin Item Card: 1970290699
       Cyclops: 21300156
       Damage Background: 952407668
       Dan: 21300010
@@ -2157,10 +3136,18 @@ TextureImporter:
       Game Over Dan 1: 21300102
       Game Over Dan 2: 21300104
       Game Over Dan 3: 21300106
-      Hearts 1: 21300004
+      Golden Heart: -441366072
+      Gradient Bar: 1541386652
+      Hearts 0: 21300036
+      Hearts 1: 21300008
       Hearts 2: 21300006
-      Hearts 3: 21300008
-      Hearts 4: 21300036
+      Hearts 3: 21300004
+      Hearts Big: 1719785639
+      Hearts Extra 0: 1642104659
+      Hearts Extra 1: 963098803
+      Hearts Extra 2: -494221929
+      Hearts Extra 3: 1607076724
+      Hearts Extra 4: 1138741196
       Item Background Large: 21300136
       Item Background Small: 21300114
       Item Card Empty: 482363449
@@ -2189,7 +3176,36 @@ TextureImporter:
       Slider Handle Normal: -645287194
       Small Slider Handle: 1205063803
       Smartphone Zombie Dan: 21300162
-      Toggle Selected: 1372044642
+      The Red Cross: -482706729
+      Toggle Selected Large: -105543520
+      UI (Gems 1) 1: -439591434
+      UI (Gems 1) 10: -1663142089
+      UI (Gems 1) 2: -878534129
+      UI (Gems 1) 3: -1281755224
+      UI (Gems 1) 4: -584552434
+      UI (Gems 1) 5: 1493060493
+      UI (Gems 1) 6: 537220148
+      UI (Gems 1) 7: 1030265515
+      UI (Gems 1) 8: -332968627
+      UI (Gems 1) 9: 2033021274
+      UI (Gems 1) Small Gems 1: 1151791760
+      UI (Gems 1) Small Gems 2: 1151791760
+      UI (Gems 1) Small Gems 3: -765162743
+      UI (Gems 1) Small Gems 4: -439591434
+      UI (Gems 2) 1: 1004459453
+      UI (Gems 2) 10: 242924132
+      UI (Gems 2) 2: -1961267463
+      UI (Gems 2) 3: 522641708
+      UI (Gems 2) 4: -891454518
+      UI (Gems 2) 5: -907389155
+      UI (Gems 2) 6: 1300899435
+      UI (Gems 2) 7: 2085340089
+      UI (Gems 2) 8: 32936505
+      UI (Gems 2) 9: -1469771282
+      UI (Gems 2) Small Gems 1: -1278017340
+      UI (Gems 2) Small Gems 2: 782391629
+      UI (Gems 2) Small Gems 3: 492819811
+      UI (Gems 2) Small Gems 4: -1939853708
       UI Background: 21300014
       UI Background FB: 21300060
       UI Background FL: 21300084
@@ -2198,30 +3214,22 @@ TextureImporter:
       UI Background Title: 21300108
       UI Bar: 21300000
       UI Bar Fill: 1234408684
-      UI Gem: 21300012
+      UI Gem 1: -2014722703
+      UI Gem 2: 979549043
       UI Gem Counter: 878895798
       UI Gem Small: -1055187834
-      UI Gems 1: 1004459453
-      UI Gems 10: -332968627
-      UI Gems 2: -439591434
-      UI Gems 3: -1514365359
-      UI Gems 4: -878534129
-      UI Gems 5: -1281755224
-      UI Gems 6: -584552434
-      UI Gems 7: 1493060493
-      UI Gems 8: 537220148
-      UI Gems 9: 1030265515
       UI Outline: 21300166
       UI Slider Background Black: 21300122
       UI Slider Background Disabled: -1257746027
       UI Slider Background White: 21300124
-      UI Small Gems 1: 2033021274
-      UI Small Gems 2: -1663142089
-      UI Small Gems 3: 1151791760
-      UI Small Gems 4: -765162743
-      UI Small Gems 5: -403799760
-      UI User: 21300144
-      White Fade: 1098208422
+      UI Slider Background White Disabled: 1890983669
+      UI Small Gems 5: 21300144
+      UI User: -25265181
+      Upgrade Background Large: -253210368
+      Upgrade Item Card: 1645160198
+      User Button Highlighted: 514164031
+      User Button Normal: 1098208422
+      White Fade: 339547876
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

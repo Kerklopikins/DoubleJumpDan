@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using UnityEngine.UI;
 using System.Collections;
 using UnityEngine.InputSystem;
@@ -11,36 +11,35 @@ public class MainMenuManager : MonoBehaviour
     public Button playButton;
     public Button shopButton;
     public Button settingsButton;
-    public Button userButton;
-    public Button tutorialButton;
     public Button statsButton;
+    public Button screenshotsButton;
 
     [Header("Initialization")]
+    [SerializeField] Button[] mainMenuButtons;
     [SerializeField] GameObject shopGameObject;
     [SerializeField] GameObject userMenuGameObject;
     [SerializeField] GameObject screenshotsMenuGameObject;
-
-
+    
     [Header("Tampered User File")]
     [SerializeField] Image tamperedUserFileImage;
     [SerializeField] Text tamperedUserFileText;
 
     [Header("Joystick")]
     public RectTransform cursor;
-    [SerializeField] Camera _camera;
     public float scrollSpeed;
     [SerializeField] Sprite[] cursorSprites;
 
+    Vector2 cursorVelocity;
     ShopManager shopManager;
     UserMenu userMenu;
     UserStatsMenu userStatsMenu;
     LevelSelectMenu levelSelectMenu;
     SettingsManager settingsManager;
     ScreenshotsMenu screenshotsMenu;
+    GameManager gameManager;
     Canvas canvas;
     Vector2 position;
     Vector2 screenPosition;
-    Vector2 input;
     float startDelay = 1.35f;
     GameInputManager gameInputManager;
     float _cursorSpeed;
@@ -56,6 +55,8 @@ public class MainMenuManager : MonoBehaviour
     int initialUserCount;
     int shopItemCount;
     bool initialized;
+    bool startedDelay;
+    bool endedDelay;
 
     void Start()
     {
@@ -66,7 +67,8 @@ public class MainMenuManager : MonoBehaviour
         levelSelectMenu = GetComponent<LevelSelectMenu>();
         settingsManager = GetComponent<SettingsManager>();
         screenshotsMenu = GetComponent<ScreenshotsMenu>();
-
+        gameManager = GameManager.Instance;
+        
         shopGameObject.SetActive(true);
         userMenuGameObject.SetActive(true);
         screenshotsMenuGameObject.SetActive(true);
@@ -79,17 +81,20 @@ public class MainMenuManager : MonoBehaviour
         shopItemCount += shopManager.itemManager.guns.Count;
         shopItemCount += shopManager.itemManager.hats.Count;
         shopItemCount += shopManager.itemManager.skins.Count;
-
-        if(playButton == null || shopButton == null || userButton == null || statsButton == null || settingsButton == null)
+        shopItemCount += shopManager.itemManager.upgrades.Count;
+        
+        if(playButton == null || shopButton == null || statsButton == null || settingsButton == null)
             Debug.LogError("Main Menu button is null");
             
         playButton.onClick.AddListener(levelSelectMenu.RefreshLevels);
         shopButton.onClick.AddListener(shopManager.RefreshShop);
         shopButton.onClick.AddListener(shopManager.RefreshShopScrollRects);
-        userButton.onClick.AddListener(userMenu.RefreshUserByteSizes);
         statsButton.onClick.AddListener(userStatsMenu.RefreshUserStats);
         settingsButton.onClick.AddListener(settingsManager.RefreshFullscreenToggle);
+        screenshotsButton.onClick.AddListener(screenshotsMenu.RefreshScreenshots);
+        
         gameInputManager.OnControllerChanged += OnControllerChanged;
+        gameInputManager.OnKeyboardOnlyInputChanged += OnKeyboardOnlyInputChanged;
 
         canvas = GetComponent<Canvas>();
         cursorImage = cursor.gameObject.GetComponent<Image>();
@@ -105,29 +110,77 @@ public class MainMenuManager : MonoBehaviour
             cursor.gameObject.SetActive(true);
         }
     }
+
     public void OnControllerChanged(bool enabled)
     {
         if(enabled)
         {
             Cursor.visible = false;
             cursor.gameObject.SetActive(true);
+            
+            position = Mouse.current.position.ReadValue();
+
+            InputState.Change(Mouse.current.position, position);
+            InputState.Change(Mouse.current.delta, Vector2.zero);
+            
+            AnchorCursor(position);
         }
         else
         {
+            if(gameInputManager.KeyboardOnly())
+                return;
+            
+            Mouse.current.WarpCursorPosition(screenPosition);
+            
             Cursor.visible = true;
             cursor.gameObject.SetActive(false);
         }
     }
     
-    void Rebind(bool enabled)
+    public void OnKeyboardOnlyInputChanged(bool keyboardOnly)
     {
-        if(gameInputManager.ControllerConnected())
+        if(!gameInputManager.ControllerConnected())
+        {
+            if(keyboardOnly)
+            {
+                Cursor.visible = false;
+                cursor.gameObject.SetActive(true);
+            }
+            else
+            {
+                Cursor.visible = true;
+                cursor.gameObject.SetActive(false);
+            }
+        }
+    }
+
+    void Rebind(bool enabled)
+    {        
+        if(gameInputManager.ControllerConnected() || gameInputManager.KeyboardOnly())
         {
             if(enabled)
-                cursor.gameObject.SetActive(false);
+                StartCoroutine(ScaleCursorCo(Vector3.one, Vector3.zero));
             else
-                cursor.gameObject.SetActive(true);
+                StartCoroutine(ScaleCursorCo(Vector3.zero, Vector3.one));
         }
+    }
+
+    IEnumerator ScaleCursorCo(Vector3 from, Vector3 to)
+    {
+        float inTime = 0;
+        float duration = 0.25f;
+
+        while(inTime < duration)
+        {
+            inTime += Time.unscaledDeltaTime;
+            
+            float t = inTime / duration;
+            cursor.localScale = Vector3.Lerp(from, to, t);   
+
+            yield return null;
+        }
+
+        cursor.localScale = to;
     }
 
     void Update()
@@ -149,49 +202,83 @@ public class MainMenuManager : MonoBehaviour
             return;
         }
         
-        if(gameInputManager.ControllerConnected() && !gameInputManager.rebinding)
+        if(!gameInputManager.Rebinding)
         {
-            input = gameInputManager.GetCursorMovement();
-
-            if(gameInputManager.FastCursorButton())
-                _cursorSpeed = cursorSpeed * 2f;
-            else
-                _cursorSpeed = cursorSpeed;
-
-            position += input * _cursorSpeed * Time.unscaledDeltaTime;
-            position.x = Mathf.Clamp(position.x, 0, Screen.width);
-            position.y = Mathf.Clamp(position.y, 0, Screen.height);
-
-            InputState.Change(Mouse.current.position, position);
-            InputState.Change(Mouse.current.delta, Vector2.zero);
-
-            screenPosition = Mouse.current.position.ReadValue();
-            RectTransformUtility.ScreenPointToLocalPointInRectangle(canvas.transform as RectTransform, screenPosition, canvas.worldCamera, out Vector2 localPosition);
-            cursor.anchoredPosition = localPosition;
-
-            if(gameInputManager.CursorClick())
-                cursorImage.sprite = cursorSprites[1];
-            else
-                cursorImage.sprite = cursorSprites[0];
+            if(gameInputManager.ControllerConnected())
+                MoveCursor(gameInputManager.ControllerCursorMove(), gameInputManager.Click(), gameInputManager.ControllerFastCursor(), gameManager.useDPad);
+            else if(gameInputManager.KeyboardOnly())
+                MoveCursor(gameInputManager.KeyboardCursorMove(), gameInputManager.Click(), gameInputManager.KeyboardFastCursor(), true);
         }
 
         if(startDelay > 0)
         {
-            tutorialButton.interactable = false;
+            if(!startedDelay)
+            {
+                ToggleMainMenuButtons(false);
+                startedDelay = true;
+            }
+            
             startDelay -= Time.deltaTime;
         }
         else
         {
-            tutorialButton.interactable = true;
+            if(!endedDelay)
+            {
+                ToggleMainMenuButtons(true);
+                endedDelay = true;
+            }
         }
     }
 
-    public void LoadTutorial()
+    void MoveCursor(Vector2 input, bool click, bool fastCursor, bool cursorSmoothing)
     {
-        if(startDelay > 0)
-            return;
+        if(fastCursor)
+            _cursorSpeed = cursorSpeed * 2f;
+        else
+            _cursorSpeed = cursorSpeed;
+
+        Vector2 target = input * _cursorSpeed;
+        cursorVelocity = Vector2.Lerp(cursorVelocity, target, 1 - Mathf.Exp(-gameManager.cursorAcceleration * Time.unscaledDeltaTime));
+
+        if(cursorSmoothing)
+        {
+            if(input != Vector2.zero)
+                cursorVelocity += input * gameManager.cursorAcceleration * Time.unscaledDeltaTime;
+            else
+                cursorVelocity = Vector2.Lerp(cursorVelocity, Vector2.zero, gameManager.cursorDeceleration * Time.unscaledDeltaTime);
             
-        LevelLoadingManager.Instance.LoadScene("Tutorial");
+            position += cursorVelocity * Time.unscaledDeltaTime;
+        }
+        else
+        {
+            position += input * _cursorSpeed * Time.unscaledDeltaTime;
+        }
+
+        position.x = Mathf.Clamp(position.x, 0, Screen.width);
+        position.y = Mathf.Clamp(position.y, 0, Screen.height);
+
+        InputState.Change(Mouse.current.position, position);
+        InputState.Change(Mouse.current.delta, Vector2.zero);
+
+        screenPosition = Mouse.current.position.ReadValue();
+        AnchorCursor(screenPosition);
+
+        if(click)
+            cursorImage.sprite = cursorSprites[1];
+        else
+            cursorImage.sprite = cursorSprites[0];
+    }
+
+    void AnchorCursor(Vector2 position)
+    {
+        RectTransformUtility.ScreenPointToLocalPointInRectangle(canvas.transform as RectTransform, position, canvas.worldCamera, out Vector2 localPosition);
+        cursor.anchoredPosition = localPosition;
+    }
+
+    public void ToggleMainMenuButtons(bool interactable)
+    {
+        for(int i = 0; i < mainMenuButtons.Length; i++)
+            mainMenuButtons[i].interactable = interactable;
     }
 
     #region TamperedUserFile

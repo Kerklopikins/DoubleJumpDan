@@ -223,7 +223,7 @@ public class MainMenuPlayer: MonoBehaviour
     {
         input = new Vector2(gameInputManager.GetHorizontalInput(), gameInputManager.GetVerticalInput());
 
-        if(!gameInputManager.StrafeButton())
+        if(!gameInputManager.SprintButton())
         {
             if(input.x > 0)
                 direction = 1;
@@ -325,9 +325,11 @@ public class MainMenuPlayer: MonoBehaviour
 
     #endregion
 
+    #if UNITY_EDITOR
     void OnDrawGizmos()
     {
         Gizmos.color = new Color(0, 0, 1, 0.5f);
         Gizmos.DrawCube(groundCheck.position + groundCheckOffset, groundCheckSize);
     }
+    #endif
 }

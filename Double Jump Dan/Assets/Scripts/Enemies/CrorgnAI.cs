@@ -185,9 +185,11 @@ public class CrorgnAI : MonoBehaviour
         bodyPivot.rotation = Quaternion.Slerp(bodyPivot.rotation, Quaternion.Euler(0, 0, rotZOffset), Time.deltaTime * 10);
     }
 
+    #if UNITY_EDITOR
     void OnDrawGizmos()
     {
         Gizmos.color = new Color(1, 0, 0, 0.25f);
         Gizmos.DrawWireSphere(transform.position, playerRange);
     }
+    #endif
 }

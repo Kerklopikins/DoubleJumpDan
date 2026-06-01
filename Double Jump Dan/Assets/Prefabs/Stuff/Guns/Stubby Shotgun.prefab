@@ -230,6 +230,7 @@ MonoBehaviour:
   burstsPerMagazine: 0
   burstCoolDownTime: 0
   aimPointOffset: 0.4375
+  restingAngleOffset: 3.225
   lowRumbleAmount: 0.35
   highRumbleAmount: 0.75
   rumbleDuration: 0.2

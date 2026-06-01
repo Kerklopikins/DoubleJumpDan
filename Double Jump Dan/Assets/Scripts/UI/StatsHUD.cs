@@ -7,17 +7,26 @@ public class StatsHUD : MonoBehaviour
 
     [Header("Gems")]
     public Transform gemIcon;
+    [SerializeField] Sprite[] gemIconSprites;
     [SerializeField] SpriteRenderer[] gemsCounter;
     [SerializeField] Sprite[] gemsCounterImages;
     [SerializeField] SpriteRenderer smallGemsCounter;
     [SerializeField] Sprite[] smallGemsImages;
 
+    [Header("Double Gems")]
+    [SerializeField] Sprite[] doubleGemsCounterImages;
+    [SerializeField] Sprite[] doubleSmallGemsImages;
+
     [Header("Lives")]
     [SerializeField] SpriteRenderer livesCounter;
     [SerializeField] Sprite[] liveSprites;
+    [SerializeField] Sprite[] extraLifeLiveSprites;
 
     [Header("Health Bar")]
     [SerializeField] Transform healthBarFillPivot;
+    [SerializeField] GameObject extraHealthBar;
+    [SerializeField] Transform extraHealthBarFillPivot;
+    [SerializeField] float barScaleDuration;
 
     [Header("Ammo Bar")]
     [SerializeField] Transform ammoBarPivot;
@@ -39,10 +48,24 @@ public class StatsHUD : MonoBehaviour
     int smallGemsImageIndex;
     Player player;
     Vector3 smallGemCountStartPosition; 
+    WaitForSeconds flashSpeed = new WaitForSeconds(0.07f);
     bool canAnimateHurtUI = true;
     bool canAnimatedGemUI = true;
     bool canAnimatedAmmoUI = true;
     GunInfo gunInfo;
+    bool usingExtraHealthBar;
+    bool hasExtraLives;
+    GameManager gameManager;
+    SpriteRenderer gemIconSprite;
+    float gemInTime;
+    float gemOutTime;
+    float hurtInTime;
+    float hurtOutTime;
+    float ammoBarInTime;
+    float healthBarScaleInTime;
+    Vector3 ammoBarMaxScale = new Vector3(1.3f, 1.3f, 1);
+    Vector3 hurtUIMaxScale = new Vector3(1.5f, 1.5f, 1);
+    Vector3 gemUIMaxScale = new Vector3(1.2f, 1.2f, 1);
 
     void Awake()
     {
@@ -51,19 +74,48 @@ public class StatsHUD : MonoBehaviour
 
     void Start()
     {
+        gameManager = GameManager.Instance;
         player = LevelManager.Instance.player;
-        
+        gemIconSprite = gemIcon.GetComponent<SpriteRenderer>();
+
         player.OnPlayerHurt += PlayerHurt;
         player.OnPlayerKilled += PlayerKilled;
         player.OnPlayerRespawn += PlayerRespawn;
         player.OnPlayerHealthChange += UpdateHealthBar;
-
+            
         smallGemCountStartPosition = smallGemsCounter.transform.localPosition;
         gemsCounter[0].sprite = gemsCounterImages[0];
         smallGemsCounter.sprite = smallGemsImages[0];
 
         uiFlashMaterial.SetFloat("_FlashAmount", 0);
+        CheckForUpgrades();
         PositionUI();
+    }
+
+    void CheckForUpgrades()
+    {
+        //The Red Cross
+        if(gameManager.currentUser.equippedUpgrades.Contains(6487))
+        {
+            usingExtraHealthBar = true;
+            extraHealthBar.SetActive(true);
+        }
+        
+        //The Golden Heart
+        if(gameManager.currentUser.equippedUpgrades.Contains(5480))
+        {
+            hasExtraLives = true;
+            livesCounter.sprite = extraLifeLiveSprites[extraLifeLiveSprites.Length - 1];
+        }
+
+        //The Giving Gem
+        if(gameManager.currentUser.equippedUpgrades.Contains(8902))
+        {
+            gemIconSprite.sprite = gemIconSprites[1];
+
+            gemsCounterImages = doubleGemsCounterImages;
+            smallGemsImages = doubleSmallGemsImages;
+        }
     }
 
     public void SubscribeToGun(GunInfo _gunInfo)
@@ -195,6 +247,7 @@ public class StatsHUD : MonoBehaviour
         else
             smallGemsCounter.sprite = smallGemsImages[0];
     }
+
     public void PlayerHurt()
     {
         ScreenEffectsManager.Instance.TriggerHurtEffect();
@@ -205,42 +258,65 @@ public class StatsHUD : MonoBehaviour
         UpdateHealthBar();
         StartCoroutine(FlashCo());
     }
+
     void UpdateHealthBar()
     {
-        float _startingHealth = player.health;
-        var healthPercent = player._health / _startingHealth;
-        healthPercent = Mathf.Clamp01(healthPercent);
-        healthBarFillPivot.transform.localScale = new UnityEngine.Vector3(healthPercent, 1, 1);
+        if(!usingExtraHealthBar)
+        {
+            healthBarFillPivot.transform.localScale = new Vector3(Mathf.Clamp01((float)player._health / player.health), 1, 1);
+        }
+        else
+        {
+            healthBarFillPivot.transform.localScale = new Vector3(Mathf.Clamp01((float)player._health / 100), 1, 1);
+            extraHealthBarFillPivot.transform.localScale = new Vector3(Mathf.Clamp((float)player._health - 100, 0, 50) / 50, 1, 1); 
+        }
     }
 
     public void PlayerKilled()
     {
-        livesCounter.sprite = liveSprites[player.lives];
+        livesCounter.sprite = hasExtraLives ? extraLifeLiveSprites[player.lives] : liveSprites[player.lives];
     }
 
     public void PlayerRespawn()
     {
-        healthBarFillPivot.transform.localScale = Vector3.one;
+        StartCoroutine(AnimateHealthBarsToFull());
+        //healthBarFillPivot.transform.localScale = Vector3.one;
+        //extraHealthBarFillPivot.transform.localScale = Vector3.one;
     }
 
     void OnApplicationQuit()
     {
         uiFlashMaterial.SetFloat("_FlashAmount", 0);
     }
+
+    IEnumerator AnimateHealthBarsToFull()
+    {
+        healthBarScaleInTime = 0;
+
+        while(healthBarScaleInTime < barScaleDuration)
+        {
+            healthBarScaleInTime += Time.unscaledDeltaTime;
+            healthBarFillPivot.transform.localScale = Vector3.Lerp(new Vector3(0, 1, 1), Vector3.one, healthBarScaleInTime / barScaleDuration);
+            extraHealthBarFillPivot.transform.localScale = Vector3.Lerp(new Vector3(0, 1, 1), Vector3.one, healthBarScaleInTime / barScaleDuration);
+
+            yield return null;
+        }
+
+        healthBarFillPivot.transform.localScale = Vector3.one;
+        extraHealthBarFillPivot.transform.localScale = Vector3.one;
+    }
+
     IEnumerator AmmoBarUIAnimation()
 	{
-        Vector3 maxScale = new Vector3(1.3f, 1.3f, 1);
-
 		canAnimatedAmmoUI = false;
 
-        ammoTransform.transform.localScale = maxScale;
-
-        float inTime = 0;
+        ammoTransform.transform.localScale = ammoBarMaxScale;
+        ammoBarInTime = 0;
         
-        while(inTime < 0.075f)
+        while(ammoBarInTime < 0.075f)
         {
-            ammoTransform.transform.localScale = Vector3.Lerp(maxScale, Vector3.one, inTime / 0.075f);
-            inTime += Time.deltaTime;
+            ammoBarInTime += Time.deltaTime;
+            ammoTransform.transform.localScale = Vector3.Lerp(ammoBarMaxScale, Vector3.one, ammoBarInTime / 0.075f);
             yield return null;
         }
 
@@ -250,25 +326,22 @@ public class StatsHUD : MonoBehaviour
 
     IEnumerator HurtUIAnimation()
 	{
-        Vector3 maxScale = new Vector3(1.5f, 1.5f, 1);
-
 		canAnimateHurtUI = false;
+        hurtInTime = 0;
 
-        float inTime = 0;
-
-        while(inTime < 0.1f)
+        while(hurtInTime < 0.1f)
 		{
-            healthTransform.transform.localScale = Vector3.Lerp(Vector3.one, maxScale, inTime / 0.1f);
-            inTime += Time.deltaTime;
+            hurtInTime += Time.deltaTime;
+            healthTransform.transform.localScale = Vector3.Lerp(Vector3.one, hurtUIMaxScale, hurtInTime / 0.1f);
 			yield return null;
 		}
 
-        float outTime = 0;
+        hurtOutTime = 0;
         
-        while(outTime < 0.1f)
+        while(hurtOutTime < 0.1f)
         {
-            healthTransform.transform.localScale = Vector3.Lerp(maxScale, Vector3.one, outTime / 0.1f);
-            outTime += Time.deltaTime;
+            hurtOutTime += Time.deltaTime;
+            healthTransform.transform.localScale = Vector3.Lerp(hurtUIMaxScale, Vector3.one, hurtOutTime / 0.1f);
             yield return null;
         }
 
@@ -278,25 +351,23 @@ public class StatsHUD : MonoBehaviour
 
     IEnumerator GemCollectAnimation()
 	{
-        Vector3 maxScale = new Vector3(1.2f, 1.2f, 1);
-
 		canAnimatedGemUI = false;
 
-        float inTime = 0;
+        gemInTime = 0;
 
-        while(inTime < 0.05f)
+        while(gemInTime < 0.05f)
 		{
-            gemsTransform.transform.localScale = Vector3.Lerp(Vector3.one, maxScale, inTime / 0.05f);
-            inTime += Time.deltaTime;
+            gemInTime += Time.deltaTime;
+            gemsTransform.transform.localScale = Vector3.Lerp(Vector3.one, gemUIMaxScale, gemInTime / 0.05f);
 			yield return null;
 		}
 
-        float outTime = 0;
+        gemOutTime = 0;
         
-        while(outTime < 0.05f)
+        while(gemOutTime < 0.05f)
         {
-            gemsTransform.transform.localScale = Vector3.Lerp(maxScale, Vector3.one, outTime / 0.05f);
-            outTime += Time.deltaTime;
+            gemOutTime += Time.deltaTime;
+            gemsTransform.transform.localScale = Vector3.Lerp(gemUIMaxScale, Vector3.one, gemOutTime / 0.05f);
             yield return null;
         }
 
@@ -309,9 +380,9 @@ public class StatsHUD : MonoBehaviour
         for(int i = 0; i < 4; i++)
         {
             uiFlashMaterial.SetFloat("_FlashAmount", 1);
-            yield return new WaitForSeconds(0.07f);
+            yield return flashSpeed;
             uiFlashMaterial.SetFloat("_FlashAmount", 0);
-            yield return new WaitForSeconds(0.07f);
+            yield return flashSpeed;
         }
     }
 }

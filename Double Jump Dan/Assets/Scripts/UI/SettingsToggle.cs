@@ -1,21 +1,27 @@
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.UI;
 
 public class SettingsToggle : MonoBehaviour, IPointerClickHandler
 {
     [SerializeField] SettingsManager settingsManager;
     [SerializeField] SettingType settingType;
     
-    public enum SettingType { PostProcessing, DistortionEffects, WeatherEffects, Fullscreen, VSync, ShowFPS, ControllerVibration, JoystickSwap, UseDPad }
+    public enum SettingType { PostProcessing, DistortionEffects, WeatherEffects, Fullscreen, VSync, ShowFPS, ControllerVibration, JoystickSwap, UseDPad, LockAiming, CameraShake }
     GameManager gameManager;
+    Toggle toggle;
 
     void Start()
     {
         gameManager = GameManager.Instance;
+        toggle = GetComponent<Toggle>();
     }
     
 	public void OnPointerClick(PointerEventData eventData)
 	{
+        if(!toggle.interactable)
+            return;
+            
 		switch(settingType)
         {
             case SettingType.PostProcessing:
@@ -44,6 +50,12 @@ public class SettingsToggle : MonoBehaviour, IPointerClickHandler
             break;
             case SettingType.UseDPad:
             ToggleUseDPad();
+            break;
+            case SettingType.LockAiming:
+            ToggleLockAiming();
+            break;
+            case SettingType.CameraShake:
+            ToggleCameraShake();
             break;
         }
 	}
@@ -95,10 +107,21 @@ public class SettingsToggle : MonoBehaviour, IPointerClickHandler
     void ToggleJoystickSwap()
     {
         gameManager.swapJoysticks = !gameManager.swapJoysticks;
+        settingsManager.UpdateDPadText(gameManager.swapJoysticks);
     }
 
     void ToggleUseDPad()
     {
         gameManager.useDPad = !gameManager.useDPad;
+    }
+
+    void ToggleLockAiming()
+    {
+        gameManager.lockAiming = !gameManager.lockAiming;
+    }
+
+    void ToggleCameraShake()
+    {
+        gameManager.cameraShake = !gameManager.cameraShake;
     }
 }

@@ -7,17 +7,17 @@ public class ItemManager : MonoBehaviour
     public List<Item> hats = new List<Item>();
     public List<Item> guns = new List<Item>();
 	public List<Item> skins = new List<Item>();
-
+	public List<Item> upgrades = new List<Item>();
 	Player player;
 	Animator playerAnimator;
     Transform hatParent;
     Transform arm;
     GameManager gameManager;
-	
+
 	void Start()
 	{
 		gameManager = GameManager.Instance;
-		
+
         if(SceneManager.GetActiveScene().name != "Main Menu")
         {
             player = LevelManager.Instance.player;
@@ -73,16 +73,51 @@ public class ItemManager : MonoBehaviour
 		var skinAnimator = skin.gameObject.GetComponent<Animator>();
 		playerAnimator.runtimeAnimatorController = skinAnimator.runtimeAnimatorController;
 
+		SkinEyeType skinEyeType = skin.GetComponent<SkinEyeType>();
+		SkinColorAndEyes skinColorAndEyes = player.GetComponent<SkinColorAndEyes>();
+
+		switch(skinEyeType.eyeType)
+		{
+			case SkinEyeType.EyeType.Double:
+			skinColorAndEyes.SetEyes(0, true);
+			break;
+			case SkinEyeType.EyeType.Tripple:
+			skinColorAndEyes.SetEyes(1, true);
+			break;
+			case SkinEyeType.EyeType.Single:
+			skinColorAndEyes.SetEyes(2, true);
+			break;
+			case SkinEyeType.EyeType.White:
+			skinColorAndEyes.SetEyes(4, true);
+			break;
+			case SkinEyeType.EyeType.Custom:
+			break;
+			case SkinEyeType.EyeType.None:
+			skinColorAndEyes.DisablePupils();
+			break;
+		}
+
+		switch(skinEyeType.eyeBrowType)
+		{
+			case SkinEyeType.EyeBrowType.Single:
+			skinColorAndEyes.SetEyebrow(1);
+			break;
+			case SkinEyeType.EyeBrowType.None:
+			skinColorAndEyes.SetEyebrow(0);
+			break;
+		}
+
 		//Custom skin
 		if(skin.itemID == 9999)
 		{
-			Color bodyColor = new Color(gameManager.currentUser.customSkinColor[0], gameManager.currentUser.customSkinColor[1], gameManager.currentUser.customSkinColor[2]);
-			Color armsAndLegsColor = new Color(gameManager.currentUser.customSkinColor[3], gameManager.currentUser.customSkinColor[4], gameManager.currentUser.customSkinColor[5]);
-			
-			player.spriteMaterials[0].color = bodyColor;
-			
+			Color bodyColor = Color.HSVToRGB(gameManager.currentUser.customSkinData[0], gameManager.currentUser.customSkinData[1], gameManager.currentUser.customSkinData[2]);
+			Color armsAndLegsColor = Color.HSVToRGB(gameManager.currentUser.customSkinData[3], gameManager.currentUser.customSkinData[4], gameManager.currentUser.customSkinData[5]);
+
+			skinColorAndEyes.SetEyes((int)gameManager.currentUser.customSkinData[6], false);
+			skinColorAndEyes.SetColor(0, bodyColor);
+
 			for(int i = 1; i < 4; i++)
-				player.spriteMaterials[i].color = armsAndLegsColor;
+				skinColorAndEyes.SetColor(i, armsAndLegsColor);
 		}
 	}
 
@@ -99,6 +134,23 @@ public class ItemManager : MonoBehaviour
 			case Item.ItemType.Skin:
 				gameManager.currentUser.skinID = shopItem.item.itemID;
 				break;
+		}
+	}
+
+	public void EquipUpgrade(ShopItem shopItem, bool equipped)
+	{
+		if(shopItem.item.itemType == Item.ItemType.Upgrade)
+		{
+			if(equipped)
+			{
+				if(!gameManager.currentUser.equippedUpgrades.Contains(shopItem.item.itemID))
+					gameManager.currentUser.equippedUpgrades.Add(shopItem.item.itemID);
+			}
+			else
+			{
+				if(gameManager.currentUser.equippedUpgrades.Contains(shopItem.item.itemID))
+					gameManager.currentUser.equippedUpgrades.Remove(shopItem.item.itemID);
+			}
 		}
 	}
 

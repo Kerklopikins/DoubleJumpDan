@@ -10,7 +10,6 @@ public class ObjectOpitimizer : MonoBehaviour
     [SerializeField] bool onlyCheckChild;
 
     Dictionary<Type, Action<Component, bool>> toggleActions;
-    bool debugMode = false;
 	float checkFrequency = 0.5f;
     float checkDistance = 60;
 	Player player;
@@ -19,7 +18,7 @@ public class ObjectOpitimizer : MonoBehaviour
     float _checkFrequency;
     float safetyTimer = 1;
     Vector2 difference;
-    
+
     void Awake()
     {
         toggleActions = new Dictionary<Type, Action<Component, bool>>()
@@ -104,11 +103,15 @@ public class ObjectOpitimizer : MonoBehaviour
         UnsubscribeFromPlayer();
     }
 
+    #if UNITY_EDITOR
+    bool debugMode = false;
+
     void OnDrawGizmos()
     {
         if(debugMode)
             Gizmos.DrawWireSphere(transform.position, checkDistance);
     }
+    #endif
 
     void Refresh()
     {

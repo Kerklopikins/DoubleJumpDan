@@ -5,6 +5,7 @@ public class BoxGizmo : MonoBehaviour
     [SerializeField] Vector2 boxSize;
     [SerializeField] Color boxColor = new Color(0, 0, 1, 1);
 
+    #if UNITY_EDITOR
     void OnDrawGizmos()
     {
         boxColor = new Color(boxColor.r, boxColor.g, boxColor.b, 1);
@@ -16,4 +17,5 @@ public class BoxGizmo : MonoBehaviour
         else if(transform.localScale.x > 0)
             Gizmos.DrawWireCube(new Vector3(transform.position.x + boxOffset.x, transform.position.y + boxOffset.y), boxSize);
     }
+    #endif
 }

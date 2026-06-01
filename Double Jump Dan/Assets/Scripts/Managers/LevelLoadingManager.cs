@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.SceneManagement;
 using System.Collections;
+using UnityEngine.InputSystem.UI;
 
 public class LevelLoadingManager : MonoBehaviour
 {
@@ -10,16 +11,16 @@ public class LevelLoadingManager : MonoBehaviour
     [SerializeField] bool startClear;
 
     public bool animationFinished { get; set; }
-    public bool loading { get; set; }
     public bool Busy { get; set; }
 	public SpriteRenderer fadeSprite { get; set; }
+    bool canPlayAnimation;
     SpriteRenderer loadingDan;
     Transform loadingSpritesTransform;
     GameObject loadingCircle;
     SpriteRenderer loadingCircleSprite;
     bool loaded;
     float levelDelay = 0.125f;
-    GameObject eventSystem;
+    InputSystemUIInputModule uIModule;
     GameHUD gameHUD;
     LocalWorldManager localWorldManager;
     Player player;
@@ -27,6 +28,8 @@ public class LevelLoadingManager : MonoBehaviour
     Camera _camera;
     float fadeDuration = 0.6f;
     bool fadedOut;
+    float loadingDanAnimationTimer;
+    int loadingDanAnimationIndex;
 
     void Awake()
     {
@@ -57,7 +60,6 @@ public class LevelLoadingManager : MonoBehaviour
 	void Start()
 	{
 		ResizeFadeBackground();
-
         localWorldManager = GameObject.FindWithTag("Level Managers").GetComponent<LocalWorldManager>();
 
         if(IsNormalLevel())
@@ -73,7 +75,7 @@ public class LevelLoadingManager : MonoBehaviour
         }
 
         if(localWorldManager.world != LocalWorldManager.World.SplashScreen)
-            eventSystem = GameObject.Find("Event System");    
+            uIModule = GameObject.Find("Event System").GetComponent<InputSystemUIInputModule>();    
 
         if(localWorldManager.world == LocalWorldManager.World.MainMenu)
             levelDelay = 0.5f;
@@ -83,8 +85,29 @@ public class LevelLoadingManager : MonoBehaviour
 
     void Update()
     {
-        if(loading)
+        if(canPlayAnimation)
+        {
             loadingCircle.transform.Rotate(Vector3.forward, -250 * Time.unscaledDeltaTime);
+
+            if(loadingDanAnimationTimer > 0)
+            {
+                loadingDanAnimationTimer -= Time.unscaledDeltaTime;
+            }
+            else
+            {
+                loadingDanAnimationIndex += 1;
+        
+                if(loadingDanAnimationIndex > loadingDanSprites.Length - 1)
+                    loadingDanAnimationIndex = 0;
+
+                if(IsNormalLevel() && player.lives <= 0)
+                    loadingDan.sprite = gameOverLoadingDanSprites[loadingDanAnimationIndex];
+                else
+                    loadingDan.sprite = loadingDanSprites[loadingDanAnimationIndex];
+
+                loadingDanAnimationTimer = 0.075f;
+            }
+        }
 
         if(startClear)
             return;
@@ -103,9 +126,12 @@ public class LevelLoadingManager : MonoBehaviour
     {
         Busy = true;
 
-        if(eventSystem != null && eventSystem.activeInHierarchy == true)
-            eventSystem.SetActive(false);
-
+        if(uIModule != null)
+        {
+            uIModule.leftClick.action.Disable();
+            uIModule.scrollWheel.action.Disable();
+        }
+        
         if(player != null)
         {
             if(player.lives > 0)
@@ -131,9 +157,7 @@ public class LevelLoadingManager : MonoBehaviour
         while(inTime < fadeDuration)
         {
             inTime += Time.unscaledDeltaTime;
-            
-            if(localWorldManager.world != LocalWorldManager.World.SplashScreen)
-                loadingSpritesTransform.localScale = Vector3.Lerp(Vector3.zero, Vector3.one, inTime / fadeDuration);
+            loadingSpritesTransform.localScale = Vector3.Lerp(Vector3.zero, Vector3.one, inTime / fadeDuration);
 
             fadeSprite.color = new Color(fadeSprite.color.r, fadeSprite.color.g, fadeSprite.color.b, Mathf.Lerp(0, 1, inTime / fadeDuration));
             yield return null;
@@ -175,9 +199,7 @@ public class LevelLoadingManager : MonoBehaviour
         while(inTime < fadeDuration)
         {
             inTime += Time.unscaledDeltaTime;
-
-            if(localWorldManager.world != LocalWorldManager.World.SplashScreen)
-                loadingSpritesTransform.localScale = Vector3.Lerp(Vector3.one, Vector3.zero, inTime / fadeDuration);
+            loadingSpritesTransform.localScale = Vector3.Lerp(Vector3.one, Vector3.zero, inTime / fadeDuration);
             
             yield return null;
         }
@@ -207,7 +229,7 @@ public class LevelLoadingManager : MonoBehaviour
 
     public void LoadScene(int sceneToLoad)
     {
-        loading = true;
+        canPlayAnimation = true;
 
         if(localWorldManager.world != LocalWorldManager.World.SplashScreen)
             GameManager.Instance.SaveUserData();
@@ -219,7 +241,7 @@ public class LevelLoadingManager : MonoBehaviour
 
     public void LoadScene(string sceneToLoad)
     {
-        loading = true;
+        canPlayAnimation = true;
 
         if(localWorldManager.world != LocalWorldManager.World.SplashScreen)
             GameManager.Instance.SaveUserData();
@@ -231,7 +253,7 @@ public class LevelLoadingManager : MonoBehaviour
 
     IEnumerator LoadSceneSlowly(int sceneToLoad)
     {
-        AnimateDanAndMusicFade();
+        FadeMusicOut();
 
         while(!animationFinished)
             yield return null;
@@ -254,7 +276,7 @@ public class LevelLoadingManager : MonoBehaviour
 
     IEnumerator LoadSceneSlowly(string sceneToLoad)
     {
-        AnimateDanAndMusicFade();
+        FadeMusicOut();
 
         while(!animationFinished)
             yield return null;
@@ -275,7 +297,7 @@ public class LevelLoadingManager : MonoBehaviour
         }
     }
 
-    void AnimateDanAndMusicFade()
+    void FadeMusicOut()
     {
         if(localWorldManager.world == LocalWorldManager.World.SplashScreen)
             return;
@@ -289,47 +311,6 @@ public class LevelLoadingManager : MonoBehaviour
         {
             if(AudioManager.Instance != null)
                 AudioManager.Instance.FadeMusicOut(1);
-        }
-
-        if(IsNormalLevel())
-        {
-            if(GameManager.died)
-                StartCoroutine(LoadingDanAnimation());
-            else
-                StartCoroutine(LoadingDanAnimation());
-        }
-        else
-        {
-            StartCoroutine(LoadingDanAnimation());
-        }
-    }
-
-    IEnumerator LoadingDanAnimation()
-    {
-        while(true)
-        {
-            if(IsNormalLevel() && player.lives <= 0)
-            {
-                loadingDan.sprite = gameOverLoadingDanSprites[0];
-                yield return new WaitForSecondsRealtime(0.075f);
-                loadingDan.sprite = gameOverLoadingDanSprites[1];
-                yield return new WaitForSecondsRealtime(0.075f);
-                loadingDan.sprite = gameOverLoadingDanSprites[2];
-                yield return new WaitForSecondsRealtime(0.075f);
-                loadingDan.sprite = gameOverLoadingDanSprites[1];
-                yield return new WaitForSecondsRealtime(0.075f);
-            }
-            else
-            {
-                loadingDan.sprite = loadingDanSprites[0];
-                yield return new WaitForSecondsRealtime(0.075f);
-                loadingDan.sprite = loadingDanSprites[1];
-                yield return new WaitForSecondsRealtime(0.075f);
-                loadingDan.sprite = loadingDanSprites[2];
-                yield return new WaitForSecondsRealtime(0.075f);
-                loadingDan.sprite = loadingDanSprites[1];
-                yield return new WaitForSecondsRealtime(0.075f);
-            }
         }
     }
 }

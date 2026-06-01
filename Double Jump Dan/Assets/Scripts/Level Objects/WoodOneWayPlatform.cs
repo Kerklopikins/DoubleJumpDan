@@ -72,12 +72,11 @@ public class WoodOneWayPlatform : MonoBehaviour
         }
     }
 
+    #if UNITY_EDITOR
     void OnValidate()
     {
         if(!editorMode)
             return;
-            
-    #if UNITY_EDITOR
 
         if(length > 0)
         {
@@ -94,12 +93,10 @@ public class WoodOneWayPlatform : MonoBehaviour
             EditorApplication.delayCall += SetSize;
 
         lastAdjustment = length;
-    #endif
     }
 
     void OnDrawGizmos()
     {
-#if UNITY_EDITOR
         if(length != 0)
         {
             Gizmos.color = new Color(0, 1, 1, 0.5f);
@@ -115,6 +112,6 @@ public class WoodOneWayPlatform : MonoBehaviour
             Gizmos.color = new Color(1, 0, 0, 0.5f);
             Gizmos.DrawCube(transform.position, new Vector3(4, 2, 1));
         }
-#endif
     }
+    #endif
 }

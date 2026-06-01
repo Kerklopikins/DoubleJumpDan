@@ -6,7 +6,6 @@ public class ScreenshotButton : MonoBehaviour
     [SerializeField] AudioClip clickSound;
     [SerializeField] Image image;
     public ScreenshotsMenu screenshotsMenu { get; set; }
-    public UIScreenManager uiScreenManager { get; set; }
 	
 	public void ViewScreenshot() 
 	{
@@ -15,7 +14,7 @@ public class ScreenshotButton : MonoBehaviour
 
         screenshotsMenu.screenshotViewerText.text = image.name.Replace(".jpg", "");
         screenshotsMenu.screenshotViewerImage.sprite = image.sprite;
-        uiScreenManager.OpenPanel(screenshotsMenu.screenshotViewerAnimator);
+        screenshotsMenu.OpenScreenshotsViewerPanel();
 
         AudioManager.Instance.PlaySound2D(clickSound);
 	}

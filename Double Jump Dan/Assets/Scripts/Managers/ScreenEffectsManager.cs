@@ -1,7 +1,7 @@
 using UnityEngine;
 using System.Collections;
 using UnityEngine.SceneManagement;
-
+using System;
 public class ScreenEffectsManager : MonoBehaviour
 {
     public static ScreenEffectsManager Instance;
@@ -9,6 +9,7 @@ public class ScreenEffectsManager : MonoBehaviour
     [SerializeField] SpriteRenderer hurtSprite;
     [SerializeField] SpriteRenderer whiteFadeSprite;
     [SerializeField] SpriteRenderer greenCircleSprite;
+    [SerializeField] SpriteRenderer[] respawnBackgroundSprites;
 
     [Header("Color Temperature")]
     [SerializeField] bool useColorTemperature;
@@ -78,6 +79,42 @@ public class ScreenEffectsManager : MonoBehaviour
         whiteFadeSprite.transform.localScale = new Vector2(cameraWidth + 0.2f, _camera.orthographicSize + 0.2f);
         hurtSprite.transform.localScale = new Vector2(cameraWidth / 32 + 0.01f, _camera.orthographicSize / 32 + 0.01f);
     }
+
+    // public void AnimateRespawnBackground(float from, float to, float duration, float inBetweenDelay)
+    // {
+    //     StartCoroutine(AnimateRespawnBackgroundCo(from, to, duration, inBetweenDelay));
+    // }
+
+    // IEnumerator AnimateRespawnBackgroundCo(float from, float to, float duration, float inBetweenDelay)
+    // {
+    //     float inTime = 0;
+
+    //     while(inTime < duration)
+    //     {
+    //         inTime += Time.unscaledDeltaTime;
+    //         respawnBackgroundSprites[0].size = new Vector2(respawnBackgroundSprites[0].size.x, Mathf.Lerp(from, to, inTime / duration));
+    //         respawnBackgroundSprites[1].size = new Vector2(respawnBackgroundSprites[1].size.x, Mathf.Lerp(from, to, inTime / duration));
+    //         yield return null;
+    //     }  
+
+    //     respawnBackgroundSprites[0].size = new Vector2(respawnBackgroundSprites[0].size.x, to);
+    //     respawnBackgroundSprites[1].size = new Vector2(respawnBackgroundSprites[1].size.x, to);
+
+    //     yield return new WaitForSecondsRealtime(inBetweenDelay);
+
+    //     float outTime = 0;
+
+    //     while(outTime < duration)
+    //     {
+    //         outTime += Time.unscaledDeltaTime;
+    //         respawnBackgroundSprites[0].size = new Vector2(respawnBackgroundSprites[0].size.x, Mathf.Lerp(to, from, outTime / duration));
+    //         respawnBackgroundSprites[1].size = new Vector2(respawnBackgroundSprites[1].size.x, Mathf.Lerp(to, from, outTime / duration));
+    //         yield return null;
+    //     }  
+
+    //     respawnBackgroundSprites[0].size = new Vector2(respawnBackgroundSprites[0].size.x, from);
+    //     respawnBackgroundSprites[1].size = new Vector2(respawnBackgroundSprites[1].size.x, from);
+    // }
 
     public void AnimateWhiteFade(float from, float to, float duration)
     {

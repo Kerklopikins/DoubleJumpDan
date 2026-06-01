@@ -159,6 +159,7 @@ public class ChickenGun : MonoBehaviour
             yield return null;
         }
 
+        transform.localEulerAngles = initialRot;
         gunInfo.Reload();
         reloading = false;
     }
@@ -170,6 +171,7 @@ public class ChickenGun : MonoBehaviour
         yield return false;
     }
 
+    #if UNITY_EDITOR
     void OnDrawGizmos()
     {
         if(eggFirePoint == null)
@@ -194,4 +196,5 @@ public class ChickenGun : MonoBehaviour
 
         Gizmos.DrawWireSphere(spawnPosition, 0.25f);
     }
+    #endif
 }

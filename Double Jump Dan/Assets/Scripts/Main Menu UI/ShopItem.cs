@@ -8,12 +8,14 @@ public class ShopItem : MonoBehaviour
 	public Item item;
 	[SerializeField] Sprite normalItemBackground;
 	[SerializeField] Sprite premiumItemBackground;
+	[SerializeField] Sprite upgradeBackground;
     [SerializeField] ShopManager shopManager;
 	[SerializeField] UIScreenManager uIScreenManager;
 	[SerializeField] Sprite[] fireRateSprites;
 	[SerializeField] AudioClip equippedSound;
 	
 	Button equipButton;
+	Toggle equipToggle;
 	Text equipButtonText;
 	GameManager gameManager;
 	Image itemPicture;
@@ -26,6 +28,7 @@ public class ShopItem : MonoBehaviour
 	Image image;
 	Button buyButton;
 
+	bool isCustomSkin;
 	ConfirmPurchase confirmPurchase;
     Text priceText;
     Animator confirmPurchaseAnimator;
@@ -35,17 +38,39 @@ public class ShopItem : MonoBehaviour
 	RectTransform rect;
 	RectTransform itemPictureRect;
 	MainMenuManager mainMenuManager;
+	UpgradeEquipToggle upgradeEquipToggle;
 
 	void Awake()
 	{
 		gameManager = GameManager.Instance;
-		equipButton = GetComponentInChildren<Button>();
-		equipButtonText = equipButton.GetComponentInChildren<Text>();
+
+		if(item.itemType != Item.ItemType.Upgrade)
+		{
+			//Custom Skin ID
+			if(item.itemID != 9999)
+				equipButton = GetComponentInChildren<Button>();
+			else
+				equipButton = transform.Find("Equip Button").GetComponent<Button>();
+			
+			equipButtonText = equipButton.GetComponentInChildren<Text>();
+		}
+		else
+		{
+			equipToggle = GetComponentInChildren<Toggle>();
+			equipButtonText = equipToggle.GetComponentInChildren<Text>();
+			upgradeEquipToggle = equipToggle.GetComponent<UpgradeEquipToggle>();
+			upgradeEquipToggle.shopItem = this;
+			upgradeEquipToggle.toggle = equipToggle;
+		}
+		
 		rectTransform = GetComponent<RectTransform>();
 		image = GetComponent<Image>();
 		contentHolder = transform.parent.GetComponent<RectTransform>();
 		rect = GetComponent<RectTransform>();
-		equipButton.onClick.AddListener(OnEquipButtonClicked);
+
+		if(equipButton != null)
+			equipButton.onClick.AddListener(OnEquipButtonClicked);
+
 		shopManager.OnShopItemsChanged += Refresh;
 		shopManager.OnShopTabsChanged += UpdateVisibility;
 		mainMenuManager = shopManager.GetComponent<MainMenuManager>();
@@ -55,7 +80,10 @@ public class ShopItem : MonoBehaviour
 
 		if(item.itemID != 1111)
 		{
-			buyButton = equipButton.transform.Find("Buy Button").GetComponent<Button>();
+			if(item.itemType != Item.ItemType.Upgrade)
+				buyButton = equipButton.transform.Find("Buy Button").GetComponent<Button>();
+			else
+				buyButton = equipToggle.transform.Find("Buy Button").GetComponent<Button>();
 
 			confirmPurchase = shopManager.confirmPurchase;
 			priceText = buyButton.GetComponentInChildren<Text>();
@@ -68,16 +96,21 @@ public class ShopItem : MonoBehaviour
 		{
 			if(item == null)
 				print("Item is null");
-			if(item.premiumItem)
-				gameObject.GetComponent<Image>().sprite = premiumItemBackground;
+
+			if(item.itemType != Item.ItemType.Upgrade)
+			{
+				if(item.premiumItem)
+					gameObject.GetComponent<Image>().sprite = premiumItemBackground;
+				else
+					gameObject.GetComponent<Image>().sprite = normalItemBackground;
+			}
 			else
-				gameObject.GetComponent<Image>().sprite = normalItemBackground;
+			{
+				gameObject.GetComponent<Image>().sprite = upgradeBackground;
+			}
 
 			itemPicture = transform.Find("Item Image").GetComponent<Image>();
-			
-			//Custom skin
-			if(item.itemID != 9999)
-				descriptionText = transform.Find("Description Text").GetComponent<Text>();
+			descriptionText = transform.Find("Description Text").GetComponent<Text>();
 		}
 
 		if(item.itemType == Item.ItemType.Gun)
@@ -119,12 +152,17 @@ public class ShopItem : MonoBehaviour
 			damageText.text = "Damage: " + gunInfo.damage;
 
 			if(gunInfo.fireMode == GunInfo.FireMode.Single)
-				fireModeText.text = " Fire Mode - Single";
+				fireModeText.text = "Fire Mode - Single";
 			else if(gunInfo.fireMode == GunInfo.FireMode.Automatic)
 				fireModeText.text = "Fire Mode - Automatic";
 			else if(gunInfo.fireMode == GunInfo.FireMode.Burst)
 				fireModeText.text = "Fire Mode - Burst";
 		}
+
+		///Checking is skin is the Custom Skin (Custom Skin ID is 9999) for enabling gray background in confirm purchase
+		if(item.itemType == Item.ItemType.Skin)
+			if(item.itemID == 9999)
+				isCustomSkin = true;
 
 		transform.Find("Title Text").GetComponent<Text>().text = transform.name;
 
@@ -142,81 +180,118 @@ public class ShopItem : MonoBehaviour
 			descriptionText.text = item.description;
 		
 		UpdateVisibility();
-		Refresh();
+		Refresh(false);
 
 		mainMenuManager.shopItems.Add(gameObject);
 	}
 
-    public void Refresh()
+    public void Refresh(bool onlyRefreshUpgrades)
 	{
-		if(item.itemType == Item.ItemType.Hat)
+		if(!onlyRefreshUpgrades)
 		{
-            if(gameManager.currentUser.hatID == item.itemID)
+			if(item.itemType == Item.ItemType.Hat)
 			{
-				equipButton.interactable = false;
-				shopManager.currentHatRect = rect;
+				if(gameManager.currentUser.hatID == item.itemID)
+				{
+					equipButton.interactable = false;
+					shopManager.currentHatRect = rect;
+				}
+				else if(gameManager.currentUser.hatID != item.itemID)
+					equipButton.interactable = true;
+				
+				if(buyButton != null)
+				{
+					if(gameManager.currentUser.ownedHats.Contains(item.itemID))
+						buyButton.gameObject.SetActive(false);
+					else
+						buyButton.gameObject.SetActive(true);
+				}
 			}
-            else if(gameManager.currentUser.hatID != item.itemID)
-				equipButton.interactable = true;
-			
+
+			if(item.itemType == Item.ItemType.Gun)
+			{		
+				if(gameManager.currentUser.gunID == item.itemID)
+				{
+					equipButton.interactable = false;
+					shopManager.currentGunRect = rect;
+				}
+				else if(gameManager.currentUser.gunID != item.itemID)
+					equipButton.interactable = true;
+
+				if(buyButton != null)
+				{
+					if(gameManager.currentUser.ownedGuns.Contains(item.itemID))
+						buyButton.gameObject.SetActive(false);
+					else
+						buyButton.gameObject.SetActive(true);
+				}
+			}
+
+			if(item.itemType == Item.ItemType.Skin)
+			{
+				if(gameManager.currentUser.skinID == item.itemID)
+				{
+					equipButton.interactable = false;
+					shopManager.currentSkinRect = rect;
+				}
+				else if(gameManager.currentUser.skinID != item.itemID)
+					equipButton.interactable = true;
+
+				if(buyButton != null)
+				{
+					if(gameManager.currentUser.ownedSkins.Contains(item.itemID))
+						buyButton.gameObject.SetActive(false);
+					else
+						buyButton.gameObject.SetActive(true);
+				}
+			}
+		}
+		
+		if(item.itemType == Item.ItemType.Upgrade)
+		{
+			if(gameManager.currentUser.equippedUpgrades.Contains(item.itemID))
+				equipToggle.isOn = true;
+			else
+				equipToggle.isOn = false;
+
 			if(buyButton != null)
 			{
-				if(gameManager.currentUser.ownedHats.Contains(item.itemID))
+				if(gameManager.currentUser.ownedUpgrades.Contains(item.itemID))
 					buyButton.gameObject.SetActive(false);
 				else
                 	buyButton.gameObject.SetActive(true);
 			}
 		}
-
-		if(item.itemType == Item.ItemType.Gun)
-		{		
-            if(gameManager.currentUser.gunID == item.itemID)
-			{
-				equipButton.interactable = false;
-				shopManager.currentGunRect = rect;
-			}
-            else if(gameManager.currentUser.gunID != item.itemID)
-				equipButton.interactable = true;
-
-			if(buyButton != null)
-			{
-				if(gameManager.currentUser.ownedGuns.Contains(item.itemID))
-					buyButton.gameObject.SetActive(false);
-				else
-					buyButton.gameObject.SetActive(true);
-			}
-		}
-
-		if(item.itemType == Item.ItemType.Skin)
+		
+		if(item.itemType != Item.ItemType.Upgrade)
 		{
-			if(gameManager.currentUser.skinID == item.itemID)
+			if(equipButton.interactable)
 			{
-				equipButton.interactable = false;
-				shopManager.currentSkinRect = rect;
+				equipButtonText.text = "Equip";
+				equipButtonText.color = Color.black;
 			}
-			else if(gameManager.currentUser.skinID != item.itemID)
-				equipButton.interactable = true;
-
-			if(buyButton != null)
+			else
 			{
-				if(gameManager.currentUser.ownedSkins.Contains(item.itemID))
-					buyButton.gameObject.SetActive(false);
-				else
-                	buyButton.gameObject.SetActive(true);
+				equipButtonText.text = "Equipped";
+				equipButtonText.color = Color.white;
 			}
-		}
-
-		if(equipButton.interactable)
-		{
-			equipButtonText.text = "Equip";
-			equipButtonText.color = Color.black;
 		}
 		else
 		{
-			equipButtonText.text = "Equipped";
-			equipButtonText.color = Color.white;
+			if(!equipToggle.isOn)
+			{
+				equipButtonText.text = "Equip";
+				equipButtonText.color = Color.black;
+			}
+			else
+			{
+				equipButtonText.text = "Equipped";
+				equipButtonText.color = Color.white;
+			}
 		}
 		
+		///Default first item ID is 1111
+		//Default first items: (Gun: 22 Magnum) - (Skin: Dan Skin) - (Hat: None)
 		if(item.itemID == 1111)
 			return;
 
@@ -242,6 +317,7 @@ public class ShopItem : MonoBehaviour
 			}
 		}
 	}
+	
 	public void OnEquipButtonClicked()
 	{
 		if(item.itemType == Item.ItemType.Gun)
@@ -257,6 +333,26 @@ public class ShopItem : MonoBehaviour
 		AudioManager.Instance.PlaySound2D(equippedSound);
 	}
 
+	public void OnEquipToggleClicked(bool isEquipped)
+	{
+		if(item.itemType != Item.ItemType.Upgrade)
+			return;
+
+		if(!isEquipped)
+		{
+			equipButtonText.text = "Equip";
+			equipButtonText.color = Color.black;
+		}
+		else
+		{
+			equipButtonText.text = "Equipped";
+			equipButtonText.color = Color.white;
+		}
+
+		shopManager.EquipUpgrade(this, isEquipped);
+		AudioManager.Instance.PlaySound2D(equippedSound);
+	}
+
 	public void BuyButtonClicked()
 	{
         if(gameManager.currentUser.gems >= item.price)
@@ -265,9 +361,9 @@ public class ShopItem : MonoBehaviour
             confirmPurchase.shopItem = this;
 
 			if(item.price > 0)
-				confirmPurchase.Open(itemPicture, "Confirm purchase for " + item.gameObject.name + " for <color=yellow> " + item.price + " </color> gems?", item.premiumItem);
+				confirmPurchase.Open(itemPicture, "Confirm purchase for " + item.gameObject.name + " for<color=yellow><size=35> " + item.price + " </size></color>gems?", item.premiumItem, item.itemType == Item.ItemType.Upgrade ? true : false, isCustomSkin);
 			else
-				confirmPurchase.Open(itemPicture, "Confirm purchase for " + item.gameObject.name + " for free?", item.premiumItem);
+				confirmPurchase.Open(itemPicture, "Confirm purchase for " + item.gameObject.name + " for free?", item.premiumItem, item.itemType == Item.ItemType.Upgrade ? true : false, isCustomSkin);
         }
     }
 
@@ -299,6 +395,6 @@ public class ShopItem : MonoBehaviour
 		image.enabled = inRange;
 
 		if(inRange && !wasVisible)
-			Refresh();
+			Refresh(false);
 	}
 }

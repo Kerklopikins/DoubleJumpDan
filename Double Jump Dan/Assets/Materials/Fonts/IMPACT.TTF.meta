@@ -1,22 +1,21 @@
 fileFormatVersion: 2
 guid: 93a712c666b3543419dcd4954846c32c
-timeCreated: 1512409140
-licenseType: Free
 TrueTypeFontImporter:
+  externalObjects: {}
   serializedVersion: 4
   fontSize: 16
   forceTextureCase: -2
   characterSpacing: 0
   characterPadding: 1
   includeFontData: 1
-  fontName: Impact
   fontNames:
   - Impact
-  fallbackFontReferences:
-  - {fileID: 12800000, guid: afecc49a484a09a438e2d82785d43031, type: 3}
+  fallbackFontReferences: []
   customCharacters: 
   fontRenderingMode: 0
   ascentCalculationMode: 1
+  useLegacyBoundsCalculation: 0
+  shouldRoundAdvanceValue: 1
   userData: 
   assetBundleName: 
   assetBundleVariant: 

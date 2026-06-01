@@ -5,25 +5,27 @@ public class HealthPack : MonoBehaviour
     [SerializeField] Transform healthPackSprite;
     [SerializeField] GameObject collectEffect;
     [SerializeField] AudioClip collectSound;
+    [SerializeField] Sprite defaultSprite;
 
     Player player;
     bool collected;
     float inTime = 0;
     Vector3 startPosition;
     SpriteRenderer spriteRenderer;
+    Animator animator;
 
     void Start()
     {
         player = LevelManager.Instance.player;
         spriteRenderer = GetComponentInChildren<SpriteRenderer>();
         startPosition = transform.position;
+        animator = GetComponent<Animator>();
 
         player.OnPlayerRespawn += PlayerRespawn;
     }
 
     void Update()
     {
-        ////////////////////////////DISABLE ANIMATOR AND CHANGE SPRITE BACK TO DEFUALRT
         if(collected)
         {
             inTime += Time.deltaTime;
@@ -37,7 +39,7 @@ public class HealthPack : MonoBehaviour
                 if(!player.dead)
                 {
                     player.GiveHealth(player.health);
-                    Destroy(gameObject);
+                    Destroy(transform.parent.gameObject);
                 }
             }
         }
@@ -63,6 +65,10 @@ public class HealthPack : MonoBehaviour
 
             AudioManager.Instance.PlaySound2D(collectSound);
             collectEffect.SetActive(true);
+
+            animator.enabled = false;
+            spriteRenderer.sprite = defaultSprite;
+            
             collected = true;
         }
     }

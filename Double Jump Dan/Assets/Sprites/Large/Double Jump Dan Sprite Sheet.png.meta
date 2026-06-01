@@ -1399,6 +1399,18 @@ TextureImporter:
     overridden: 0
     androidETC2FallbackOverride: 0
     forceMaximumCompressionQuality_BC6H_BC7: 1
+  - serializedVersion: 3
+    buildTarget: iPhone
+    maxTextureSize: 512
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 0
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
   spriteSheet:
     serializedVersion: 2
     sprites:
@@ -2834,12 +2846,12 @@ TextureImporter:
       name: Emoji Man Arm
       rect:
         serializedVersion: 2
-        x: 67
-        y: 295
-        width: 7
-        height: 1
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+        x: 76
+        y: 288
+        width: 2
+        height: 10
+      alignment: 9
+      pivot: {x: 0.5, y: 0.9}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
@@ -2852,33 +2864,12 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Emoji Man Idle
-      rect:
-        serializedVersion: 2
-        x: 67
-        y: 271
-        width: 13
-        height: 13
-      alignment: 7
-      pivot: {x: 0.5, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: a55ca6467856f86409a2bdd33893d96c
-      internalID: 1786178830
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
       name: Emoji Man Walk 1
       rect:
         serializedVersion: 2
         x: 67
-        y: 257
-        width: 13
+        y: 272
+        width: 11
         height: 13
       alignment: 7
       pivot: {x: 0.5, y: 0}
@@ -2897,9 +2888,9 @@ TextureImporter:
       name: Emoji Man Walk 2
       rect:
         serializedVersion: 2
-        x: 81
-        y: 257
-        width: 13
+        x: 78
+        y: 272
+        width: 11
         height: 13
       alignment: 7
       pivot: {x: 0.5, y: 0}
@@ -2918,9 +2909,9 @@ TextureImporter:
       name: Emoji Man Jump
       rect:
         serializedVersion: 2
-        x: 81
-        y: 271
-        width: 13
+        x: 101
+        y: 272
+        width: 11
         height: 13
       alignment: 7
       pivot: {x: 0.5, y: 0}
@@ -3246,111 +3237,6 @@ TextureImporter:
       bones: []
       spriteID: 0e3cbaf41dcb00b4d9805a666f4fabcd
       internalID: 281116368
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Gem 3
-      rect:
-        serializedVersion: 2
-        x: 240
-        y: 496
-        width: 16
-        height: 16
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 4f38d31e22534d441b46026074c372d5
-      internalID: 544323233
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Gem 4
-      rect:
-        serializedVersion: 2
-        x: 256
-        y: 496
-        width: 16
-        height: 16
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 14c2a86ae7abe13488703f191ffa2920
-      internalID: -2118553872
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Gem 5
-      rect:
-        serializedVersion: 2
-        x: 272
-        y: 496
-        width: 16
-        height: 16
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 2545b13007f854f458e198bb26b81b65
-      internalID: -1290615325
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Gem 6
-      rect:
-        serializedVersion: 2
-        x: 288
-        y: 496
-        width: 16
-        height: 16
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 0b5f459495c4a4142b5a1a96d8d9dadf
-      internalID: -1008661209
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Gem 7
-      rect:
-        serializedVersion: 2
-        x: 304
-        y: 496
-        width: 16
-        height: 16
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 1ff3530930959024cbd24448a4050f62
-      internalID: 1190753641
       vertices: []
       indices: 
       edges: []
@@ -5229,11 +5115,11 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 67
-        y: 297
-        width: 7
+        y: 294
+        width: 8
         height: 5
       alignment: 9
-      pivot: {x: 1, y: 0.1}
+      pivot: {x: 1, y: 0.3}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
@@ -5859,8 +5745,8 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 67
-        y: 289
-        width: 7
+        y: 288
+        width: 8
         height: 5
       alignment: 9
       pivot: {x: 1, y: 0.9}
@@ -5939,11 +5825,11 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Pupils
+      name: 2 Pupils
       rect:
         serializedVersion: 2
-        x: 19
-        y: 206
+        x: 54
+        y: 177
         width: 8
         height: 2
       alignment: 0
@@ -5963,8 +5849,8 @@ TextureImporter:
       name: Eye Brow
       rect:
         serializedVersion: 2
-        x: 19
-        y: 203
+        x: 54
+        y: 174
         width: 12
         height: 2
       alignment: 0
@@ -5981,12 +5867,12 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Pupil
+      name: 1 Pupil
       rect:
         serializedVersion: 2
-        x: 19
-        y: 200
-        width: 2
+        x: 54
+        y: 171
+        width: 4
         height: 2
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
@@ -6005,8 +5891,8 @@ TextureImporter:
       name: Shadow Dan Pupils
       rect:
         serializedVersion: 2
-        x: 19
-        y: 197
+        x: 54
+        y: 168
         width: 8
         height: 2
       alignment: 0
@@ -6023,15 +5909,15 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Randy Pupils
+      name: 3 Pupils
       rect:
         serializedVersion: 2
-        x: 19
-        y: 192
+        x: 54
+        y: 163
         width: 10
         height: 4
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      alignment: 9
+      pivot: {x: 0.5, y: 0.25}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
@@ -7283,11 +7169,11 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Custom Skin Eyes
+      name: 2 Eyes
       rect:
         serializedVersion: 2
-        x: 32
-        y: 201
+        x: 68
+        y: 187
         width: 10
         height: 4
       alignment: 0
@@ -7304,11 +7190,11 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Custom Skin Eyes 2
+      name: 3 Eyes
       rect:
         serializedVersion: 2
-        x: 35
-        y: 206
+        x: 55
+        y: 185
         width: 12
         height: 6
       alignment: 9
@@ -7325,11 +7211,11 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Custom Skin Eyes 3
+      name: One Eye
       rect:
         serializedVersion: 2
-        x: 32
-        y: 196
+        x: 55
+        y: 180
         width: 4
         height: 4
       alignment: 9
@@ -7341,6 +7227,69 @@ TextureImporter:
       bones: []
       spriteID: e9254e99a4ed7944582f57af95558f49
       internalID: 1161670492
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Emoji Man Walk 3
+      rect:
+        serializedVersion: 2
+        x: 89
+        y: 272
+        width: 11
+        height: 13
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 3e02b10a409e8d24c9fd251b219e5339
+      internalID: 1791017069
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Alien Eye
+      rect:
+        serializedVersion: 2
+        x: 69
+        y: 180
+        width: 10
+        height: 5
+      alignment: 9
+      pivot: {x: 0.4, y: 0.4}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 07558f5f55e6dc943b6cb2d20bec7582
+      internalID: 1790909914
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Alien Pupil
+      rect:
+        serializedVersion: 2
+        x: 67
+        y: 173
+        width: 3
+        height: 3
+      alignment: 9
+      pivot: {x: 0.33333334, y: 0.33333334}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 82e3c332504d8044fbf41e0b1b6a2aab
+      internalID: -1228173009
       vertices: []
       indices: 
       edges: []
@@ -7360,9 +7309,14 @@ TextureImporter:
       '-': 51453209
       0: 658086534
       1: -926063540
+      1 Pupil: 1635251758
       2: -1154768158
+      2 Eyes: -115065162
+      2 Pupils: 748127935
       22 Magnum: 21300526
       3: 616228149
+      3 Eyes: 63460481
+      3 Pupils: 343497580
       4: -2051204620
       44 Magnum: 21300246
       5: 1942014513
@@ -7372,6 +7326,8 @@ TextureImporter:
       8: 1259939917
       9: -587454694
       AK-47: 21300250
+      Alien Eye: 1790909914
+      Alien Pupil: -1228173009
       Angry Stan Arm: 21300758
       Angry Stan Body: -1859713128
       Angry Stan Legs 1: 21300730
@@ -7446,9 +7402,6 @@ TextureImporter:
       Crushing Spikes V: -289554004
       Custom Skin Arm 1: 1597590126
       Custom Skin Body: -1535349455
-      Custom Skin Eyes: -115065162
-      Custom Skin Eyes 2: 63460481
-      Custom Skin Eyes 3: 1161670492
       Custom Skin Jump: 1824282275
       Custom Skin Legs 1: -2051350964
       Custom Skin Legs 2: 1064876400
@@ -7498,6 +7451,7 @@ TextureImporter:
       Emoji Man Poop: -1750042337
       Emoji Man Walk 1: -1225938573
       Emoji Man Walk 2: -1037522733
+      Emoji Man Walk 3: 1791017069
       Emoji Man Yeah: -1138650253
       Enemy 1: 544257496
       Enemy 2: 1723672978
@@ -7577,6 +7531,7 @@ TextureImporter:
       Moving Platform Small: 1485391032
       Moving Platform Tiny: -935509271
       Muzzle Flash Gun: 21300592
+      One Eye: 1161670492
       Pendulum End: -1966021168
       Pendulum Engine: -444167055
       Pendulum Segmant: 998831247
@@ -7585,8 +7540,6 @@ TextureImporter:
       Portal: 21300346
       Portal Glow: 21300746
       Portal White: 21300748
-      Pupil: 1635251758
-      Pupils: 748127935
       Rainbow Gun: 21300702
       Rainbow Gun Glow: -1117488336
       Randy Arm 1: 82847855
@@ -7596,7 +7549,6 @@ TextureImporter:
       Randy Legs 2: 2002509159
       Randy Legs 3: -544682229
       Randy Legs Jump: -14743228
-      Randy Pupils: 343497580
       Randy Walk 1: 267940721
       Randy Walk 2: 2051252053
       Red Laser: -734467599

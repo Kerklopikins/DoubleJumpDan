@@ -339,6 +339,7 @@ public class TrediconAI : MonoBehaviour
         }
     }
 
+    #if UNITY_EDITOR
     void OnDrawGizmos()
     {
         Gizmos.color = new Color(0, 1, 1, 1);
@@ -356,4 +357,5 @@ public class TrediconAI : MonoBehaviour
         Gizmos.color = new Color(1, 0, 0, 0.25f);
         Gizmos.DrawWireSphere(transform.position + new Vector3(0, detectionHeightOffset, 0), playerRange);
     }
+    #endif
 }

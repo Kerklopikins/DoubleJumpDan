@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
@@ -10,8 +9,8 @@ using UnityEngine.SceneManagement;
 public class GameManager : MonoBehaviour
 {
     public static GameManager Instance { get; private set; }
-    public Sprite[] gemSprites;
-
+    public float cursorAcceleration; /////SAVE 
+    public float cursorDeceleration; ////SAVE
     //Game Data
     [HideInInspector] public User currentUser;
     [HideInInspector] public List<User> users = new List<User>();
@@ -20,18 +19,19 @@ public class GameManager : MonoBehaviour
 	[HideInInspector] public int screenResolution = -1;
     [HideInInspector] public int frameRate = -1;
     [HideInInspector] public bool vSync = true;
+    [HideInInspector] public bool cameraShake = true;
     [HideInInspector] public bool showPerformanceData = false;
     [HideInInspector] public float aimSensitivity = 0.5f; 
     [HideInInspector] public float cursorSensitivity = 0.5f; 
     [HideInInspector] public bool controllerVibration = true;
     [HideInInspector] public bool swapJoysticks = false;
     [HideInInspector] public bool useDPad = false;
+    [HideInInspector] public bool lockAiming = false;
     [HideInInspector] public string inputBindings = "";
     [HideInInspector] public bool postProcessing = true;
     [HideInInspector] public bool distortionEffects = true;
     [HideInInspector] public bool weatherEffects = true;
     string folderPath;
-    public SpriteRenderer centralizedGem { get; set; }
     public static bool died;
     bool inMainMenu;
     MainMenuManager mainMenuManager;
@@ -45,10 +45,6 @@ public class GameManager : MonoBehaviour
         {
             inMainMenu = true;
             mainMenuManager = GameObject.FindWithTag("Main Menu").GetComponent<MainMenuManager>();
-        }
-        else
-        {
-            centralizedGem = transform.Find("Centralized Gem").GetComponent<SpriteRenderer>();  
         }
         
         if(!File.Exists(folderPath + "/GameData.json"))
@@ -79,12 +75,12 @@ public class GameManager : MonoBehaviour
     {
         byte[] keyBytes = Encoding.UTF8.GetBytes(key.PadRight(32)); // 256-bit key
 
-        using (Aes aes = Aes.Create())
+        using(Aes aes = Aes.Create())
         {
             aes.Key = keyBytes;
             aes.GenerateIV();
 
-            using (var encryptor = aes.CreateEncryptor())
+            using(var encryptor = aes.CreateEncryptor())
             {
                 byte[] inputBytes = Encoding.UTF8.GetBytes(plainText);
                 byte[] encrypted = encryptor.TransformFinalBlock(inputBytes, 0, inputBytes.Length);
@@ -102,12 +98,12 @@ public class GameManager : MonoBehaviour
         byte[] data = Convert.FromBase64String(parts[1]);
         byte[] keyBytes = Encoding.UTF8.GetBytes(key.PadRight(32));
 
-        using (Aes aes = Aes.Create())
+        using(Aes aes = Aes.Create())
         {
             aes.Key = keyBytes;
             aes.IV = iv;
 
-            using (var decryptor = aes.CreateDecryptor())
+            using(var decryptor = aes.CreateDecryptor())
             {
                 byte[] decrypted = decryptor.TransformFinalBlock(data, 0, data.Length);
                 return Encoding.UTF8.GetString(decrypted);
@@ -135,12 +131,14 @@ public class GameManager : MonoBehaviour
 		gameData.screenResolution = screenResolution;
         gameData.frameRate = frameRate;
         gameData.vSync = vSync;
+        gameData.cameraShake = cameraShake;
         gameData.showPerformanceData = showPerformanceData;
         gameData.aimSensitivity = aimSensitivity;
         gameData.cursorSensitivity = cursorSensitivity;
         gameData.controllerVibration = controllerVibration;
         gameData.swapJoysticks = swapJoysticks;
         gameData.useDPad = useDPad;
+        gameData.lockAiming = lockAiming;
         gameData.inputBindings = inputBindings;
         gameData.postProcessing = postProcessing;
         gameData.distortionEffects = distortionEffects;
@@ -172,12 +170,14 @@ public class GameManager : MonoBehaviour
 			screenResolution = gameData.screenResolution;
             frameRate = gameData.frameRate;
             vSync = gameData.vSync;
+            cameraShake = gameData.cameraShake;
             showPerformanceData = gameData.showPerformanceData;
             aimSensitivity = gameData.aimSensitivity;
             cursorSensitivity = gameData.cursorSensitivity;
             controllerVibration = gameData.controllerVibration;
             swapJoysticks = gameData.swapJoysticks;
-            useDPad = gameData.swapJoysticks;
+            useDPad = gameData.useDPad;
+            lockAiming = gameData.lockAiming;
             inputBindings = gameData.inputBindings;
             postProcessing = gameData.postProcessing;
             distortionEffects = gameData.distortionEffects;
@@ -199,17 +199,20 @@ public class GameManager : MonoBehaviour
         user.ownedHats = currentUser.ownedHats;
         user.ownedGuns = currentUser.ownedGuns;
 		user.ownedSkins = currentUser.ownedSkins;
+        user.ownedUpgrades = currentUser.ownedUpgrades;
         user.hatID = currentUser.hatID;
         user.gunID = currentUser.gunID;
 		user.skinID = currentUser.skinID;
-        user.customSkinColor = currentUser.customSkinColor;
+        user.equippedUpgrades = currentUser.equippedUpgrades;
+        user.customSkinData = currentUser.customSkinData;
 		user.levelsCompleted = currentUser.levelsCompleted;
         user.hash = (user.gems * 17 + 9).ToString();
         user.totalEnemiesKilled = currentUser.totalEnemiesKilled;
         user.totalDeaths = currentUser.totalDeaths;
         user.totalGemsCollected = currentUser.totalGemsCollected;
         user.totalPlaytime = currentUser.totalPlaytime;
-        
+        user.totalJumps = currentUser.totalJumps;
+
         string json = JsonUtility.ToJson(user);
         string encrypted = Encrypt(json, "5a82be8ec0fdafa41013f6ac33b109");
 
@@ -234,15 +237,19 @@ public class GameManager : MonoBehaviour
                 currentUser.ownedHats = user.ownedHats;
                 currentUser.ownedGuns = user.ownedGuns;
                 currentUser.ownedSkins = user.ownedSkins;
+                currentUser.ownedUpgrades = user.ownedUpgrades;
                 currentUser.hatID = user.hatID;
                 currentUser.gunID = user.gunID;
                 currentUser.skinID = user.skinID;
-                currentUser.customSkinColor = user.customSkinColor;
+                currentUser.equippedUpgrades = user.equippedUpgrades;
+                currentUser.customSkinData = user.customSkinData;
                 currentUser.levelsCompleted = user.levelsCompleted;
                 currentUser.totalEnemiesKilled = user.totalEnemiesKilled;
                 currentUser.totalDeaths = user.totalDeaths;
                 currentUser.totalGemsCollected = user.totalGemsCollected;
                 currentUser.totalPlaytime = user.totalPlaytime;
+                currentUser.totalJumps = user.totalJumps;
+
                 return;
             }
         }
@@ -265,15 +272,19 @@ public class GameManager : MonoBehaviour
                 currentUser.ownedHats = userBak.ownedHats;
                 currentUser.ownedGuns = userBak.ownedGuns;
                 currentUser.ownedSkins = userBak.ownedSkins;
+                currentUser.ownedUpgrades = userBak.ownedUpgrades;
                 currentUser.hatID = userBak.hatID;
                 currentUser.gunID = userBak.gunID;
                 currentUser.skinID = userBak.skinID;
-                currentUser.customSkinColor = userBak.customSkinColor;
+                currentUser.equippedUpgrades = userBak.equippedUpgrades;
+                currentUser.customSkinData = userBak.customSkinData;
                 currentUser.levelsCompleted = userBak.levelsCompleted;
                 currentUser.totalEnemiesKilled = userBak.totalEnemiesKilled;
                 currentUser.totalDeaths = userBak.totalDeaths;
                 currentUser.totalGemsCollected = userBak.totalGemsCollected;
                 currentUser.totalPlaytime = userBak.totalPlaytime;
+                currentUser.totalJumps = userBak.totalJumps;
+                
                 SaveUserData();
                 return;
             }
@@ -294,12 +305,14 @@ public class GameManager : MonoBehaviour
         currentUser.ownedHats.Clear();
         currentUser.ownedGuns.Clear();
 		currentUser.ownedSkins.Clear();
+        currentUser.ownedUpgrades.Clear();
 		currentUser.levelsCompleted = 1;
         currentUser.totalEnemiesKilled = 0;
         currentUser.totalDeaths = 0;
         currentUser.totalGemsCollected = 0;
         currentUser.totalPlaytime = 0;
-        currentUser.customSkinColor.Clear();
+        currentUser.totalJumps = 0;
+        currentUser.customSkinData.Clear();
 
         currentUser.ownedHats.Add(1111);
         currentUser.hatID = 1111;
@@ -307,7 +320,8 @@ public class GameManager : MonoBehaviour
         currentUser.gunID = 1111;
         currentUser.ownedSkins.Add(1111);
         currentUser.skinID = 1111;
-        currentUser.customSkinColor = new List<float> { 1, 1, 1, 1, 1, 1 };
+        currentUser.equippedUpgrades.Clear();
+        currentUser.customSkinData = new List<float> { 0, 0, 0.85f, 0, 0, 0.5f, 0 };
     }
 
     public void DeleteUserData(int user)
@@ -319,13 +333,6 @@ public class GameManager : MonoBehaviour
 			File.Delete(folderPath + "/UserData" + user + ".bak");
     }
 
-    public int LoadUserFileSize(int _currentUser)
-    {
-		FileStream file = File.Open(folderPath + "/UserData" + _currentUser + ".json", FileMode.Open);
-        int fileSize = (int)file.Length;
-        file.Close();
-        return fileSize;
-    }
     #endregion
 
     public void ResetGame()
@@ -363,12 +370,14 @@ public class GameData
 	public int screenResolution;
     public int frameRate;
     public bool vSync;
+    public bool cameraShake;
     public bool showPerformanceData;
     public float aimSensitivity; 
     public float cursorSensitivity; 
     public bool controllerVibration;
     public bool swapJoysticks;
     public bool useDPad;
+    public bool lockAiming;
     public string inputBindings;
     public bool postProcessing;
     public bool distortionEffects;
@@ -385,14 +394,17 @@ public class User
     public List<int> ownedHats = new List<int> { 1111 };
     public List<int> ownedGuns = new List<int> { 1111 };
 	public List<int> ownedSkins = new List<int> { 1111 };
+    public List<int> ownedUpgrades = new List<int>();
     public int hatID = 1111;
     public int gunID = 1111;
 	public int skinID = 1111;
-    public List<float> customSkinColor = new List<float> { 1, 1, 1, 1, 1, 1 };
+    public List<int> equippedUpgrades = new List<int>();
+    public List<float> customSkinData = new List<float> { 0, 0, 0.85f, 0, 0, 0.5f, 0 };
 	public int levelsCompleted = 1;
     public string hash;
     public int totalEnemiesKilled;
     public int totalDeaths;
     public int totalGemsCollected;
     public double totalPlaytime;
+    public int totalJumps;
 }

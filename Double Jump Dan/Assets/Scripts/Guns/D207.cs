@@ -27,6 +27,7 @@ public class D207: MonoBehaviour
     Transform laserParent;
     GunInfo gunInfo;
     GameInputManager gameInputManager;
+
 	void Start()
 	{
         laserParent = LevelManager.Instance.levelObjects;
@@ -170,12 +171,14 @@ public class D207: MonoBehaviour
             yield return null;
         }
 
+        transform.localEulerAngles = initialRot;
         gunInfo.Reload();
         reloading = false;
 
         yield return null;
     }
 
+    #if UNITY_EDITOR
     void OnDrawGizmos()
     {
         if(firePoint == null)
@@ -200,4 +203,5 @@ public class D207: MonoBehaviour
 
         Gizmos.DrawWireSphere(spawnPosition, 0.25f);
     }
+    #endif
 }

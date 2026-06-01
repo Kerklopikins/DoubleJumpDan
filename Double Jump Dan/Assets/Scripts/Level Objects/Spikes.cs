@@ -25,6 +25,8 @@ public class Spikes : MonoBehaviour
     {
         player.TakeDamage(player.health, 0, false, 0, 0, 0, transform, false, 0, 0);
     }
+
+    //#if UNITY_EDITOR
     //void OnDrawGizmos()
     //{
         //float angle = Mathf.Acos(killThreshold);
@@ -39,4 +41,5 @@ public class Spikes : MonoBehaviour
         //Gizmos.color = Color.green;
         //Gizmos.DrawLine(transform.position, transform.position + transform.up * debugLength);
     //}
+    //#endif
 }

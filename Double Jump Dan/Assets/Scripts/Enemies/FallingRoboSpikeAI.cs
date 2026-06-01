@@ -74,6 +74,7 @@ public class FallingRoboSpikeAI : MonoBehaviour
             health.TakeDamage(health.health);
     }
 
+    #if UNITY_EDITOR
     void OnDrawGizmos()
     {
         RaycastHit2D hit;
@@ -89,4 +90,5 @@ public class FallingRoboSpikeAI : MonoBehaviour
 		
         Gizmos.DrawLine(transform.position, hit.point);
     }
+    #endif
 }

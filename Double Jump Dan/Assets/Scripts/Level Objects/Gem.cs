@@ -13,11 +13,12 @@ public class Gem : MonoBehaviour
     bool collected;
     float inTime = 0;
     Vector3 startPosition;
-
+    
 	void Start()
 	{
-        centralizedGem = GameManager.Instance.centralizedGem;
-        spriteRenderer.sprite = GameManager.Instance.gemSprites[Random.Range(0, GameManager.Instance.gemSprites.Length)];
+        centralizedGem = LevelManager.Instance.centralizedGem;
+        spriteRenderer.sprite = LevelManager.Instance.doubleGems ? LevelManager.Instance.gemSprites[1] : LevelManager.Instance.gemSprites[0];
+        
         startPosition = transform.position;
     }
 
@@ -42,7 +43,7 @@ public class Gem : MonoBehaviour
             else
             {
                 LevelManager.Instance.AddGems(gemsToGivePlayer);
-                Destroy(gameObject);
+                Destroy(transform.parent.gameObject);
             }
         }
 	}

@@ -10,6 +10,7 @@ public class UserStatsMenu : MonoBehaviour
     [SerializeField] Text deathsCounterText;
     [SerializeField] Text gemsCounterText;
     [SerializeField] Text playtimeCounterText;
+    [SerializeField] Text jumpsCounterText;
 
     GameManager gameManager;
 
@@ -20,7 +21,7 @@ public class UserStatsMenu : MonoBehaviour
 
     void Update()
     {
-        if(statsGameObject.activeSelf)
+        if(statsGameObject.activeInHierarchy)
             playtimeCounterText.text = GetTotalPlaytimeString();
     }
 
@@ -30,6 +31,8 @@ public class UserStatsMenu : MonoBehaviour
         enemiesCounterText.text = gameManager.currentUser.totalEnemiesKilled.ToString();
         deathsCounterText.text = gameManager.currentUser.totalDeaths.ToString();
         gemsCounterText.text = gameManager.currentUser.totalGemsCollected.ToString();
+        jumpsCounterText.text = gameManager.currentUser.totalJumps.ToString();
+        
         playtimeCounterText.text = GetTotalPlaytimeString();
     }
 

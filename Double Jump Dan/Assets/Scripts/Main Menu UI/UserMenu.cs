@@ -7,6 +7,7 @@ using System.Collections.Generic;
 
 public class UserMenu : MonoBehaviour 
 {
+    [SerializeField] GameObject userMenuGameObject;
     [SerializeField] Button userButton;
     [SerializeField] Transform usersParent;
     [SerializeField] InputField userNameInputField;
@@ -38,15 +39,14 @@ public class UserMenu : MonoBehaviour
     GameManager gameManager;
 	string previousUserName;
     bool createdNewUser;
-    public event Action OnUserByteSizeRefresh;
     public event Action OnUserButtonsRefresh;
     public event Action<bool> OnButtonsDisabled;
     EditState editState;
     public enum EditState { Normal, New, Rename, Color };
     Text changeColorText;
-    ButtonEffects changeColorButtonEffects;
+    SelectableEffects changeColorButtonEffects;
     Shadow changeColorTextShadow;
-    ButtonEffects changeUserButtonEffects;
+    SelectableEffects changeUserButtonEffects;
     Shadow changeUserTextShadow;
     List<string> currentUserNames = new List<string>();
     GameInputManager gameInputManager;
@@ -77,9 +77,9 @@ public class UserMenu : MonoBehaviour
 
         changeColorText = changeColorButton.GetComponentInChildren<Text>();
         changeColorTextShadow = changeColorText.GetComponent<Shadow>();
-        changeColorButtonEffects = changeColorButton.GetComponent<ButtonEffects>();
+        changeColorButtonEffects = changeColorButton.GetComponent<SelectableEffects>();
         changeUserTextShadow = changeUserText.GetComponent<Shadow>();
-        changeUserButtonEffects = changeUserButton.GetComponent<ButtonEffects>();
+        changeUserButtonEffects = changeUserButton.GetComponent<SelectableEffects>();
         
         UpdateChangeUserButton();
 
@@ -95,7 +95,7 @@ public class UserMenu : MonoBehaviour
             cancelButton.interactable = true;
             oneToTwentyCharsText.SetActive(true);
 
-            if(userNameInputField.text.Length > 0 && !currentUserNames.Contains(userNameInputField.text))
+            if(userNameInputField.text.Length > 0 && !string.IsNullOrWhiteSpace(userNameInputField.text) && !currentUserNames.Contains(userNameInputField.text))
             {
                 confirmButton.interactable = true;
 
@@ -126,7 +126,7 @@ public class UserMenu : MonoBehaviour
             currentUserButton.userName = userNameInputField.text;
             currentUserButton.usernameText.text = currentUserButton.userName;
 
-            if(userNameInputField.text.Length > 0 && !currentUserNames.Contains(userNameInputField.text) || userNameInputField.text == previousUserName)
+            if(userNameInputField.text.Length > 0 && !string.IsNullOrWhiteSpace(userNameInputField.text) && !currentUserNames.Contains(userNameInputField.text) || userNameInputField.text == previousUserName)
             {
                 confirmButton.interactable = true;
 
@@ -171,16 +171,19 @@ public class UserMenu : MonoBehaviour
             }
         }
 
-        if(editState != EditState.Normal)
+        if(userMenuGameObject.activeInHierarchy)
         {
-            exitUIArea.enabled = false;
-
-            if(gameInputManager.EscapeButtonDown() && uiScreenManager.transitionTimer <= 0)
-                Cancel();
-        }
-        else
-        {
-            exitUIArea.enabled = true;
+            if(editState != EditState.Normal)
+            {   
+                exitUIArea.CanExit = false;
+                
+                if(gameInputManager.EscapeButtonDown() && uiScreenManager.transitionTimer <= 0)
+                    Cancel();
+            }
+            else
+            {
+                exitUIArea.CanExit = true;
+            }
         }
             
         if(gameManager.users.Count <= 1)
@@ -189,7 +192,7 @@ public class UserMenu : MonoBehaviour
         /////At the very start when there are no users
         if(gameManager.users.Count == 0)
         {
-            if(createNewUserInputField.text.Length > 0)
+            if(createNewUserInputField.text.Length > 0 && !string.IsNullOrWhiteSpace(createNewUserInputField.text))
             {
                 createNewUserButton.interactable = true;
 
@@ -209,11 +212,6 @@ public class UserMenu : MonoBehaviour
             else
                 createNewUserButton.interactable = false;
         }
-    }
-
-    public void RefreshUserByteSizes()
-    {
-        OnUserByteSizeRefresh?.Invoke();
     }
 
     public void New()

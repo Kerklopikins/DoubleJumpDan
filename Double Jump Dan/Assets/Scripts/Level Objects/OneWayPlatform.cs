@@ -71,6 +71,7 @@ public class OneWayPlatform : MonoBehaviour
         falling = false;
     }
 
+    #if UNITY_EDITOR
     void OnDrawGizmos()
     {
         if(!offsetAdjustmentMode)
@@ -81,4 +82,5 @@ public class OneWayPlatform : MonoBehaviour
         Gizmos.DrawWireSphere(new Vector3(transform.position.x + platformCollider.size.x * 0.5f + positionOffsetX + centerPointOffset, transform.position.y, 0), 0.2f);
         Gizmos.DrawWireSphere(new Vector3(transform.position.x - platformCollider.size.x * 0.5f - positionOffsetX + centerPointOffset, transform.position.y, 0), 0.2f);
     }
+    #endif
 }

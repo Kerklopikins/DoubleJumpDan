@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 4445698611817820}
   - component: {fileID: 95564168219559970}
   - component: {fileID: -1973979827161561548}
+  - component: {fileID: -7513413658237317542}
   m_Layer: 0
   m_Name: Dan
   m_TagString: Untagged
@@ -73,3 +74,17 @@ MonoBehaviour:
   description: Dan, the original and the best.
   picture: {fileID: 21300010, guid: fd62903050e1ca349bba8b53f64cbbda, type: 3}
   premiumItem: 0
+--- !u!114 &-7513413658237317542
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1863906000987150}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2a154ea4747eb5f4ba10e9064891ba4f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  eyeType: 1
+  eyeBrowType: 1

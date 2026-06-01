@@ -43,6 +43,7 @@ public class SpatialAudioController : MonoBehaviour
         pitch = _pitch;
     }
 
+    #if UNITY_EDITOR
     void OnDrawGizmos()
     {
         Gizmos.color = Color.white;
@@ -53,4 +54,5 @@ public class SpatialAudioController : MonoBehaviour
             Gizmos.DrawWireSphere(transform.position, maxDistance);
         }
     }
+    #endif
 }

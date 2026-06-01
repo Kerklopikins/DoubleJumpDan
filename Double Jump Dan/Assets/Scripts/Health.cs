@@ -42,11 +42,14 @@ public class Health : MonoBehaviour
     ObjectOpitimizer objectOpitimizer;
     bool dead;
     Camera _camera;
+    LevelManager levelManager;
 
     void Start()
     {
+        levelManager = LevelManager.Instance;
+        
         startingHealth = health;
-        _camera = LevelManager.Instance.mainCamera;
+        _camera = levelManager.mainCamera;
 
         if(GetComponentInParent<ObjectOpitimizer>() != null)
         {
@@ -221,7 +224,7 @@ public class Health : MonoBehaviour
             GameObject gem = PoolManager.Instance.ReuseObject("Gems", transformProperties);
             SpriteRenderer gemSprite = gem.GetComponent<SpriteRenderer>();
 
-            gemSprite.sprite = GameManager.Instance.gemSprites[UnityEngine.Random.Range(0, GameManager.Instance.gemSprites.Length)];
+            gemSprite.sprite = levelManager.gemSprites[levelManager.doubleGems ? 1 : 0];
             Vector3 targetOffset = GetRandomOffset();
             StartCoroutine(PopGem(gem, originalPosition, originalPosition + targetOffset, gemSprite));
             yield return new WaitForSeconds(0.0125f);
@@ -294,7 +297,7 @@ public class Health : MonoBehaviour
             yield return null;
         }
 
-        LevelManager.Instance.AddGems(1);
+        levelManager.AddGems(1);
         gem.SetActive(false);
         gemSprite.color = new Color(gemSprite.color.r, gemSprite.color.g, gemSprite.color.b, 1);
     }

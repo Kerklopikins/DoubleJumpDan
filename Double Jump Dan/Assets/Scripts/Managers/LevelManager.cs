@@ -25,6 +25,9 @@ public class LevelManager : MonoBehaviour
     [Header("Random Object Placement")]
     [SerializeField] List<SpawnType> spawnTypes = new List<SpawnType>();
 
+    [Header("Gem Sprites")]
+    public Sprite[] gemSprites;
+
     public Player player { get; private set; }
     public BoxCollider2D levelBounds { get; private set; }
     public Transform levelObjects { get; private set; }
@@ -32,6 +35,7 @@ public class LevelManager : MonoBehaviour
     public Camera mainCamera { get; private set; }
     public int gems { get; set; }
     public Vector2 currentSpawnPoint { get; private set; }
+    public SpriteRenderer centralizedGem { get; set; }
     bool playerEntered;
     float xDistance = 1.5f;
     GameManager gameManager;
@@ -40,7 +44,8 @@ public class LevelManager : MonoBehaviour
     int objectSpawnProbability;
     int randomObjectIndex;
     float _checkTimer;
-
+    public bool doubleGems { get; private set; }
+    
     void Awake()
     {
         Instance = this;
@@ -54,8 +59,9 @@ public class LevelManager : MonoBehaviour
         levelBounds = GameObject.FindWithTag("Bounds").GetComponent<BoxCollider2D>();
         levelObjects = GameObject.FindWithTag("Level Objects").transform;
         player = GameObject.FindWithTag("Player").GetComponent<Player>();
-        mainCamera = Camera.main;
-        
+        centralizedGem = transform.Find("Centralized Gem").GetComponent<SpriteRenderer>();  
+        mainCamera = Camera.main;    
+            
         Respawn();
     }
 
@@ -93,6 +99,15 @@ public class LevelManager : MonoBehaviour
 
         player.OnPlayerRespawn += Refresh;
         player.OnPlayerTeleported += Refresh;
+
+        CheckForUpgrades();
+    }
+
+    void CheckForUpgrades()
+    {
+        //The Giving Gem
+        if(gameManager.currentUser.equippedUpgrades.Contains(8902))
+            doubleGems = true;
     }
 
     void Update()
@@ -133,13 +148,13 @@ public class LevelManager : MonoBehaviour
         {
             if(CameraInZone(objectZone.position, objectZone.size))
             {
-                if(objectZone.objectsToToggle[0].activeSelf == false)
+                if(objectZone.objectsToToggle[0].activeInHierarchy == false)
                     for(int i = 0; i < objectZone.objectsToToggle.Count; i++)
                         objectZone.objectsToToggle[i].SetActive(true);
             }
             else
             {
-                if(objectZone.objectsToToggle[0].activeSelf == true)
+                if(objectZone.objectsToToggle[0].activeInHierarchy == true)
                     for(int i = 0; i < objectZone.objectsToToggle.Count; i++)
                         objectZone.objectsToToggle[i].SetActive(false);
             }
@@ -165,12 +180,17 @@ public class LevelManager : MonoBehaviour
     {
         return CameraHeight() * mainCamera.aspect;
     }
-
+    
+    //TEST THIS AND TEST IF SCREENSHOTS TEXT IS WORKING RIGHT
     public void AddGems(int gemsToGive)
     {
-        gems += gemsToGive;
-        GameManager.Instance.currentUser.gems += gemsToGive;
-        GameManager.Instance.currentUser.totalGemsCollected += gemsToGive;
+        if(doubleGems)
+            gems += gemsToGive * 2;
+        else
+            gems += gemsToGive;
+
+        gameManager.currentUser.gems += gemsToGive;
+        gameManager.currentUser.totalGemsCollected += gemsToGive;
         StatsHUD.Instance.UpdateGemsCounter(gems);
     }
 
@@ -189,9 +209,14 @@ public class LevelManager : MonoBehaviour
         currentSpawnPoint = position;
     }
     
+	Vector2 SnapVector(Vector2 v)
+	{
+		return new Vector2(Mathf.Round(v.x), Mathf.Round(v.y));
+	}
+
+    #if UNITY_EDITOR
     void OnValidate()
 	{
-#if UNITY_EDITOR
 		if(objectZones.Count == 0)
 			return;
 			
@@ -200,16 +225,10 @@ public class LevelManager : MonoBehaviour
 			objectZones[i].position = SnapVector(objectZones[i].position);
 			objectZones[i].size = SnapVector(objectZones[i].size);	
         }
-#endif
     }
-	private Vector2 SnapVector(Vector2 v)
-	{
-		return new Vector2(Mathf.Round(v.x), Mathf.Round(v.y));
-	}
 
     void OnDrawGizmos()
     {
-    #if UNITY_EDITOR
         Gizmos.color = new Color(0, 1, 0, 0.5f);
         Gizmos.DrawCube(levelStart.position, new Vector3(2, 2, 1));
         Gizmos.DrawCube(levelFinish.position, new Vector3(2, 2, 1));
@@ -276,8 +295,8 @@ public class LevelManager : MonoBehaviour
             }
         }
         //Gizmos.DrawSphere(new Vector3(transform.position.x - xDistance, transform.position.y, 0), 0.1f);
-    #endif
     }
+    #endif
 
     [Serializable]
     public class SpawnType

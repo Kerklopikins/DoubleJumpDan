@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 4445698611817820}
   - component: {fileID: 95564168219559970}
   - component: {fileID: -3200060728472508993}
+  - component: {fileID: -8188131948457993141}
   m_Layer: 0
   m_Name: Emoji Man
   m_TagString: Untagged
@@ -73,3 +74,17 @@ MonoBehaviour:
   description: A surprise everytime you play!
   picture: {fileID: 21300172, guid: fd62903050e1ca349bba8b53f64cbbda, type: 3}
   premiumItem: 1
+--- !u!114 &-8188131948457993141
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1863906000987150}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2a154ea4747eb5f4ba10e9064891ba4f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  eyeType: 5
+  eyeBrowType: 1

@@ -3,7 +3,6 @@ using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using System.Collections;
 using UnityEngine.InputSystem;
-using UnityEngine.InputSystem.UI;
 using UnityEngine.InputSystem.LowLevel;
 
 public class GameHUD: MonoBehaviour
@@ -48,6 +47,7 @@ public class GameHUD: MonoBehaviour
     public float crosshairsSmoothSpeed { get; set; }
     public static float referenceTime;
     float startDelay = 1;
+    Vector2 cursorVelocity;
     Player player;
     LocalWorldManager localWorldManager;
     RectTransform pauseButtonRect;
@@ -55,6 +55,7 @@ public class GameHUD: MonoBehaviour
     bool canToggleSettings;
     GunInfo gunInfo;
     GameInputManager gameInputManager;
+    GameManager gameManager;
     Camera _camera;
     Canvas canvas;
     Vector2 position;
@@ -70,6 +71,7 @@ public class GameHUD: MonoBehaviour
     bool crosshairsRed;
     SettingsManager settingsManager;
     Image cursorImage;
+    bool gameOver;
 
     void Awake()
     {
@@ -86,6 +88,7 @@ public class GameHUD: MonoBehaviour
         pauseButtonRect = pauseButton.GetComponent<RectTransform>();
         gameInputManager = GameInputManager.Instance;
         settingsManager = GetComponent<SettingsManager>();
+        gameManager = GameManager.Instance;
 
         player.OnPlayerKilled += PlayerKilled;
         player.OnPlayerRespawn += PlayerRespawn;
@@ -113,7 +116,7 @@ public class GameHUD: MonoBehaviour
             cursor.gameObject.SetActive(true);
             crosshairsParent.gameObject.SetActive(true);
         }
-
+        
         crosshairsSprite = crosshairs.GetComponent<SpriteRenderer>();
     }
 
@@ -141,6 +144,9 @@ public class GameHUD: MonoBehaviour
         }
         else
         {
+            if(gameInputManager.KeyboardOnly())
+                return;
+                
             Cursor.visible = true;
             cursor.gameObject.SetActive(false);
             crosshairsParent.gameObject.SetActive(false);
@@ -160,47 +166,35 @@ public class GameHUD: MonoBehaviour
             ///Main Cursor
             if(paused || finishedLevel || screenshotScript.frozen)
             {
-                input = gameInputManager.GetCursorMovement();
-
-                if(gameInputManager.FastCursorButton())
-                    _cursorSpeed = cursorSpeed * 2f;
-                else
-                    _cursorSpeed = cursorSpeed;
-
-                position += input * _cursorSpeed * Time.unscaledDeltaTime;
-
-                position.x = Mathf.Clamp(position.x, 0, Screen.width);
-                position.y = Mathf.Clamp(position.y, 0, Screen.height);
-
-                InputState.Change(Mouse.current.position, position);
-                InputState.Change(Mouse.current.delta, Vector2.zero);
-
-                screenPosition = Mouse.current.position.ReadValue();
-                RectTransformUtility.ScreenPointToLocalPointInRectangle(canvas.transform as RectTransform, screenPosition, canvas.worldCamera, out Vector2 localPosition);
-                cursor.anchoredPosition = localPosition;
-
-                if(gameInputManager.CursorClick())
-                    cursorImage.sprite = cursorSprites[1];
-                else
-                    cursorImage.sprite = cursorSprites[0];
+                if(gameInputManager.ControllerConnected())
+                    MoveCursor(gameInputManager.ControllerCursorMove(), gameInputManager.Click(), gameInputManager.ControllerFastCursor(), gameManager.useDPad);
+                else if(gameInputManager.KeyboardOnly())
+                    MoveCursor(gameInputManager.KeyboardCursorMove(), gameInputManager.Click(), gameInputManager.KeyboardFastCursor(), true);
             }
 
             ///Player Crosshairs
             if(!player.dead)
             {
-                Vector2 aimInput = gameInputManager.AimDirection();
-            
-                if(aimInput.magnitude > 0.1f)
+                if(!gameManager.lockAiming)
                 {
-                    float targetAngle = Mathf.Atan2(aimInput.y, aimInput.x) * Mathf.Rad2Deg;
-                    float rotationSpeed = crosshairsSmoothSpeed * aimInput.magnitude;
-                    currentAngle = Mathf.LerpAngle(currentAngle, targetAngle, Time.deltaTime * rotationSpeed);
-                }
-                
-                float angleRad = currentAngle * Mathf.Deg2Rad;
+                    Vector2 aimInput = gameInputManager.AimDirection();
+            
+                    if(aimInput.magnitude > 0.1f)
+                    {
+                        float targetAngle = Mathf.Atan2(aimInput.y, aimInput.x) * Mathf.Rad2Deg;
+                        float rotationSpeed = crosshairsSmoothSpeed * aimInput.magnitude;
+                        currentAngle = Mathf.LerpAngle(currentAngle, targetAngle, Time.deltaTime * rotationSpeed);
+                    }
+                    
+                    float angleRad = currentAngle * Mathf.Deg2Rad;
 
-                Vector2 direction = new Vector2(Mathf.Cos(angleRad), Mathf.Sin(angleRad));
-                crosshairs.localPosition = direction * maxCrosshairsRadius;   
+                    Vector2 direction = new Vector2(Mathf.Cos(angleRad), Mathf.Sin(angleRad));
+                    crosshairs.localPosition = direction * maxCrosshairsRadius;   
+                }
+                else
+                {
+                    crosshairs.localPosition = new Vector2(player.direction * maxCrosshairsRadius, player.aimPoint.localPosition.x + 0.125f);
+                }
             }
 
             crosshairsAnimationTimer -= Time.deltaTime;
@@ -264,6 +258,46 @@ public class GameHUD: MonoBehaviour
             
         if(gameInputManager.EscapeButtonDown())
             ToggleSettings(false);
+    }
+
+    void MoveCursor(Vector2 input, bool click, bool fastCursor, bool cursorSmoothing)
+    {
+        if(fastCursor)
+            _cursorSpeed = cursorSpeed * 2f;
+        else
+            _cursorSpeed = cursorSpeed;
+
+        Vector2 target = input * _cursorSpeed;
+        cursorVelocity = Vector2.Lerp(cursorVelocity, target, 1 - Mathf.Exp(-gameManager.cursorAcceleration * Time.unscaledDeltaTime));
+
+        if(cursorSmoothing)
+        {
+            if(input != Vector2.zero)
+                cursorVelocity += input * gameManager.cursorAcceleration * Time.unscaledDeltaTime;
+            else
+                cursorVelocity = Vector2.Lerp(cursorVelocity, Vector2.zero, gameManager.cursorDeceleration * Time.unscaledDeltaTime);
+            
+            position += cursorVelocity * Time.unscaledDeltaTime;
+        }
+        else
+        {
+            position += input * _cursorSpeed * Time.unscaledDeltaTime;
+        }
+
+        position.x = Mathf.Clamp(position.x, 0, Screen.width);
+        position.y = Mathf.Clamp(position.y, 0, Screen.height);
+
+        InputState.Change(Mouse.current.position, position);
+        InputState.Change(Mouse.current.delta, Vector2.zero);
+
+        screenPosition = Mouse.current.position.ReadValue();
+        RectTransformUtility.ScreenPointToLocalPointInRectangle(canvas.transform as RectTransform, screenPosition, canvas.worldCamera, out Vector2 localPosition);
+        cursor.anchoredPosition = localPosition;
+
+        if(click)
+            cursorImage.sprite = cursorSprites[1];
+        else
+            cursorImage.sprite = cursorSprites[0];
     }
 
     public bool IsCursorOverPauseButton()
@@ -384,7 +418,13 @@ public class GameHUD: MonoBehaviour
     public void LoadScene(string sceneToLoad)
     {
         if(canPause)
+        {
             LevelLoadingManager.Instance.LoadScene(sceneToLoad);
+            AudioManager.Instance.PlaySound2D(pauseSound);
+
+            for(int i = 0; i < pauseMenuButtons.Length; i++)
+                pauseMenuButtons[i].interactable = false;
+        }
     }
 
     public void LoadNextScene()
@@ -402,19 +442,39 @@ public class GameHUD: MonoBehaviour
             {
                 LevelLoadingManager.Instance.LoadScene(nextScene);
             }
+
+            AudioManager.Instance.PlaySound2D(pauseSound);
+
+            for(int i = 0; i < pauseMenuButtons.Length; i++)
+                pauseMenuButtons[i].interactable = false;
         }
     }
 
     public void Restart()
     {
         if(canPause)
+        {
             LevelLoadingManager.Instance.LoadScene(SceneManager.GetActiveScene().buildIndex);
+
+            if(!gameOver)
+                AudioManager.Instance.PlaySound2D(pauseSound);
+
+            for(int i = 0; i < pauseMenuButtons.Length; i++)
+                pauseMenuButtons[i].interactable = false;
+        }
     }
 
     public void LoadMainMenu()
     {
         if(canPause)
+        {
             LevelLoadingManager.Instance.LoadScene("Main Menu");
+            
+            AudioManager.Instance.PlaySound2D(pauseSound);
+            
+            for(int i = 0; i < pauseMenuButtons.Length; i++)
+                pauseMenuButtons[i].interactable = false;
+        }
     }
 
     public void ToggleSettings(bool open)
@@ -427,7 +487,10 @@ public class GameHUD: MonoBehaviour
         else if(!open && inSettings)
         {
             if(canToggleSettings)
+            {
                 StartCoroutine(DelaySettingsClose());
+                settingsManager.SaveSettings();
+            }
         }
     }
     IEnumerator DelaySettingsOpen()
@@ -522,5 +585,7 @@ public class GameHUD: MonoBehaviour
     {
 		AudioManager.Instance.PlaySound2D(gameOverSound);
 		gameOverAnimator.enabled = true;
+
+        gameOver = true;
     }
 }

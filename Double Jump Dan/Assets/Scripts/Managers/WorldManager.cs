@@ -23,16 +23,17 @@ public class WorldManager : MonoBehaviour
 
     [Header("Weather")]
     public Transform clouds;
-    [SerializeField] Color sunsetCloudTint;
-    [SerializeField] Color sunriseCloudTint;
+    public Color sunsetCloudTint;
+    public Color sunriseCloudTint;
     public GameObject dust;
     [SerializeField] MeshRenderer[] dustMeshes;
     public Transform snow;
 
     [Header("Distortion Effects")]
     [SerializeField] GameObject heatWave;
-
-    public event Action OnTimeOfDayChanged;
+    
+    public event Action OnInitialized;
+    public bool Initiated { get; private set; }
     float cloudEmissionOverTime;
     Camera _camera;
     ParticleSystem cloudParticleSystem;
@@ -42,6 +43,7 @@ public class WorldManager : MonoBehaviour
     MeshRenderer heatWaveMesh;
     ParticleSystem snowParticles;
     bool inMainMenu;
+    static int mainMenuTimeOfDayIndex = -1;
 
     void Awake()
     {
@@ -117,8 +119,9 @@ public class WorldManager : MonoBehaviour
             
             SetSkyAndMaterialsColor(1, 1, 1, 0);
         }
-
-        OnTimeOfDayChanged?.Invoke();
+        
+        Initiated = true;
+        OnInitialized?.Invoke();
     }
 
     Vector2 BackgroundWeatherScale()
@@ -152,7 +155,6 @@ public class WorldManager : MonoBehaviour
             emission.rateOverTime = cloudEmissionOverTime;
 
             cloudParticleSystemRenderer = clouds.GetComponent<ParticleSystemRenderer>();
-            cloudParticleSystemRenderer.material.color = new Color(mainMaterial.color.r, mainMaterial.color.g, mainMaterial.color.b, cloudParticleSystemRenderer.material.color.a);
 
             cloudParticleSystem.Stop();
             cloudParticleSystem.Play();
@@ -161,6 +163,8 @@ public class WorldManager : MonoBehaviour
                 cloudParticleSystemRenderer.material.color = new Color(sunsetCloudTint.r, sunsetCloudTint.g, sunsetCloudTint.b, cloudParticleSystemRenderer.material.color.a);
             else if(localWorldManager.timeOfDay == LocalWorldManager.TimeOfDay.Sunrise)
                 cloudParticleSystemRenderer.material.color = new Color(sunriseCloudTint.r, sunriseCloudTint.g, sunriseCloudTint.b, cloudParticleSystemRenderer.material.color.a);
+            else
+                cloudParticleSystemRenderer.material.color = new Color(mainMaterial.color.r, mainMaterial.color.g, mainMaterial.color.b, cloudParticleSystemRenderer.material.color.a);
         }
         else
         {
@@ -252,6 +256,9 @@ public class WorldManager : MonoBehaviour
         sun.transform.eulerAngles = new Vector3(0, 0, 0);
         moon.transform.eulerAngles = new Vector3(0, 0, 0);
         
+        if(stars.gameObject.activeInHierarchy)
+            stars.gameObject.SetActive(false);
+
         if(localWorldManager.weatherType != LocalWorldManager.WeatherType.Snowing)
             screenEffectsManager.SetTintColor(localWorldManager.dayTintColor);                
         
@@ -265,6 +272,9 @@ public class WorldManager : MonoBehaviour
         sunPivot.transform.localEulerAngles = new Vector3(0, 0, 0);
         sun.transform.eulerAngles = new Vector3(0, 0, 0);
         moon.transform.eulerAngles = new Vector3(0, 0, 0);
+
+        if(stars.gameObject.activeInHierarchy)
+            stars.gameObject.SetActive(false);
 
         if(localWorldManager.weatherType != LocalWorldManager.WeatherType.Snowing)
             screenEffectsManager.SetTintColor(localWorldManager.sunsetTintColor);
@@ -293,6 +303,9 @@ public class WorldManager : MonoBehaviour
     {
         sunPivot.SetActive(false);
 
+        if(stars.gameObject.activeInHierarchy)
+            stars.gameObject.SetActive(false);
+
         if(localWorldManager.weatherType != LocalWorldManager.WeatherType.Snowing)
             screenEffectsManager.SetTintColor(localWorldManager.sunriseTintColor);
 
@@ -303,6 +316,9 @@ public class WorldManager : MonoBehaviour
     {
         sun.SetActive(false);
 
+        if(stars.gameObject.activeInHierarchy)
+            stars.gameObject.SetActive(false);
+
         if(localWorldManager.weatherType != LocalWorldManager.WeatherType.Snowing)
             screenEffectsManager.SetTintColor(localWorldManager.overcastTintColor);
 
@@ -311,7 +327,29 @@ public class WorldManager : MonoBehaviour
 
     void SetRandomTimeOfDay()
     {
-        int timeIndex = UnityEngine.Random.Range(0, 4);
+        int timeIndex;
+
+        if(inMainMenu)
+        {
+            if(mainMenuTimeOfDayIndex == -1)
+            {
+                mainMenuTimeOfDayIndex = UnityEngine.Random.Range(0, 4);
+                timeIndex = mainMenuTimeOfDayIndex;
+            }
+            else
+            {
+                mainMenuTimeOfDayIndex++;
+
+                if(mainMenuTimeOfDayIndex > 3)
+                    mainMenuTimeOfDayIndex = 0;
+
+                timeIndex = mainMenuTimeOfDayIndex;
+            }
+        }
+        else
+        {
+            timeIndex = UnityEngine.Random.Range(0, 4);
+        }
 
         if(timeIndex == 0)
         {

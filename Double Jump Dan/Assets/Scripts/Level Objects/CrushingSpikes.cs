@@ -120,12 +120,12 @@ public class CrushingSpikes : MonoBehaviour
         spikeCollider.size = new Vector2(spriteRenderer.size.x - 0.5f, spriteRenderer.size.y - 0.5f);
     }
 
+    #if UNITY_EDITOR
     void OnValidate()
     {
         if(!editorMode)
             return;
             
-    #if UNITY_EDITOR
         if(length > 1)
             length = (int)Mathf.Round(length / 2) * 2;
 
@@ -133,12 +133,10 @@ public class CrushingSpikes : MonoBehaviour
             EditorApplication.delayCall += SetSize;
         
         lastAdjustment = length;
-    #endif
     }
 
     void OnDrawGizmos()
     {
-#if UNITY_EDITOR
         Gizmos.color = new Color(1, 0, 0, 0.5f);
         
         if(Application.isPlaying)
@@ -159,7 +157,6 @@ public class CrushingSpikes : MonoBehaviour
             if(sizeDirection == SizeDirection.Vertical)
                 Gizmos.DrawCube(new Vector3(transform.position.x, transform.position.y + endPoint, transform.position.z), new Vector3(spriteRenderer.size.x - 1.75f, spriteRenderer.size.y - 1.75f, 1));   
         }
-#endif
-
     }
+    #endif
 }

@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 4445698611817820}
   - component: {fileID: 95564168219559970}
   - component: {fileID: -1973979827161561548}
+  - component: {fileID: 5329734837805478970}
   m_Layer: 0
   m_Name: Custom Skin
   m_TagString: Untagged
@@ -70,6 +71,21 @@ MonoBehaviour:
   itemType: 2
   itemID: 9999
   price: 300
-  description: 
+  description: Your very own custom skin! Change the colors to anything you can imagine,
+    and switch between various eye types.
   picture: {fileID: -1370817795, guid: fd62903050e1ca349bba8b53f64cbbda, type: 3}
   premiumItem: 1
+--- !u!114 &5329734837805478970
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1863906000987150}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2a154ea4747eb5f4ba10e9064891ba4f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  eyeType: 4
+  eyeBrowType: 1

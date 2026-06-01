@@ -25,21 +25,6 @@ public class Pendulum : MonoBehaviour
         SetSize();
     }
 
-    void OnValidate()
-    {   
-    #if UNITY_EDITOR
-        if(!editorMode)
-            return;
-
-        length = (int)Mathf.Round(length / 2) * 2;
-
-        if(lastAdjustment != length)
-            EditorApplication.delayCall += SetSize;
-
-        lastAdjustment = length;
-    #endif
-    }
-
     void SetSize()
     {
         middleSegmant.size = new Vector2(middleSegmant.size.x, length);
@@ -54,6 +39,20 @@ public class Pendulum : MonoBehaviour
         float angle = Mathf.Lerp(startRotation, endRotation, t);
         pivot.transform.localEulerAngles = new Vector3(0, 0, angle);
 	}
+
+    #if UNITY_EDITOR
+    void OnValidate()
+    {   
+        if(!editorMode)
+            return;
+
+        length = (int)Mathf.Round(length / 2) * 2;
+
+        if(lastAdjustment != length)
+            EditorApplication.delayCall += SetSize;
+
+        lastAdjustment = length;
+    }
 
     void OnDrawGizmos()
     {
@@ -89,4 +88,5 @@ public class Pendulum : MonoBehaviour
         ////End part
         Gizmos.DrawCube(new Vector3(0, -_length + 1, 0), new Vector3(6, 2, 1));
     }
+    #endif
 }

@@ -9,32 +9,42 @@ public class TimeOfDayMaterialChanger : MonoBehaviour
     MeshRenderer meshRenderer;
     SpriteRenderer spriteRenderer;
     ParticleSystemRenderer particleSystemRenderer;
- 
+	
 	void Start() 
 	{
 		worldManager = WorldManager.Instance;
-		worldManager.OnTimeOfDayChanged += UpdateMaterialColor;
+		
+		if(worldManager.Initiated)
+            UpdateMaterialColor();
+        else
+            worldManager.OnInitialized += UpdateMaterialColor;
 	}
 
 	public void UpdateMaterialColor()
 	{
 		if(rendererType == RendererType.Mesh)
 		{
-			meshRenderer = GetComponent<MeshRenderer>();
+			if(meshRenderer == null)
+				meshRenderer = GetComponent<MeshRenderer>();
+
 			meshRenderer.material.color = new Color(worldManager.mainMaterial.color.r, worldManager.mainMaterial.color.g, worldManager.mainMaterial.color.b, meshRenderer.material.color.a);
 			return;
 		}
 
 		if(rendererType == RendererType.Sprite)
 		{
-			spriteRenderer = GetComponent<SpriteRenderer>();
+			if(spriteRenderer == null)
+				spriteRenderer = GetComponent<SpriteRenderer>();
+
 			spriteRenderer.color = new Color(worldManager.mainMaterial.color.r, worldManager.mainMaterial.color.g, worldManager.mainMaterial.color.b, spriteRenderer.color.a);
 			return;
 		}
 
 		if(rendererType == RendererType.Particle)
 		{
-			particleSystemRenderer = GetComponent<ParticleSystemRenderer>();
+			if(particleSystemRenderer == null)
+				particleSystemRenderer = GetComponent<ParticleSystemRenderer>();
+
 			particleSystemRenderer.material.color = new Color(worldManager.mainMaterial.color.r, worldManager.mainMaterial.color.g, worldManager.mainMaterial.color.b, particleSystemRenderer.material.color.a);
 			return;
 		}

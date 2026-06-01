@@ -1,10 +1,10 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
-
+using System;
 public class UserButton : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IPointerUpHandler, IPointerDownHandler, IPointerClickHandler
 {
-    [SerializeField] Text fileSizeText;
+    [SerializeField] Text playtimeCounterText;
     public Text usernameText;
     [SerializeField] Shadow[] dropShadows;
     [SerializeField] AudioClip buttonClick;
@@ -21,6 +21,7 @@ public class UserButton : MonoBehaviour, IPointerEnterHandler, IPointerExitHandl
     bool isPointerDown;
     Image buttonImage;
     MainMenuManager mainMenuManager;
+    bool isCurrentUser;
 
 	void Start() 
 	{
@@ -42,12 +43,11 @@ public class UserButton : MonoBehaviour, IPointerEnterHandler, IPointerExitHandl
         SetTextColorAndShadow();
 
         usernameText.text = userName;
+        playtimeCounterText.text = GetTotalPlaytimeString(user.totalPlaytime);
+
         gameObject.name = userName;
         
         Refresh();
-
-        userMenu.OnUserByteSizeRefresh += RefreshUserByteSize;
-        RefreshUserByteSize();
 
         userMenu.OnUserButtonsRefresh += Refresh;
         userMenu.OnButtonsDisabled += ButtonDisable;
@@ -57,18 +57,12 @@ public class UserButton : MonoBehaviour, IPointerEnterHandler, IPointerExitHandl
     
     public void Remove()
     {
-        userMenu.OnUserByteSizeRefresh -= RefreshUserByteSize;
-
         userMenu.OnUserButtonsRefresh -= Refresh;
         userMenu.OnButtonsDisabled -= ButtonDisable;
+        
         Destroy(gameObject);
     }
-    public void RefreshUserByteSize()
-    {
-        int userFileSize = gameManager.LoadUserFileSize(user.userID) - 217;
-        userFileSize = Mathf.Clamp(userFileSize, 0, 200000);
-		fileSizeText.text = userFileSize.ToString() + " Bytes";
-    }
+    
     public void Refresh()
     {        
         if(gameManager.currentUser.userID == user.userID)
@@ -77,17 +71,19 @@ public class UserButton : MonoBehaviour, IPointerEnterHandler, IPointerExitHandl
             userMenu.previousUserColorIndex = colorIndex;
             userMenu.colorSelectionIndex = colorIndex;
             
-            fileSizeText.fontSize = 30;
+            playtimeCounterText.fontSize = 30;
             usernameText.fontSize = 30;
 
             button.interactable = false;
+            isCurrentUser = true;
         }
         else
         {
-            fileSizeText.fontSize = 25;
+            playtimeCounterText.fontSize = 25;
             usernameText.fontSize = 25;
 
             button.interactable = true;
+            isCurrentUser = false;
         }
     }
 
@@ -123,11 +119,14 @@ public class UserButton : MonoBehaviour, IPointerEnterHandler, IPointerExitHandl
             for(int i = 0; i < dropShadows.Length; i++)
                 dropShadows[i].enabled = true;
 
-        fileSizeText.color = TextColor();
+        playtimeCounterText.color = TextColor();
         usernameText.color = TextColor();
     }
     void Update()
     {
+        if(isCurrentUser)
+            playtimeCounterText.text = GetTotalPlaytimeString(gameManager.currentUser.totalPlaytime);
+
         if(!button.interactable)
         {
             SetDisabled();
@@ -142,6 +141,26 @@ public class UserButton : MonoBehaviour, IPointerEnterHandler, IPointerExitHandl
             SetPressed();
         else
             SetNormal();
+    }
+
+    string GetTotalPlaytimeString(double value)
+    {
+        TimeSpan t = TimeSpan.FromSeconds(value);
+
+        string formatted = "";
+
+        if(t.Days > 0)
+            formatted += t.Days + "d ";
+        
+        if(t.Hours > 0)
+            formatted += t.Hours + "h ";
+
+        if(t.Minutes > 0)
+            formatted += t.Minutes + "m ";
+        
+        formatted += t.Seconds + "s ";
+
+        return formatted;
     }
 
     Color TextColor()
@@ -181,21 +200,21 @@ public class UserButton : MonoBehaviour, IPointerEnterHandler, IPointerExitHandl
     {
         buttonImage.sprite = normalSprite;
         usernameText.color = TextColor();
-        fileSizeText.color = TextColor();
+        playtimeCounterText.color = TextColor();
     }
 
     void SetHighlighted()
     {
         buttonImage.sprite = highlightedSprite;
         usernameText.color = Color.white;
-        fileSizeText.color = Color.white;
+        playtimeCounterText.color = Color.white;
     }
 
     void SetPressed()
     {
         buttonImage.sprite = highlightedSprite;
         usernameText.color = Color.white;
-        fileSizeText.color = Color.white;
+        playtimeCounterText.color = Color.white;
     }
 
     void SetDisabled()
@@ -204,13 +223,13 @@ public class UserButton : MonoBehaviour, IPointerEnterHandler, IPointerExitHandl
         {
             buttonImage.sprite = highlightedSprite;
             usernameText.color = Color.white;
-            fileSizeText.color = Color.white;
+            playtimeCounterText.color = Color.white;
         }
         else
         {
             buttonImage.sprite = disabledSprite;
             usernameText.color = TextColor();
-            fileSizeText.color = TextColor();
+            playtimeCounterText.color = TextColor();
         }
     }
 }

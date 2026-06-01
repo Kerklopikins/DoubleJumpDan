@@ -411,6 +411,7 @@ public class Gun : MonoBehaviour
             yield return null;
         }
 
+        transform.localEulerAngles = initialRot;
         gunInfo.Reload();
         reloading = false;
 
@@ -425,6 +426,7 @@ public class Gun : MonoBehaviour
             bullets[i].localScale = new Vector3(0, 1, 1);
     }
 
+    #if UNITY_EDITOR
     void OnDrawGizmos()
     {
         if(projectileFirePoints[0] == null)
@@ -449,4 +451,5 @@ public class Gun : MonoBehaviour
 
         Gizmos.DrawWireSphere(spawnPosition, 0.25f);
     }
+    #endif
 }
