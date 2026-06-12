@@ -279,7 +279,7 @@ MonoBehaviour:
     duration: 1
     noisePercent: 0.25
     dampingPercent: 0
-    rotationPercent: 0
+    rotationPercent: 0.05
   lowRumbleAmount: 0.6
   highRumbleAmount: 1
   rumbleDuration: 0.5

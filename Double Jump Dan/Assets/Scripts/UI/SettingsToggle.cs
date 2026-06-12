@@ -7,7 +7,7 @@ public class SettingsToggle : MonoBehaviour, IPointerClickHandler
     [SerializeField] SettingsManager settingsManager;
     [SerializeField] SettingType settingType;
     
-    public enum SettingType { PostProcessing, DistortionEffects, WeatherEffects, Fullscreen, VSync, ShowFPS, ControllerVibration, JoystickSwap, UseDPad, LockAiming, CameraShake }
+    public enum SettingType { PostProcessing, DistortionEffects, WeatherEffects, Fullscreen, VSync, ShowFPS, ControllerVibration, JoystickSwap, UseDPad, LockAiming, CameraShake, MotionBlur }
     GameManager gameManager;
     Toggle toggle;
 
@@ -56,6 +56,9 @@ public class SettingsToggle : MonoBehaviour, IPointerClickHandler
             break;
             case SettingType.CameraShake:
             ToggleCameraShake();
+            break;
+            case SettingType.MotionBlur:
+            ToggleMotionBlur();
             break;
         }
 	}
@@ -123,5 +126,11 @@ public class SettingsToggle : MonoBehaviour, IPointerClickHandler
     void ToggleCameraShake()
     {
         gameManager.cameraShake = !gameManager.cameraShake;
+    }
+
+    void ToggleMotionBlur()
+    {
+        gameManager.motionBlur = !gameManager.motionBlur;
+        ScreenEffectsManager.Instance.UpdatePostProcessing();
     }
 }

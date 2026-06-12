@@ -5,6 +5,11 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using UnityEngine.InputSystem;
+using System;
+
+#if UNITY_STANDALONE_WIN || UNITY_EDITOR_WIN
+using UnityEngine.Windows.Speech;
+#endif
 
 public class DevControls : MonoBehaviour
 {   
@@ -14,6 +19,11 @@ public class DevControls : MonoBehaviour
     [SerializeField] GameObject devModeUI;
     [SerializeField] Text messageText;
     [SerializeField] InputField textField;
+
+#if UNITY_STANDALONE_WIN || UNITY_EDITOR_WIN
+    Dictionary<string, Action> keywordActions = new Dictionary<string, Action>();
+    KeywordRecognizer keywordRecognizer;
+#endif
 
     WorldManager worldManager;
     List<Parallax> parallaxes = new List<Parallax>();
@@ -29,8 +39,61 @@ public class DevControls : MonoBehaviour
     Vector2 lastScreenSize;
     float screenSizeCheckTimer;
     public enum LevelType { Normal, MainMenu }
+    bool invincible;
+    bool isWindows10OrNewer;
+    int numberFromVoiceCommand;
+
     void Start()
     {
+        Version version = Environment.OSVersion.Version;
+        isWindows10OrNewer = (Application.platform == RuntimePlatform.WindowsEditor || Application.platform == RuntimePlatform.WindowsPlayer) && version.Major >= 10;
+
+    #if UNITY_STANDALONE_WIN || UNITY_EDITOR_WIN
+        LevelLoadingManager.Instance.OnLevelLoading += DisposeOfKeywordRecognizer;
+
+        if(isWindows10OrNewer)
+        {
+            keywordActions.Add("invincible true", InvincibleTrue);
+            keywordActions.Add("invincible false", InvincibleFalse);
+            keywordActions.Add("heal", Heal);
+            keywordActions.Add("game over", GameOver);
+            keywordActions.Add("kill all", KillAll);
+            keywordActions.Add("daytime", ToggleDay);
+            keywordActions.Add("sunset", ToggleSunset);
+            keywordActions.Add("night", ToggleNight);
+            keywordActions.Add("sunrise", ToggleSunrise);
+            keywordActions.Add("overcast", ToggleOvercast);
+
+            keywordActions.Add("dust on", DustOn);
+            keywordActions.Add("dust off", DustOff);
+
+            keywordActions.Add("snow on", SnowOn);
+            keywordActions.Add("snow off", SnowOff);
+
+            keywordActions.Add("clouds on", CloudsOn);
+            keywordActions.Add("clouds off", CloudsOff);
+
+            keywordActions.Add("change gun", ChangeGun);
+            keywordActions.Add("change hat", ChangeHat);
+            keywordActions.Add("change skin", ChangeSkin);
+
+            keywordActions.Add("load scene zero", LoadScene);
+            keywordActions.Add("load scene one", LoadScene);
+            keywordActions.Add("load scene two", LoadScene);
+            keywordActions.Add("load scene three", LoadScene);
+            keywordActions.Add("load scene four", LoadScene);
+            keywordActions.Add("load scene five", LoadScene);
+            keywordActions.Add("load scene six", LoadScene);
+            keywordActions.Add("load scene seven", LoadScene);
+            keywordActions.Add("load scene eight", LoadScene);
+            keywordActions.Add("load scene nine", LoadScene);
+            keywordActions.Add("load scene ten", LoadScene);
+
+            keywordRecognizer = new KeywordRecognizer(keywordActions.Keys.ToArray());
+            keywordRecognizer.OnPhraseRecognized += OnKeywordsRecognized;   
+        }
+    #endif
+
         if(levelType == LevelType.Normal)
         {
             if(enableTestingMode)
@@ -43,6 +106,44 @@ public class DevControls : MonoBehaviour
             }
         }
     }
+
+#if UNITY_STANDALONE_WIN || UNITY_EDITOR_WIN
+    void OnKeywordsRecognized(PhraseRecognizedEventArgs args)
+    {
+        if(isWindows10OrNewer)
+        {                
+            if(args.text.Contains("zero"))
+                numberFromVoiceCommand = 0;
+            else if(args.text.Contains("one"))
+                numberFromVoiceCommand = 1;
+            else if(args.text.Contains("two"))
+                numberFromVoiceCommand = 2;
+            else if(args.text.Contains("three"))
+                numberFromVoiceCommand = 3;
+            else if(args.text.Contains("four"))
+                numberFromVoiceCommand = 4;
+            else if(args.text.Contains("five"))
+                numberFromVoiceCommand = 5;
+            else if(args.text.Contains("six"))
+                numberFromVoiceCommand = 6;
+            else if(args.text.Contains("seven"))
+                numberFromVoiceCommand = 7;
+            else if(args.text.Contains("eight"))
+                numberFromVoiceCommand = 8;
+            else if(args.text.Contains("nine"))
+                numberFromVoiceCommand = 9;
+            else if(args.text.Contains("ten"))
+                numberFromVoiceCommand = 10;
+            else
+                numberFromVoiceCommand = -1;
+
+            keywordActions[args.text].Invoke();
+
+            textField.text = "";
+            StartCoroutine(ClearMessageText());
+        }
+    }
+#endif
 
     void Update()
     {   
@@ -92,18 +193,24 @@ public class DevControls : MonoBehaviour
             {
                 if(enteredDevMode)
                 {
+                #if UNITY_STANDALONE_WIN || UNITY_EDITOR_WIN
+                    if(isWindows10OrNewer)
+                        keywordRecognizer.Start();
+                #endif
                     textField.Select();
                     gameHUD.enabled = false;
                     screenshot.enabled = false;
                     player.enabled = false;
-                    Time.timeScale = 0;
                 }
                 else
                 {
+                #if UNITY_STANDALONE_WIN || UNITY_EDITOR_WIN
+                    if(isWindows10OrNewer)
+                        keywordRecognizer.Stop();
+                #endif
                     gameHUD.enabled = true;
                     screenshot.enabled = true;
                     player.enabled = true;
-                    Time.timeScale = timeScale;
                 }
                 
                 messageText.text = "Entered Dev Mode";
@@ -171,8 +278,6 @@ public class DevControls : MonoBehaviour
                 }
                 else if(commandString.ToLower().Contains("invincible"))
                 {
-                    bool invincible;
-
                     if(commandString.ToLower().Contains("true"))
                         invincible = true;
                     else if(commandString.ToLower().Contains("false"))
@@ -192,66 +297,48 @@ public class DevControls : MonoBehaviour
                     value = Mathf.Clamp(value, 0, SceneManager.sceneCountInBuildSettings - 1);
                     int roundedValue = Mathf.RoundToInt(value);
                     LevelLoadingManager.Instance.LoadScene(roundedValue);
+
                     messageText.text = "Loading scene";
                 }
                 else if(commandString.ToLower().Contains("heal"))
                 {
-                    //The Golden Heart
-                    player.lives = GameManager.Instance.currentUser.equippedUpgrades.Contains(5480) ? 4 : 3;
-                    player.GiveHealth(player.health);
-                    StatsHUD.Instance.PlayerKilled();
-                    messageText.text = "Max lives and health";
+                    Heal();
                 }
                 else if(commandString.ToLower().Contains("gameover"))
                 {
-                    player.lives = 1;
-                    player.Kill();
-                    messageText.text = "Now that wasn't very nice";
+                    GameOver();
                 }
                 else if(commandString.ToLower().Contains("killall"))
                 {
-                    healths = new List<Health>(FindObjectsByType<Health>(FindObjectsInactive.Exclude, FindObjectsSortMode.None));
-
-                    if(healths.Count > 0)
-                        foreach(var health in healths)
-                            if(health.gameObject.activeInHierarchy)
-                                health.Kill();
-                    
-                    healths.Clear();
-                    messageText.text = "All enemies killed";
+                    KillAll();
                 }
-                else if(commandString.ToLower().Contains("day"))
+                else if(commandString.ToLower().Contains("daytime"))
                 {
                     ToggleDay();
-                    messageText.text = "Time of day set to day";
                 }
                 else if(commandString.ToLower().Contains("sunset"))
                 {
                     ToggleSunset();
-                    messageText.text = "Time of day set to sunset";
                 }
                 else if(commandString.ToLower().Contains("night"))
                 {
                     ToggleNight();
-                    messageText.text = "Time of day set to night";
                 }
                 else if(commandString.ToLower().Contains("sunrise"))
                 {
                     ToggleSunrise();
-                    messageText.text = "Time of day set to sunrise";
                 }
                 else if(commandString.ToLower().Contains("overcast"))
                 {
                     ToggleOvercast();
-                    messageText.text = "Sky set to overcast";
                 }
                 else if(commandString.ToLower().Contains("dust"))
                 {
                     bool on;
 
-                    if(commandString.ToLower().Contains("true"))
+                    if(commandString.ToLower().Contains("on"))
                         on = true;
-                    else if(commandString.ToLower().Contains("false"))
+                    else if(commandString.ToLower().Contains("off"))
                         on = false;
                     else
                         on = false;
@@ -267,9 +354,9 @@ public class DevControls : MonoBehaviour
                 {
                     bool on;
 
-                    if(commandString.ToLower().Contains("true"))
+                    if(commandString.ToLower().Contains("on"))
                         on = true;
-                    else if(commandString.ToLower().Contains("false"))
+                    else if(commandString.ToLower().Contains("off"))
                         on = false;
                     else
                         on = false;
@@ -285,9 +372,9 @@ public class DevControls : MonoBehaviour
                 {
                     bool on;
 
-                    if(commandString.ToLower().Contains("true"))
+                    if(commandString.ToLower().Contains("on"))
                         on = true;
-                    else if(commandString.ToLower().Contains("false"))
+                    else if(commandString.ToLower().Contains("off"))
                         on = false;
                     else
                         on = false;
@@ -302,7 +389,22 @@ public class DevControls : MonoBehaviour
                 else if(commandString.ToLower().Contains("resize"))
                 {
                     ResizeBGAndPosUI();
-                    messageText.text = "Background, Screen Effects, and UI resized and refreshed";
+                }
+                else if(commandString.ToLower().Contains("changegun"))
+                {
+                    ChangeGun();
+                }
+                else if(commandString.ToLower().Contains("changehat"))
+                {
+                    ChangeHat();
+                }
+                else if(commandString.ToLower().Contains("changeskin"))
+                {
+                    ChangeSkin();
+                }
+                else
+                {
+                    messageText.text = "Invalid command";
                 }
 
                 StartCoroutine(ClearMessageText());
@@ -310,6 +412,111 @@ public class DevControls : MonoBehaviour
             }
         }
     }
+
+    #region Voice Commands
+
+    #if UNITY_STANDALONE_WIN || UNITY_EDITOR_WIN
+    void DisposeOfKeywordRecognizer()
+    {
+        if(isWindows10OrNewer)
+        {
+            if(keywordRecognizer.IsRunning)
+                keywordRecognizer.Stop();
+
+            if(keywordRecognizer != null)
+                keywordRecognizer.Dispose();
+        }
+    }
+    #endif
+
+    void LoadScene()
+    {
+        LevelLoadingManager.Instance.LoadScene(numberFromVoiceCommand);
+    }
+
+    void Heal()
+    {
+         //The Golden Heart
+        player.lives = GameManager.Instance.currentUser.equippedUpgrades.Contains(5480) ? 4 : 3;
+        player.GiveHealth(player.health);
+        StatsHUD.Instance.PlayerKilled();
+        messageText.text = "Max lives and health";
+    }
+
+    void GameOver()
+    {
+        player.lives = 1;
+        player.Kill();
+        messageText.text = "Now that wasn't very nice";
+    }
+
+    void KillAll()
+    {
+        healths = new List<Health>(FindObjectsByType<Health>(FindObjectsInactive.Exclude, FindObjectsSortMode.None));
+
+        if(healths.Count > 0)
+            foreach(var health in healths)
+                if(health.gameObject.activeInHierarchy)
+                    health.Kill();
+        
+        healths.Clear();
+        messageText.text = "All enemies killed";
+    }
+
+#if UNITY_STANDALONE_WIN || UNITY_EDITOR_WIN
+    void InvincibleTrue()
+    {
+        invincible = true;
+        messageText.text = "Player invincible is set to true";
+
+        player.invincible = invincible;
+    }
+
+    void InvincibleFalse()
+    {
+        invincible = false;
+        messageText.text = "Player invincible is set to false";
+
+        player.invincible = invincible;
+    }
+
+    void DustOn()
+    {
+        ToggleDust(true);
+        messageText.text = "Dust enabled";
+    }
+
+    void DustOff()
+    {
+        ToggleDust(false);
+        messageText.text = "Dust disabled";
+    }
+
+    void SnowOn()
+    {
+        ToggleSnow(true);
+        messageText.text = "Snow enabled";
+    }
+
+    void SnowOff()
+    {
+        ToggleSnow(false);
+        messageText.text = "Snow disabled";
+    }
+
+    void CloudsOn()
+    {
+        ToggleClouds(true);
+        messageText.text = "Clouds enabled";
+    }
+
+    void CloudsOff()
+    {
+        ToggleClouds(false);
+        messageText.text = "Clouds disabled";
+    }
+#endif
+    #endregion
 
     IEnumerator ClearMessageText()
     {
@@ -319,6 +526,7 @@ public class DevControls : MonoBehaviour
 
     public void ResizeBGAndPosUI()
     {
+        messageText.text = "Background, Screen Effects, and UI resized and refreshed";
         worldManager.UpdatePositionAndScale();
         LevelLoadingManager.Instance.ResizeFadeBackground();
         StatsHUD.Instance.PositionUI();
@@ -328,37 +536,35 @@ public class DevControls : MonoBehaviour
             parallax.OffsetBackground();    
     }
 
-    public void SpawnGun()
+    public void ChangeGun()
     {
         GameObject oldGun = GameObject.Find("Arm 2").GetComponentInChildren<GunInfo>().gameObject;
         GameObject.Find("Arm 2").transform.localEulerAngles = new Vector3(0, 0, 90);
         oldGun.SetActive(false);
         
-        Item randomItem = itemManager.guns[Random.Range(0, itemManager.guns.Count)];
+        Item randomItem = itemManager.guns[UnityEngine.Random.Range(0, itemManager.guns.Count)];
         itemManager.InstantiateGun(randomItem);
-        messageText.text = "Spawned " + randomItem.gameObject.name;
+        messageText.text = "Changed gun to " + randomItem.gameObject.name;
         StartCoroutine(ClearMessageText());
     }
 
-    public void SpawnHat()
+    public void ChangeHat()
     {
         Item[] items = player.GetComponentsInChildren<Item>();
-
-        print(items.Length);
 
         foreach(Item item in items)
             if(item.itemType == Item.ItemType.Hat)
                 item.gameObject.SetActive(false);
             
-        Item randomItem = itemManager.hats[Random.Range(0, itemManager.hats.Count)];
+        Item randomItem = itemManager.hats[UnityEngine.Random.Range(0, itemManager.hats.Count)];
         itemManager.InstantiateHat(randomItem);
-        messageText.text = "Spawned " + randomItem.gameObject.name;
+        messageText.text = "Changed hat to " + randomItem.gameObject.name;
         StartCoroutine(ClearMessageText());
     }
 
     public void ChangeSkin()
     {
-        Item randomItem = itemManager.skins[Random.Range(0, itemManager.skins.Count)];
+        Item randomItem = itemManager.skins[UnityEngine.Random.Range(0, itemManager.skins.Count)];
         
         ////Shadow dan
         if(randomItem.itemID != 1757)
@@ -373,6 +579,8 @@ public class DevControls : MonoBehaviour
 
     public void ToggleDay()
     {
+        messageText.text = "Time of day set to day";
+
         worldManager.SetDay();
         worldManager.stars.gameObject.SetActive(false);
 
@@ -395,6 +603,8 @@ public class DevControls : MonoBehaviour
 
     public void ToggleSunset()
     {
+        messageText.text = "Time of day set to sunset";
+
         worldManager.SetSunset();
         worldManager.stars.gameObject.SetActive(false);
 
@@ -417,6 +627,8 @@ public class DevControls : MonoBehaviour
 
     public void ToggleNight()
     {
+        messageText.text = "Time of day set to night";
+
         worldManager.SetNight();
         worldManager.stars.gameObject.SetActive(true);
 
@@ -439,6 +651,8 @@ public class DevControls : MonoBehaviour
 
     public void ToggleSunrise()
     {
+        messageText.text = "Time of day set to sunrise";
+        
         worldManager.SetSunrise();
         worldManager.stars.gameObject.SetActive(false);
 
@@ -461,6 +675,8 @@ public class DevControls : MonoBehaviour
 
     public void ToggleOvercast()
     {
+        messageText.text = "Sky set to overcast";
+
         worldManager.SetOvercast();
 
         foreach(TimeOfDayMaterialChanger changer in timeMatChangers)

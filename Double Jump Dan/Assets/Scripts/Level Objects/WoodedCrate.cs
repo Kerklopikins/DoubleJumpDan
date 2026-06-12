@@ -31,19 +31,19 @@ public class WoodedCrate : MonoBehaviour
             for(int i = 0; i < pieces.Length; i++)
             {
                 pieces[i].gameObject.SetActive(true);
-                StartCoroutine(ExplodeCrate(pieces[i].gameObject));
+                StartCoroutine(ExplodeCrate(pieces[i].transform));
             }
 
             initiated = true;
         }       
     }
 
-    IEnumerator ExplodeCrate(GameObject piece)
+    IEnumerator ExplodeCrate(Transform piece)
     {
         StartCoroutine(ScalePiecesOverTime(piece));
 
         float direction = Random.value > 0.5f ? 1 : -1;
-        Vector3 startPosition = piece.transform.position;
+        Vector3 startPosition = piece.position;
         float flingHeight = Random.Range(flingHeightMinMax.x, flingHeightMinMax.y);
 
         Vector3 flingEnd = startPosition + new Vector3(direction * Random.Range(flingEndMinMax.x, flingEndMinMax.y), -10, 0);
@@ -70,30 +70,29 @@ public class WoodedCrate : MonoBehaviour
             previousX2 = previousX;
             previousDeltaTime2 = previousDeltaTime;
 
-            previousY = piece.transform.position.y;
-            previousX = piece.transform.position.x;
+            previousY = piece.position.y;
+            previousX = piece.position.x;
             previousDeltaTime = Time.deltaTime;
 
-            piece.transform.position = position;
-            piece.transform.Rotate(0, 0, direction * rotationSpeed * Time.deltaTime);
+            piece.position = position;
+            piece.Rotate(0, 0, -direction * rotationSpeed * Time.deltaTime);
 
             yield return null;
         }
 
-
-        float velocityY1 = Time.deltaTime > 0 ? (piece.transform.position.y - previousY) / Time.deltaTime : 0;
+        float velocityY1 = Time.deltaTime > 0 ? (piece.position.y - previousY) / Time.deltaTime : 0;
         float velocityY2 = previousDeltaTime2 > 0 ? (previousY - previousY2) / previousDeltaTime2 : 0;
         
         float initialVelocityY = (velocityY1 + velocityY2) / 2;
 
-        float velocityX1 = Time.deltaTime > 0 ? (piece.transform.position.x - previousX) / Time.deltaTime : 0;
+        float velocityX1 = Time.deltaTime > 0 ? (piece.position.x - previousX) / Time.deltaTime : 0;
         float velocityX2 = previousDeltaTime2 > 0 ? (previousX - previousX2) / previousDeltaTime2 : 0;
         float initialVelocityX = (velocityX1 + velocityX2) / 2;
 
         float gravity = -18;
         float fallElapsed = 0;
         float fallDuration = 0.5f;
-        Vector3 landedPosition = piece.transform.position;
+        Vector3 landedPosition = piece.position;
 
         while(fallElapsed < fallDuration)
         {
@@ -101,8 +100,8 @@ public class WoodedCrate : MonoBehaviour
             float yOffset = initialVelocityY * fallElapsed + 0.5f * gravity * fallElapsed * fallElapsed;
             float xOffset = initialVelocityX * fallElapsed;
 
-            piece.transform.position = new Vector3(landedPosition.x + xOffset, landedPosition.y + yOffset, landedPosition.z);
-            piece.transform.Rotate(0, 0, direction * 500 * Time.deltaTime);
+            piece.position = new Vector3(landedPosition.x + xOffset, landedPosition.y + yOffset, landedPosition.z);
+            piece.Rotate(0, 0, -direction * rotationSpeed * Time.deltaTime);
             yield return null;
         }
 
@@ -111,7 +110,7 @@ public class WoodedCrate : MonoBehaviour
         Destroy(gameObject);
     }
 
-    IEnumerator ScalePiecesOverTime(GameObject piece)
+    IEnumerator ScalePiecesOverTime(Transform piece)
     {
         float duration = Random.Range(durationMinMax.x * 1.5f, durationMinMax.y * 1.5f);
         float inTime = 0;
@@ -122,7 +121,7 @@ public class WoodedCrate : MonoBehaviour
             float t = Mathf.Clamp01(inTime / duration);
             float easedT = 1 - (1 - t) * (1 - t);
 
-            piece.transform.localScale = Vector2.Lerp(Vector2.one, Vector2.zero, easedT);
+            piece.localScale = Vector2.Lerp(Vector2.one, Vector2.zero, easedT);
             yield return null;
         }
     }

@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 using UnityEngine.SceneManagement;
 using System.Collections;
 using UnityEngine.InputSystem.UI;
@@ -10,6 +11,7 @@ public class LevelLoadingManager : MonoBehaviour
     [SerializeField] Sprite[] gameOverLoadingDanSprites;
     [SerializeField] bool startClear;
 
+    public event Action OnLevelLoading;
     public bool animationFinished { get; set; }
     public bool Busy { get; set; }
 	public SpriteRenderer fadeSprite { get; set; }
@@ -237,6 +239,8 @@ public class LevelLoadingManager : MonoBehaviour
         ResizeFadeBackground();		
         StartCoroutine(LoadSceneSlowly(sceneToLoad));
         StartCoroutine(FadeInCo());
+
+        OnLevelLoading?.Invoke();
     }
 
     public void LoadScene(string sceneToLoad)
@@ -249,6 +253,8 @@ public class LevelLoadingManager : MonoBehaviour
         ResizeFadeBackground();		
         StartCoroutine(LoadSceneSlowly(sceneToLoad));
         StartCoroutine(FadeInCo());
+
+        OnLevelLoading?.Invoke();
     }
 
     IEnumerator LoadSceneSlowly(int sceneToLoad)

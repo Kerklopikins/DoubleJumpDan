@@ -37,7 +37,7 @@ AnimationClip:
   - serializedVersion: 2
     curve:
     - time: 0
-      value: {fileID: 21300800, guid: a84efda117f28ec47ace744a727c2bed, type: 3}
+      value: {fileID: 1615400089, guid: a84efda117f28ec47ace744a727c2bed, type: 3}
     attribute: m_Sprite
     path: Legs/Body/Arm 2
     classID: 212
@@ -123,7 +123,7 @@ AnimationClip:
       isIntCurve: 0
       isSerializeReferenceCurve: 0
     pptrCurveMapping:
-    - {fileID: 21300800, guid: a84efda117f28ec47ace744a727c2bed, type: 3}
+    - {fileID: 1615400089, guid: a84efda117f28ec47ace744a727c2bed, type: 3}
     - {fileID: 21300800, guid: a84efda117f28ec47ace744a727c2bed, type: 3}
     - {fileID: 1038185661, guid: a84efda117f28ec47ace744a727c2bed, type: 3}
     - {fileID: -1822459293, guid: a84efda117f28ec47ace744a727c2bed, type: 3}

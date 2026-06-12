@@ -10,7 +10,8 @@ public class Rainbow : MonoBehaviour, IPoolable
     
     Vector3 targetPoint;
     float speed;
-
+    ProjectileProperties projectileProperties;
+    
     void FixedUpdate()
     {
         float correctedSpeed = Mathf.Abs(speed);
@@ -38,7 +39,7 @@ public class Rainbow : MonoBehaviour, IPoolable
     {
         giveDamage.hit = false;
         
-        ProjectileProperties projectileProperties = (ProjectileProperties)data;
+        projectileProperties = (ProjectileProperties)data;
 
         speed = projectileProperties.speed;
         giveDamage.damageToGive = projectileProperties.damage;

@@ -12090,6 +12090,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   smoothing: {x: 4, y: 4}
+  followSpeed: 1
+  followSmoothTime: 0.15
+  enableLookahead: 1
+  lookaheadDistance: 4
+  lookaheadSpeed: 3
+  returnLookaheadSpeed: 0
+  lookaheadSmoothTime: 0.3
+  lookaheadDeadzone: 5
 --- !u!114 &2401183972487348870
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -12106,13 +12114,15 @@ MonoBehaviour:
   whiteFadeSprite: {fileID: 5607559642550583770}
   greenCircleSprite: {fileID: 7307757664729379832}
   respawnBackgroundSprites: []
-  useColorTemperature: 1
   colorTemperatureMaterial: {fileID: 2100000, guid: 7c5e85dcc5f88ea47840aa5eb4ee2ecf,
     type: 2}
   exposure: 0.32
   tintColor: {r: 1, g: 0.874, b: 0.65, a: 1}
   grayscaleMaterial: {fileID: 2100000, guid: f50dbae2f6b952f46b8a05657940d91c, type: 2}
   grayscaleAmount: 0
+  motionBlurMaterial: {fileID: 2100000, guid: bcb926a0aacc3ff47b7f6e762996170b, type: 2}
+  intensity: 0.065
+  sampleCount: 8
 --- !u!114 &6925399933680529758
 MonoBehaviour:
   m_ObjectHideFlags: 0

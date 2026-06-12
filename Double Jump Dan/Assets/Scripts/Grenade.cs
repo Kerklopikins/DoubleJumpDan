@@ -17,6 +17,7 @@ public class Grenade : MonoBehaviour, IPoolable
     [SerializeField] float highRumbleAmount;
     [SerializeField] float rumbleDuration;
 
+    ProjectileProperties projectileProperties;
     Rigidbody2D rb2D;
     float lifeTime;
     string destroyedEffectPool;
@@ -24,6 +25,7 @@ public class Grenade : MonoBehaviour, IPoolable
     float lifeTimeAfterCollision = 2.25f;
     Collider2D grenadeCollider;
     int collisionMask;
+    TransformProperties transformProperties;
 
     void Awake()
     {
@@ -42,7 +44,7 @@ public class Grenade : MonoBehaviour, IPoolable
         explosionCollider.enabled = false;
         giveDamage.hit = false;
         
-        ProjectileProperties projectileProperties = (ProjectileProperties)data;
+        projectileProperties = (ProjectileProperties)data;
         
         force = projectileProperties.speed;
         giveDamage.damageToGive = projectileProperties.damage;
@@ -100,7 +102,6 @@ public class Grenade : MonoBehaviour, IPoolable
             grenadeCollider.enabled = false;
             StartCoroutine(Explode());
 
-            TransformProperties transformProperties = new TransformProperties();
             transformProperties.position = transform.position;
             transformProperties.scale = Vector3.one;
             transformProperties.rotation = Quaternion.identity;

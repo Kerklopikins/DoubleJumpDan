@@ -12,7 +12,7 @@ public class LevelManager : MonoBehaviour
     public static LevelManager Instance;
     
     [SerializeField] Transform levelStart;
-    [SerializeField] Transform levelFinish;
+    public Transform levelFinish;
 
     [Header("Finish Level")]
     [SerializeField] float maxDetectionHeight;
@@ -28,6 +28,7 @@ public class LevelManager : MonoBehaviour
     [Header("Gem Sprites")]
     public Sprite[] gemSprites;
 
+    public event Action OnLevelFinished;
     public Player player { get; private set; }
     public BoxCollider2D levelBounds { get; private set; }
     public Transform levelObjects { get; private set; }
@@ -135,6 +136,7 @@ public class LevelManager : MonoBehaviour
                     gameManager.currentUser.levelsCompleted = currentScene + 1;
             }
 
+            OnLevelFinished?.Invoke();
             GameHUD.Instance.FinishLevel();
             gameManager.SaveUserData();
             

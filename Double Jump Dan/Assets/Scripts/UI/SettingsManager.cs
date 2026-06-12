@@ -12,6 +12,7 @@ public class SettingsManager : MonoBehaviour
     [SerializeField] GameObject fpsTracker;
 
     [Header("Toggles")]
+    [SerializeField] Toggle motionBlurToggle;
     [SerializeField] Toggle postProcessingToggle;
     [SerializeField] Toggle distortionEffectsToggle;
     [SerializeField] Toggle weatherEffectsToggle;
@@ -164,7 +165,7 @@ public class SettingsManager : MonoBehaviour
             vSyncToggle.isOn = gameManager.vSync;
             cameraShakeToggle.isOn = gameManager.cameraShake;
             showFPSToggle.isOn = gameManager.showPerformanceData;
-
+            
             QualitySettings.vSyncCount = gameManager.vSync ? 1 : 0;
         
             if(!gameManager.vSync)
@@ -172,6 +173,7 @@ public class SettingsManager : MonoBehaviour
 
             mainMenuManager.cursorSpeed = 1600 * cursorSensitivitySlider.value;
             
+            motionBlurToggle.isOn = gameManager.motionBlur;
             postProcessingToggle.isOn = gameManager.postProcessing;
             distortionEffectsToggle.isOn = gameManager.distortionEffects;
             weatherEffectsToggle.isOn = gameManager.weatherEffects;

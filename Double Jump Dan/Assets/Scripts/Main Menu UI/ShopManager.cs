@@ -3,6 +3,7 @@ using UnityEngine.UI;
 using System;
 using System.Collections;
 using System.Linq;
+using UnityEngine.SceneManagement;
 
 public class ShopManager : MonoBehaviour
 {
@@ -58,6 +59,7 @@ public class ShopManager : MonoBehaviour
     UIArea skinsArea;
     UIArea upgradesArea;
     ExitUIArea exitUIArea;
+    UserMenu userMenu;
     //bool scrollViewMoved;
     //int gunsCount;
     //int hatsCount;
@@ -76,9 +78,12 @@ public class ShopManager : MonoBehaviour
         mainMenuManager = GetComponent<MainMenuManager>();
         uIScreenManager = GetComponent<UIScreenManager>();
         shopAnimator = shop.GetComponent<Animator>();
+        userMenu = GetComponent<UserMenu>();
 
         gameInputManager.OnControllerChanged += OnControllerChanged;
         gameInputManager.OnKeyboardOnlyInputChanged += OnKeyboardOnlyInputChanged;
+        
+        userMenu.OnUserButtonsRefresh += OnUserSwitched;
 
         if(gameInputManager.ControllerConnected())
         {
@@ -189,7 +194,7 @@ public class ShopManager : MonoBehaviour
                     if(shopTabIndex < 0)
                         shopTabIndex = 3;
 
-                    SwitchShopTabs();
+                    SwitchShopTabs(true);
                 }
                 
                 if(gameInputManager.RightBumperDown())
@@ -199,7 +204,7 @@ public class ShopManager : MonoBehaviour
                     if(shopTabIndex > 3)
                         shopTabIndex = 0;
 
-                    SwitchShopTabs();
+                    SwitchShopTabs(true);
                 }
             }
 
@@ -300,7 +305,7 @@ public class ShopManager : MonoBehaviour
         shopTabTransitionTimer = 0.3f;
     }
 
-    void SwitchShopTabs()
+    void SwitchShopTabs(bool playAudio)
     {
         switch(shopTabIndex)
         {
@@ -319,7 +324,9 @@ public class ShopManager : MonoBehaviour
                     skinsArea.OpenArea(false);
                     upgradesArea.OpenArea(false);
 
-                    AudioManager.Instance.PlaySound2D(shopTabSwitchSound);
+                    if(playAudio)
+                        AudioManager.Instance.PlaySound2D(shopTabSwitchSound);
+
                     ResetShopTabTransitionTimer();
                     RefreshShopScrollRects();
                 }
@@ -339,7 +346,9 @@ public class ShopManager : MonoBehaviour
                     skinsArea.OpenArea(false);
                     upgradesArea.OpenArea(false);
 
-                    AudioManager.Instance.PlaySound2D(shopTabSwitchSound);
+                    if(playAudio)
+                        AudioManager.Instance.PlaySound2D(shopTabSwitchSound);
+
                     ResetShopTabTransitionTimer();
                     RefreshShopScrollRects();
                 }
@@ -359,7 +368,9 @@ public class ShopManager : MonoBehaviour
                     skinsArea.OpenArea(true);
                     upgradesArea.OpenArea(false);
 
-                    AudioManager.Instance.PlaySound2D(shopTabSwitchSound);
+                    if(playAudio)
+                        AudioManager.Instance.PlaySound2D(shopTabSwitchSound);
+
                     ResetShopTabTransitionTimer();
                     RefreshShopScrollRects();
                 }
@@ -379,7 +390,9 @@ public class ShopManager : MonoBehaviour
                     skinsArea.OpenArea(false);
                     upgradesArea.OpenArea(true);
 
-                    AudioManager.Instance.PlaySound2D(shopTabSwitchSound);
+                    if(playAudio)
+                        AudioManager.Instance.PlaySound2D(shopTabSwitchSound);
+
                     ResetShopTabTransitionTimer();
                     //RefreshShopScrollRects();
                 }
@@ -392,7 +405,7 @@ public class ShopManager : MonoBehaviour
         if(gunsButton.interactable && shopTabTransitionTimer <= 0)
         {
             shopTabIndex = 0;
-            SwitchShopTabs();
+            SwitchShopTabs(true);
         }
     }
 
@@ -401,7 +414,7 @@ public class ShopManager : MonoBehaviour
         if(hatsButton.interactable && shopTabTransitionTimer <= 0)
         {
             shopTabIndex = 1;
-            SwitchShopTabs();
+            SwitchShopTabs(true);
         }
     }
 
@@ -410,7 +423,7 @@ public class ShopManager : MonoBehaviour
         if(skinsButton.interactable && shopTabTransitionTimer <= 0)
         {
             shopTabIndex = 2;
-            SwitchShopTabs();
+            SwitchShopTabs(true);
         }
     }
 
@@ -419,7 +432,7 @@ public class ShopManager : MonoBehaviour
         if(upgradesButton.interactable && shopTabTransitionTimer <= 0)
         {
             shopTabIndex = 3;
-            SwitchShopTabs();
+            SwitchShopTabs(true);
         }
     }
 
@@ -487,6 +500,12 @@ public class ShopManager : MonoBehaviour
         OnShopTabsChanged?.Invoke();
     }
     
+    void OnUserSwitched()
+    {
+        shopTabIndex = 0;
+        SwitchShopTabs(false);
+    }
+
     public void RefreshGemsText()
     {
         if(gameManager.currentUser.gems != 1)
@@ -595,6 +614,8 @@ public class ShopManager : MonoBehaviour
                 gameManager.currentUser.ownedUpgrades.Add(upgrade.itemID);
         }
 		
+        gameManager.currentUser.levelsCompleted = SceneManager.sceneCountInBuildSettings - 3;
+        
         SaveShopData();
         RefreshShop();
     }

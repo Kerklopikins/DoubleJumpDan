@@ -14,6 +14,7 @@ public class SplashScreen : MonoBehaviour
     void Start()
     {
         Time.timeScale = 1;
+        QualitySettings.vSyncCount = GameManager.Instance.vSync ? 1 : 0;
     }
     
     void Update()

@@ -31,6 +31,8 @@ public class ChickenGun : MonoBehaviour
     SpriteRenderer spriteRenderer;
     string destroyedEffectPool;
     GameInputManager gameInputManager;
+    RicochetProperties ricochetProperties;
+
     void Start()
     {
         startingPosition = transform.localPosition;
@@ -92,9 +94,7 @@ public class ChickenGun : MonoBehaviour
                     CameraManager.Instance.Shake(properties);
 
                 gunInfo.Shoot(1);
-            
-                RicochetProperties ricochetProperties = new RicochetProperties();
-                
+                                
                 ricochetProperties.speed = speed * player.transform.localScale.x;
                 ricochetProperties.damage = gunInfo.damage;
                 ricochetProperties.lifeTime = lifeTime;
@@ -128,9 +128,13 @@ public class ChickenGun : MonoBehaviour
 
     void LateUpdate()
     {
+        if(player.dead || LevelManager.Instance.FinishedLevel())
+            return;
+
         transform.localPosition = Vector3.SmoothDamp(transform.localPosition, startingPosition, ref recoilSmoothDampVelocity, recoilMoveSettleTime);
     }
-    public void ForceReload()
+    
+    void ForceReload()
     {
         if(reloading)
         {
@@ -138,6 +142,8 @@ public class ChickenGun : MonoBehaviour
             gunInfo.Reload();
             reloading = false;
         }
+
+        transform.localPosition = startingPosition;
     }
     IEnumerator AnimateReload()
     {
@@ -150,6 +156,9 @@ public class ChickenGun : MonoBehaviour
 
         while(percent < 1)
         {
+            if(player.dead || LevelManager.Instance.FinishedLevel())
+                break;
+
             percent += Time.deltaTime * reloadSpeed;
             float interpolation = (-Mathf.Pow(percent, 2) + percent) * 4;
 
@@ -159,10 +168,14 @@ public class ChickenGun : MonoBehaviour
             yield return null;
         }
 
-        transform.localEulerAngles = initialRot;
-        gunInfo.Reload();
-        reloading = false;
+        if(!player.dead && !LevelManager.Instance.FinishedLevel())
+        {
+            transform.localEulerAngles = initialRot;
+            gunInfo.Reload();
+            reloading = false;
+        }
     }
+    
     IEnumerator AnimateChicken()
     {
         spriteRenderer.sprite = shot;

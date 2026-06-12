@@ -77,7 +77,7 @@ SpriteRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 1004492393
-  m_SortingLayer: -1
+  m_SortingLayer: -2
   m_SortingOrder: -4
   m_Sprite: {fileID: 21300724, guid: a84efda117f28ec47ace744a727c2bed, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -104,13 +104,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   fireMode: 1
   _fireRate: 3
-  damage: 15
+  damage: 12
   startingAmmo: 6
   shotsPerBurst: 0
   burstsPerMagazine: 0
   burstCoolDownTime: 0
   aimPointOffset: 0.125
-  restingAngleOffset: 1.432
   lowRumbleAmount: 0.15
   highRumbleAmount: 0.25
   rumbleDuration: 0.5
@@ -133,14 +132,18 @@ MonoBehaviour:
   barrelLength: 1.75
   boltsToSpawn: 10
   length: 20
+  startSegment: {fileID: 1219334865, guid: a84efda117f28ec47ace744a727c2bed, type: 3}
+  endSegment: {fileID: -951961539, guid: a84efda117f28ec47ace744a727c2bed, type: 3}
   bolt: {fileID: 1801754894649790, guid: 5dd946c37a7543b45a92f71834146870, type: 3}
   boltDuration: 0.02
   crazyness: 25
+  lengthDivisor: 9.65
   collisionMask:
     serializedVersion: 2
     m_Bits: 4352
   shootSound: {fileID: 8300000, guid: 6a658eb78309ad74a823309ce828d739, type: 3}
   reloadSound: {fileID: 8300000, guid: 49dc1f04f82b5ae44bdbf711bfb85411, type: 3}
+  hitTimer: 0.125
   lightningSparks: {fileID: 1572599503493678, guid: 7148ec2642cdf5946b6ab08ac5a51ead,
     type: 3}
   glowSprite: {fileID: 6413018508571859715}
@@ -297,7 +300,7 @@ SpriteRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 1004492393
-  m_SortingLayer: -1
+  m_SortingLayer: -2
   m_SortingOrder: -3
   m_Sprite: {fileID: -218421234, guid: a84efda117f28ec47ace744a727c2bed, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}

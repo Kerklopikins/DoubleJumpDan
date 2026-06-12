@@ -8,6 +8,7 @@ public class Player: MonoBehaviour
     [Header("Movement")]
     public float walkSpeed = 10;
     public float sprintSpeed = 13;
+    public float inAirSprintSpeed;
     public float accelerationTimeGrounded;
     public float accelerationTimeInAir;
     public float jumpHeight;
@@ -98,6 +99,7 @@ public class Player: MonoBehaviour
     Vector2 input; //For movement
     int xInput; //For movement
     int yInput; //For movement
+    float smoothedX;
     Vector3 lastAimDirection; //For arm
     Vector3 difference; //For arm
     public Transform crosshairs { get; set; }
@@ -108,6 +110,7 @@ public class Player: MonoBehaviour
     //Animation
     float walkAnimationSpeed; //For speeding up when sprinting
     float walkAnimationT; //For speeding up when sprinting
+    float velocityXAbs; //For animation and particle systems
 
     //Rotating Eyes
     Vector2 eyeBrowStartPosition;
@@ -116,13 +119,21 @@ public class Player: MonoBehaviour
     float targetY;
 
     //Health, damage, lives, kill, respawn
+    public SpriteRenderer gunSpriteRenderer { get; set; }
     public bool dead { get; private set; }
     public int _health { get; private set; }
     public int lives { get; set; }
     float hurtTimer = 0.125f;
     float _hurtTimer;
 
+    //Gun fling when killed or finished level
+    public Transform gunTransform { get; set; }
+    public Vector2 gunStartPosition { get; set; }
+    bool flingRight = true;
+    bool flingedGun;
+
     //Finish Level
+    Camera _camera;
     float finishLevelJumpTimer;
     float finishLevelInTime;
     float finalPositionX;
@@ -139,6 +150,10 @@ public class Player: MonoBehaviour
     float weeEffectFallThreshold = 2.5f; //How long to fall until wee is activated
     bool animatedWee;
     bool canAnimateWee = true;
+    
+    //Particle Effects
+    float walkParticlesEmmisionRate;
+    bool isWalkingOnGround;
 
     //Camera
     public bool canFollow { get; set; } //Called when killed or finished level
@@ -164,6 +179,7 @@ public class Player: MonoBehaviour
         animator = GetComponent<Animator>();
         _collider2D = GetComponent<Collider2D>();
         gameManager = GameManager.Instance;
+        _camera = LevelManager.Instance.mainCamera;
 
         direction = 1;
 
@@ -179,7 +195,10 @@ public class Player: MonoBehaviour
         gameInputManager = GameInputManager.Instance;
         
         if(gameManager.lockAiming)
+        {
             pupilsParent.localPosition = new Vector3(pupilsParentStartPosition.x + maxPupilsOffset.x, pupilsParentStartPosition.y -maxPupilsOffset.y, 0);
+            eyeBrow.localPosition = new Vector2(eyeBrowStartPosition.x, eyeBrowStartPosition.y - maxPupilsOffset.y);
+        }
 
         CheckForUpgrades();
     }
@@ -239,8 +258,7 @@ public class Player: MonoBehaviour
         if(rb2D.velocity.y <= -25)
             rb2D.velocity = new Vector2(rb2D.velocity.x, -25);
         
-        float targetVelocityX = input.x * _speed;
-        float smoothedX = Mathf.SmoothDamp(rb2D.velocity.x, targetVelocityX, ref velocityXSmoothing, (grounded) ? accelerationTimeGrounded : accelerationTimeInAir);
+        smoothedX = Mathf.SmoothDamp(rb2D.velocity.x, input.x * _speed, ref velocityXSmoothing, grounded ? accelerationTimeGrounded : accelerationTimeInAir);
 
         /////MAKE SURE THIS ISNT MESSING ANYTHING UP
         if(float.IsNaN(velocityXSmoothing) || dead || Mathf.Abs(velocityXSmoothing) < 0.0005f)
@@ -262,7 +280,7 @@ public class Player: MonoBehaviour
         if(fallButtonTimer > 0)
             fallButtonTimer -= Time.deltaTime;
 
-        if(grounded && fallButtonTimer <= 0 && gameInputManager.GetVerticalInput() < -gameInputManager.VerticalInputSensitivity)
+        if(grounded && fallButtonTimer <= 0 && gameInputManager.VerticalMoveInput() < -gameInputManager.VerticalInputSensitivity)
             fallButtonTimer = 0;
         else if(!grounded)
             fallButtonTimer = fallButtonDelay;
@@ -278,7 +296,7 @@ public class Player: MonoBehaviour
             rb2D.velocity = new Vector2(rb2D.velocity.x, jumpHeight);
             doubleJumpTimer = 0.15f;
             
-            GameManager.Instance.currentUser.totalJumps += 1;
+            gameManager.currentUser.totalJumps += 1;
         }
 
         doubleJumpTimer -= Time.deltaTime;
@@ -293,7 +311,7 @@ public class Player: MonoBehaviour
             rb2D.velocity = new Vector2(rb2D.velocity.x, jumpHeight);
             doubleJump = true;
 
-            GameManager.Instance.currentUser.totalJumps += 1;
+            gameManager.currentUser.totalJumps += 1;
         }
     }
 
@@ -363,9 +381,9 @@ public class Player: MonoBehaviour
         else
         {
             //Mouse distance
-            if(Vector2.Distance(transform.position, gameInputManager.GetRealMousePosition()) > 2)
+            if(Vector2.Distance(transform.position, gameInputManager.RealMousePosition()) > 2)
             {
-                difference = gameInputManager.GetRealMousePosition() - aimPoint.position;
+                difference = gameInputManager.RealMousePosition() - aimPoint.position;
                 difference.Normalize();
                 
                 lastAimDirection = difference;
@@ -400,24 +418,24 @@ public class Player: MonoBehaviour
 
     public void HandleInput()
     {
-        if(gameInputManager.GetHorizontalInput() > gameInputManager.HorizontalInputSensitivity)
+        if(gameInputManager.HorizontalMoveInput() > gameInputManager.HorizontalInputSensitivity)
             xInput = 1;
-        else if(gameInputManager.GetHorizontalInput() < -gameInputManager.HorizontalInputSensitivity)
+        else if(gameInputManager.HorizontalMoveInput() < -gameInputManager.HorizontalInputSensitivity)
             xInput = -1;
         else
             xInput = 0;
 
-        if(gameInputManager.GetVerticalInput() > gameInputManager.VerticalInputSensitivity)
+        if(gameInputManager.VerticalMoveInput() > gameInputManager.VerticalInputSensitivity)
             yInput = 1;
-        else if(gameInputManager.GetVerticalInput() < -gameInputManager.VerticalInputSensitivity)
+        else if(gameInputManager.VerticalMoveInput() < -gameInputManager.VerticalInputSensitivity)
             yInput = -1;
         else
             yInput = 0;
 
         input = new Vector2(xInput, yInput);
 
-        if(gameInputManager.SprintButton() && grounded)
-            _speed = sprintSpeed;
+        if(gameInputManager.SprintButton())
+            _speed = grounded ? sprintSpeed : inAirSprintSpeed;
         else
             _speed = walkSpeed;
 
@@ -429,15 +447,11 @@ public class Player: MonoBehaviour
         transform.localScale = new Vector3(direction, 1, 1);   
         
         if(!gameManager.lockAiming)
-        {
             RotateArm();
-            RotateEyes();
-        }
         else
-        {
             armTwo.rotation = Quaternion.Euler(0, 0, direction == 1 ? 90 : -90); 
-        }
 
+        RotateEyes();
         Jump();
     }
 
@@ -469,40 +483,48 @@ public class Player: MonoBehaviour
     #region RotateEyes
     void RotateEyes()
     {
-        if(gameInputManager.ControllerConnected())
+        if(!gameManager.lockAiming)
         {
-            eyeLookDirection = crosshairs.position - transform.position;
+            if(gameInputManager.ControllerConnected())
+            {
+                eyeLookDirection = crosshairs.position - transform.position;
+            }
+            else
+            {
+                Vector3 realMousePosition = gameInputManager.RealMousePosition();
+
+                realMousePosition.z = pupilsParent.position.z;
+                eyeLookDirection = realMousePosition - transform.position;
+            }
+            
+            eyeLookDirection = new Vector3(eyeLookDirection.x * transform.localScale.x, eyeLookDirection.y, 0);
+            
+            float t = Mathf.Clamp01(eyeLookDirection.magnitude / maxMouseDistance);
+            float thresholdX = Mathf.Lerp(minThreshold, maxThreshold, t) + maxPupilsOffset.x;
+            float thresholdY = Mathf.Lerp(minThreshold, maxThreshold, t) + maxPupilsOffset.y;
+            
+            float scaledX = eyeLookDirection.x * horizontalSensitivity;
+            float scaledY = eyeLookDirection.y * verticalSensitivity;
+            
+            if(scaledX > thresholdX)
+                targetX = maxPupilsOffset.x;
+            else if(scaledX < -thresholdX)
+                targetX = -maxPupilsOffset.x;
+            else
+                targetX = maxPupilsOffset.x;
+
+            if(scaledY > thresholdY)
+                targetY = maxPupilsOffset.y;
+            else if(scaledY < -thresholdY)
+                targetY = -maxPupilsOffset.y;
+            else
+                targetY = -maxPupilsOffset.y;
         }
         else
         {
-            Vector3 realMousePosition = gameInputManager.GetRealMousePosition();
-
-            realMousePosition.z = pupilsParent.position.z;
-            eyeLookDirection = realMousePosition - transform.position;
+            targetX = maxPupilsOffset.x;
+            targetY = yInput > 0 ? maxPupilsOffset.y : -maxPupilsOffset.y; 
         }
-        
-        eyeLookDirection = new Vector3(eyeLookDirection.x * transform.localScale.x, eyeLookDirection.y, 0);
-        
-        float t = Mathf.Clamp01(eyeLookDirection.magnitude / maxMouseDistance);
-        float thresholdX = Mathf.Lerp(minThreshold, maxThreshold, t) + maxPupilsOffset.x;
-        float thresholdY = Mathf.Lerp(minThreshold, maxThreshold, t) + maxPupilsOffset.y;
-        
-        float scaledX = eyeLookDirection.x * horizontalSensitivity;
-        float scaledY = eyeLookDirection.y * verticalSensitivity;
-        
-        if(scaledX > thresholdX)
-            targetX = maxPupilsOffset.x;
-        else if(scaledX < -thresholdX)
-            targetX = -maxPupilsOffset.x;
-        else
-            targetX = maxPupilsOffset.x;
-
-        if(scaledY > thresholdY)
-            targetY = maxPupilsOffset.y;
-        else if(scaledY < -thresholdY)
-            targetY = -maxPupilsOffset.y;
-        else
-            targetY = -maxPupilsOffset.y;
         
         pupilsParent.localPosition = Vector2.Lerp(pupilsParent.localPosition, pupilsParentStartPosition + new Vector2(targetX, targetY), Time.deltaTime * smoothSpeed);
                 
@@ -562,13 +584,13 @@ public class Player: MonoBehaviour
     #region AnimationAndWalkEffects
     void SetAnimationsAndWalkEffects()
     {
-        float velocityXAbs = Mathf.Abs(rb2D.velocity.x);
-        bool isWalkingOnGround = grounded && velocityXAbs > 0.5f;
+        velocityXAbs = Mathf.Abs(rb2D.velocity.x);
+        isWalkingOnGround = grounded && velocityXAbs > 0.5f;
 
         ParticleSystem.EmissionModule emission = walkParticles.emission;
-        float emmisionRate = isWalkingOnGround ? Mathf.Lerp(10, 30, velocityXAbs / 8) : 0;
-
-        emission.rateOverTime = emmisionRate;
+        walkParticlesEmmisionRate = isWalkingOnGround ? Mathf.Lerp(10, 30, velocityXAbs / 8) : 0;
+        
+        emission.rateOverTime = walkParticlesEmmisionRate;
 
         animator.SetBool("Grounded", grounded);
         
@@ -635,6 +657,7 @@ public class Player: MonoBehaviour
         }
 
         animator.SetFloat("Walk Speed", walkAnimationSpeed);
+
         currentBodyRotation = Mathf.Lerp(currentBodyRotation, direction == 1 ? bodyTargetRotation : -bodyTargetRotation, bodyRotateSpeed * Time.deltaTime);
         body.rotation = Quaternion.Euler(0, 0, currentBodyRotation);     
 
@@ -708,12 +731,22 @@ public class Player: MonoBehaviour
     {
         for(int i = 0; i < 4; i++)
         {
+            if(dead)
+            {
+                gunSpriteRenderer.material.SetFloat("_FlashAmount", 0);
+                ApplySpriteMaterialProperties(0);
+                break;
+            }
+            
             ApplySpriteMaterialProperties(1);
-
+            gunSpriteRenderer.material.SetFloat("_FlashAmount", 1);
+            
             yield return flashSpeed;
 
             if(!dead)
                 ApplySpriteMaterialProperties(0);
+
+            gunSpriteRenderer.material.SetFloat("_FlashAmount", 0);
 
             yield return flashSpeed;
         }
@@ -857,9 +890,10 @@ public class Player: MonoBehaviour
 
         OnPlayerKilled?.Invoke();
 
-        GameManager.Instance.currentUser.totalDeaths += 1;
+        gameManager.currentUser.totalDeaths += 1;
         gameInputManager.RumbleController(lowDeathRumble, highDeathRumble, deathRumbleDuration);
 
+        StartCoroutine(FlingGun());
         StartCoroutine(KillCo());
     }
 
@@ -915,6 +949,9 @@ public class Player: MonoBehaviour
         bodyTargetRotation = 0;
         currentBodyRotation = 0;
         body.localEulerAngles = Vector3.zero;
+        
+        gunTransform.parent = armTwo;
+        gunTransform.localScale = Vector3.one;        
 
         float inTime = 0;
         float duration = 0.75f;
@@ -926,6 +963,9 @@ public class Player: MonoBehaviour
             inTime += Time.unscaledDeltaTime;
 
             armTwo.localRotation = Quaternion.Euler(0, 0, 90);
+            gunTransform.localPosition = gunStartPosition;
+            gunTransform.localEulerAngles = new Vector3(0, 0, -90);
+
             animator.SetBool("Grounded", true);
             animator.SetFloat("Speed", 0);
 
@@ -968,6 +1008,10 @@ public class Player: MonoBehaviour
     {
         teleporting = true;
         invincible = true;
+
+        bodyTargetRotation = 0;
+        currentBodyRotation = 0;
+        body.localEulerAngles = Vector3.zero;
     }
 
     public void Teleported(Vector3 transportPoint)
@@ -997,28 +1041,32 @@ public class Player: MonoBehaviour
         
         float duration = 0.75f;
 
-        Vector3 targetPosition = new Vector3(pupilsParentStartPosition.x + maxPupilsOffset.x, pupilsParentStartPosition.y -maxPupilsOffset.y, 0);
-        pupilsParent.localPosition = Vector3.Lerp(pupilsParent.localPosition, targetPosition, Time.deltaTime * smoothSpeed);
+        pupilsParent.localPosition = Vector2.Lerp(pupilsParent.localPosition, new Vector2(pupilsParentStartPosition.x + maxPupilsOffset.x, pupilsParentStartPosition.y -maxPupilsOffset.y), Time.deltaTime * smoothSpeed);
+
+        if(eyeBrow.gameObject.activeInHierarchy)
+            eyeBrow.localPosition = Vector2.Lerp(eyeBrow.localPosition, new Vector2(eyeBrowStartPosition.x, eyeBrowStartPosition.y - maxPupilsOffset.y), Time.deltaTime * smoothSpeed);    
+
+        currentBodyRotation = Mathf.Lerp(currentBodyRotation, 0, bodyRotateSpeed * Time.deltaTime);
+        body.rotation = Quaternion.Euler(0, 0, currentBodyRotation);
+        
+        if(!flingedGun)
+        {
+            StartCoroutine(FlingGun());
+            flingedGun = true;
+        }
 
         if(canAnimateWee)
         {
             StartCoroutine(AnimateWeeEffect(-1));
             animatedWee = false;
         }
-
+        
         if(finishLevelInTime < duration)
         {
             finishLevelInTime += Time.unscaledDeltaTime;
-            
             float smoothT = Mathf.SmoothStep(0, 1, finishLevelInTime / duration);
 
-            float velocityX = Mathf.Lerp(rb2D.velocity.x, 0, smoothT);
-
-            rb2D.velocity = new Vector2(velocityX, rb2D.velocity.y);
-            
-            float angle = Mathf.Lerp(armTwo.localEulerAngles.z, 150, smoothT);
-            armTwo.localEulerAngles = new Vector3(0, 0, angle);
-
+            rb2D.velocity = new Vector2(Mathf.Lerp(rb2D.velocity.x, 0, smoothT), rb2D.velocity.y);
             finalPositionX = transform.position.x;
         }
         else
@@ -1042,9 +1090,88 @@ public class Player: MonoBehaviour
                 firstFinishJump = true;
             }
         }
+
+        armTwo.localEulerAngles = new Vector3(0, 0, grounded ? 90 : 180);
     }
 
     #endregion
+
+    IEnumerator FlingGun()
+    {
+        gunTransform.parent = null;
+        flingRight = !flingRight;
+
+        int direction = flingRight ? 1 : -1;
+        Vector3 startPosition = gunTransform.position;
+        //float flingHeight = UnityEngine.Random.Range(10, 18);
+        float flingHeight = UnityEngine.Random.Range(9, 12);
+        Vector3 flingEnd = startPosition + new Vector3(direction * UnityEngine.Random.Range(10, 18), -10, 0);
+        
+        float flingDuration = 1.5f;
+        float elapsed = 0;
+
+        float previousY = 0, previousY2 = 0;
+        float previousX = 0, previousX2 = 0;
+        float previousDeltaTime = 0, previousDeltaTime2 = 0;
+
+        while(elapsed < flingDuration)
+        {
+            elapsed += Time.unscaledDeltaTime;
+            float t = Mathf.Clamp01(elapsed / flingDuration);
+
+            float easedT = t * t;
+            float arcY = (1 - Mathf.Pow(t * 2 - 1, 2)) * flingHeight;
+
+            Vector3 position = Vector3.Lerp(startPosition, flingEnd, easedT);
+            position.y = startPosition.y + arcY + Mathf.Lerp(0, flingEnd.y - startPosition.y, easedT);
+
+            previousY2 = previousY;
+            previousX2 = previousX;
+            previousDeltaTime2 = previousDeltaTime;
+
+            previousY = gunTransform.position.y;
+            previousX = gunTransform.position.x;
+            previousDeltaTime = Time.unscaledDeltaTime;
+
+            gunTransform.position = position;
+            gunTransform.Rotate(0, 0, -direction * 500 * Time.unscaledDeltaTime);
+
+            yield return null;
+        }
+
+        if(!dead)
+        {
+            float velocityY1 = Time.unscaledDeltaTime > 0 ? (gunTransform.position.y - previousY) / Time.unscaledDeltaTime : 0;
+            float velocityY2 = previousDeltaTime2 > 0 ? (previousY - previousY2) / previousDeltaTime2 : 0;
+            
+            float initialVelocityY = (velocityY1 + velocityY2) / 2;
+
+            float velocityX1 = Time.unscaledDeltaTime > 0 ? (gunTransform.position.x - previousX) / Time.unscaledDeltaTime : 0;
+            float velocityX2 = previousDeltaTime2 > 0 ? (previousX - previousX2) / previousDeltaTime2 : 0;
+            float initialVelocityX = (velocityX1 + velocityX2) / 2;
+
+            float gravity = -18;
+            float fallElapsed = 0;
+            float fallDuration = 4f;
+
+            Vector3 landedPosition = gunTransform.position;
+
+            while(fallElapsed < fallDuration)
+            {
+                fallElapsed += Time.unscaledDeltaTime;
+                float yOffset = initialVelocityY * fallElapsed + 0.5f * gravity * fallElapsed * fallElapsed;
+                float xOffset = initialVelocityX * fallElapsed;
+                
+                gunTransform.position = new Vector3(landedPosition.x + xOffset, landedPosition.y + yOffset, landedPosition.z);
+                gunTransform.Rotate(0, 0, -direction * 500 * Time.unscaledDeltaTime);
+
+                if(gunTransform.position.y < _camera.transform.position.y - _camera.orthographicSize * 2)
+                    fallDuration = 0;
+
+                yield return null;
+            }   
+        }
+    }
 
     public void EnableShadowDanTracer()
     {

@@ -127,6 +127,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   walkSpeed: 10
   sprintSpeed: 14
+  inAirSprintSpeed: 12
   accelerationTimeGrounded: 0.2
   accelerationTimeInAir: 0.4
   jumpHeight: 22
@@ -418,7 +419,7 @@ SpriteRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 1004492393
-  m_SortingLayer: -1
+  m_SortingLayer: -2
   m_SortingOrder: 3
   m_Sprite: {fileID: 21300816, guid: a84efda117f28ec47ace744a727c2bed, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -503,14 +504,14 @@ SpriteRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 1004492393
-  m_SortingLayer: -1
+  m_SortingLayer: -2
   m_SortingOrder: 1
-  m_Sprite: {fileID: -53238633, guid: a84efda117f28ec47ace744a727c2bed, type: 3}
+  m_Sprite: {fileID: 537260675, guid: a84efda117f28ec47ace744a727c2bed, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
-  m_Size: {x: 2.125, y: 2}
+  m_Size: {x: 2.25, y: 2}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
@@ -529,7 +530,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   emojis:
-  - {fileID: -53238633, guid: a84efda117f28ec47ace744a727c2bed, type: 3}
   - {fileID: 1382578102, guid: a84efda117f28ec47ace744a727c2bed, type: 3}
   - {fileID: 537260675, guid: a84efda117f28ec47ace744a727c2bed, type: 3}
   - {fileID: -589499410, guid: a84efda117f28ec47ace744a727c2bed, type: 3}
@@ -609,7 +609,7 @@ SpriteRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 1004492393
-  m_SortingLayer: -1
+  m_SortingLayer: -2
   m_SortingOrder: 3
   m_Sprite: {fileID: 21300672, guid: a84efda117f28ec47ace744a727c2bed, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -694,7 +694,7 @@ SpriteRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 1004492393
-  m_SortingLayer: -1
+  m_SortingLayer: -2
   m_SortingOrder: -5
   m_Sprite: {fileID: 21300672, guid: a84efda117f28ec47ace744a727c2bed, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -778,7 +778,7 @@ SpriteRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 1004492393
-  m_SortingLayer: -1
+  m_SortingLayer: -2
   m_SortingOrder: 0
   m_Sprite: {fileID: 13926108, guid: a84efda117f28ec47ace744a727c2bed, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -5645,7 +5645,7 @@ ParticleSystemRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 1004492393
-  m_SortingLayer: -1
+  m_SortingLayer: -2
   m_SortingOrder: -6
   m_RenderMode: 0
   m_MeshDistribution: 0
@@ -5750,7 +5750,7 @@ SpriteRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 1004492393
-  m_SortingLayer: -1
+  m_SortingLayer: -2
   m_SortingOrder: 0
   m_Sprite: {fileID: 565584017, guid: a84efda117f28ec47ace744a727c2bed, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -5836,7 +5836,7 @@ SpriteRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 1004492393
-  m_SortingLayer: -1
+  m_SortingLayer: -2
   m_SortingOrder: -2
   m_Sprite: {fileID: 21300000, guid: a84efda117f28ec47ace744a727c2bed, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -5954,7 +5954,7 @@ SpriteRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 1004492393
-  m_SortingLayer: -1
+  m_SortingLayer: -2
   m_SortingOrder: 0
   m_Sprite: {fileID: -115065162, guid: a84efda117f28ec47ace744a727c2bed, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -6042,7 +6042,7 @@ SpriteRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 1004492393
-  m_SortingLayer: -1
+  m_SortingLayer: -2
   m_SortingOrder: -1
   m_Sprite: {fileID: 1198447221, guid: a84efda117f28ec47ace744a727c2bed, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -6067,7 +6067,7 @@ GameObject:
   - component: {fileID: 151519995566672819}
   - component: {fileID: 5528795501435140280}
   m_Layer: 0
-  m_Name: Walk Particle
+  m_Name: Walk Particles
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -10851,7 +10851,7 @@ ParticleSystemRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 1004492393
-  m_SortingLayer: -1
+  m_SortingLayer: -2
   m_SortingOrder: -6
   m_RenderMode: 0
   m_MeshDistribution: 0
@@ -15802,7 +15802,7 @@ ParticleSystemRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 1004492393
-  m_SortingLayer: -1
+  m_SortingLayer: -2
   m_SortingOrder: -6
   m_RenderMode: 0
   m_MeshDistribution: 0
@@ -15907,7 +15907,7 @@ SpriteRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 1004492393
-  m_SortingLayer: -1
+  m_SortingLayer: -2
   m_SortingOrder: 1
   m_Sprite: {fileID: 748127935, guid: a84efda117f28ec47ace744a727c2bed, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}

@@ -94,6 +94,7 @@ MonoBehaviour:
   useDPad: 0
   lockAiming: 0
   inputBindings: 
+  motionBlur: 1
   postProcessing: 1
   distortionEffects: 1
   weatherEffects: 1
@@ -142,6 +143,8 @@ MonoBehaviour:
   - {fileID: 362601165079314667, guid: 335d2d9d1c24f2041921d7d73c2a8f87, type: 3}
   - {fileID: 2584498817252309614, guid: 90b80a39c4835b24d9ec92f440266220, type: 3}
   - {fileID: 154079353288283113, guid: e3c049db1484b314aab5e397cab6805a, type: 3}
+  - {fileID: -1501731162115627389, guid: fd50867f9ee4bf74dae942c00619fbf7, type: 3}
+  - {fileID: 6097075904655847626, guid: 4d0d216105bbbab48a1bb3f709509903, type: 3}
   skins:
   - {fileID: -1973979827161561548, guid: ea597b3be62c1cb41a4556e710588681, type: 3}
   - {fileID: 1932299221149112963, guid: b625f00c7d249cf44980f58c4449990a, type: 3}

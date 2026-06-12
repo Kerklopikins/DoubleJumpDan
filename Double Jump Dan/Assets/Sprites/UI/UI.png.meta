@@ -406,6 +406,18 @@ TextureImporter:
     overridden: 0
     androidETC2FallbackOverride: 0
     forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 3
+    buildTarget: Windows Store Apps
+    maxTextureSize: 512
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 0
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
   spriteSheet:
     serializedVersion: 2
     sprites:
@@ -1192,7 +1204,7 @@ TextureImporter:
         serializedVersion: 2
         x: 156
         y: 492
-        width: 25
+        width: 24
         height: 20
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
@@ -3087,6 +3099,8 @@ TextureImporter:
     weights: []
     secondaryTextures: []
     nameFileIdTable:
+      '#2': 2046514113
+      '#AAA': 1935876280
       Ammo: -594595216
       Angry Stan: 21300154
       Arrow Left Highlighted: 1512719246

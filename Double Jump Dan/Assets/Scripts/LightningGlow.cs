@@ -10,7 +10,8 @@ public class LightningGlow : MonoBehaviour, IPoolable
     float glowFadeSpeed;
     float percent;
     float _lifeTime;
-
+    TransformProperties properties;
+    
     void Start()
     {
         glowFadeSpeed = 1 / glowFadeTime;
@@ -18,7 +19,7 @@ public class LightningGlow : MonoBehaviour, IPoolable
 
     public void OnObjectReuse(object data)
     {
-        TransformProperties properties = (TransformProperties)data;
+        properties = (TransformProperties)data;
         transform.position = properties.position;
         transform.localScale = properties.scale;
         transform.rotation = properties.rotation;

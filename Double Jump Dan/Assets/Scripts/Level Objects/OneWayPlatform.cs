@@ -47,7 +47,7 @@ public class OneWayPlatform : MonoBehaviour
         }
         else
         {            
-            if(player.fallButtonTimer <= 0 && gameInputManager.GetVerticalInput() < -gameInputManager.VerticalInputSensitivity && !falling)
+            if(player.fallButtonTimer <= 0 && gameInputManager.VerticalMoveInput() < -gameInputManager.VerticalInputSensitivity && !falling)
             {
                 StartCoroutine(FallCo());
                 return;

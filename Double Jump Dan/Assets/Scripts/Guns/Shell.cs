@@ -11,6 +11,7 @@ public class Shell : MonoBehaviour, IPoolable
     SpriteRenderer spriteRenderer;
     Rigidbody2D rb2D;
     float _lifeTime;
+    TransformProperties properties;
 
     void Awake()
     {
@@ -22,9 +23,12 @@ public class Shell : MonoBehaviour, IPoolable
     {
         rb2D.velocity = Vector2.zero;
         rb2D.angularVelocity = 0;
-        TransformProperties properties = (TransformProperties)data;
+        
+        properties = (TransformProperties)data;
+
         transform.position = properties.position;
         transform.rotation = properties.rotation;
+        
         Vector3 direction = Quaternion.Euler(0, 0, Random.Range(75, 105)) * transform.right;
 
         _lifeTime = lifetime;

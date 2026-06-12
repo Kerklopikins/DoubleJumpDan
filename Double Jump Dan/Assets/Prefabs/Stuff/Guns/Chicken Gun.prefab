@@ -4867,7 +4867,7 @@ ParticleSystemRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 1004492393
-  m_SortingLayer: -1
+  m_SortingLayer: -2
   m_SortingOrder: -1
   m_RenderMode: 0
   m_MeshDistribution: 0
@@ -4990,7 +4990,7 @@ SpriteRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 1004492393
-  m_SortingLayer: -1
+  m_SortingLayer: -2
   m_SortingOrder: -4
   m_Sprite: {fileID: 21300726, guid: a84efda117f28ec47ace744a727c2bed, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -5055,7 +5055,7 @@ MonoBehaviour:
   projectile: {fileID: 100000, guid: f5248d72f6aec604abaa37217535965c, type: 3}
   destroyedEffect: {fileID: 172260, guid: 0af77b6223ab6404d9f57fa1c13c411f, type: 3}
   speed: 60
-  lifeTime: 10
+  lifeTime: 4
   kickMinMax: {x: 0.2, y: 0.2}
   recoilMoveSettleTime: 0.1
   properties:

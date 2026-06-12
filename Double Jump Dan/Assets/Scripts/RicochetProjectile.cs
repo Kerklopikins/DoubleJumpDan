@@ -21,6 +21,8 @@ public class RicochetProjectile : MonoBehaviour, IPoolable
     string destroyedEffectPool;
     GiveDamage giveDamage;
     RaycastHit2D lastHit;
+    RicochetProperties ricochetProperties;
+    TransformProperties transformProperties;
 
     void Awake()
     {
@@ -37,7 +39,7 @@ public class RicochetProjectile : MonoBehaviour, IPoolable
         giveDamage.hit = false;
         bounceCount = 0;
 
-        RicochetProperties ricochetProperties = (RicochetProperties)data;
+        ricochetProperties = (RicochetProperties)data;
 
         giveDamage.damageToGive = ricochetProperties.damage;
         lifeTime = ricochetProperties.lifeTime;
@@ -66,7 +68,7 @@ public class RicochetProjectile : MonoBehaviour, IPoolable
     void FixedUpdate()
     {
         if(giveDamage.hit)
-            DestroyProjectile(destroyedEffectPool);
+            DestroyProjectile();
        
         transform.position = Vector2.MoveTowards(transform.position, targetPoint, speed * Time.deltaTime);
     
@@ -75,7 +77,7 @@ public class RicochetProjectile : MonoBehaviour, IPoolable
             if(bounceCount < maxBounces && lastHit.collider != null)
                 Bounce();
             else
-                DestroyProjectile(destroyedEffectPool);
+                DestroyProjectile();
         }
     }
 
@@ -108,7 +110,7 @@ public class RicochetProjectile : MonoBehaviour, IPoolable
         SetNextTarget(newStart, currentDirection);
     }
 
-    void DestroyProjectile(string poolName)
+    void DestroyProjectile()
     {
         if(properties.strength > 0)
             CameraManager.Instance.Shake(properties);
@@ -116,7 +118,6 @@ public class RicochetProjectile : MonoBehaviour, IPoolable
         if(destroyedSounds.Length > 0)
             AudioManager.Instance.PlaySound2D(destroyedSounds[Random.Range(0, destroyedSounds.Length)]);
         
-        TransformProperties transformProperties = new TransformProperties();
         transformProperties.position = transform.position;
         transformProperties.scale = new Vector3(-transform.lossyScale.x, 1, 1);
         transformProperties.rotation = transform.rotation;

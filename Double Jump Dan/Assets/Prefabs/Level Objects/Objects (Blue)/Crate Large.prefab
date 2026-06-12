@@ -725,7 +725,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   nonEnemy: 1
-  health: 5
+  health: 25
   invincible: 0
   healthBar: {fileID: 0}
   fill: {fileID: 0}

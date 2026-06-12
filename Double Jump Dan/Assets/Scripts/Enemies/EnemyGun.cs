@@ -36,6 +36,7 @@ public class EnemyGun : MonoBehaviour
     [Header("Camera Shake")]
     [SerializeField] CameraManager.Properties properties;
 
+    ProjectileProperties projectileProperties;
 	float _fireRate;
     Vector3 recoilSmoothDampVelocity;
     Vector3 startingPosition;
@@ -112,9 +113,7 @@ public class EnemyGun : MonoBehaviour
                         direction = bulletFireLocations[i].right;
                     else if(transform.lossyScale.x > 0)
                         direction = -bulletFireLocations[i].right;
-                    
-                    ProjectileProperties projectileProperties = new ProjectileProperties();
-                    
+                                        
                     projectileProperties.speed = speed * -transform.lossyScale.x;
                     projectileProperties.damage = bulletDamage;
                     projectileProperties.lifeTime = bulletLifeTime;

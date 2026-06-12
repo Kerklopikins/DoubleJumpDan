@@ -329,7 +329,7 @@ public class InputRebindingButton : MonoBehaviour
             return "Unknown";
         
         string controlName = controlPath.Contains("/") ? controlPath.Substring(controlPath.LastIndexOf('/') + 1) : controlPath;
-        
+
         if(deviceLayoutName != null)
         {
             if(deviceLayoutName.Contains("DualShock") || deviceLayoutName.Contains("DualSense"))
@@ -340,7 +340,7 @@ public class InputRebindingButton : MonoBehaviour
             else if(deviceLayoutName.Contains("XInput") || deviceLayoutName.Contains("Xbox") || deviceLayoutName.Contains("Gamepad"))
             {
                 if(GameInputManager.XboxDisplayNameOverrides.TryGetValue(controlName, out string xboxName))
-                    return xboxName;     
+                    return xboxName;
             }
         }
 
@@ -373,15 +373,37 @@ public class InputRebindingButton : MonoBehaviour
     }
     
     #region TODO
+    //LIGHTNING GUN
+    //MAKE SPAWRK PARTICLE SHAPE HEMISPHEERE
+    
+    ////THIS SCRIPT
+    ///FIX NULL deviceLayoutName. store it probably
+    
+    ///ADD AN EVENT WHEN THE PLAYER'S DEAD BOOL IS ACTUALLY TURNED OFF, VS JUST TRACKING IT EVERY FRAME
+    /// 
+    //SPLASH SCREEN
+    //TEST IF VSYNC IS WORKING IN SLPASH SCREEN
+    ///DELAY ANIMATION BY LIKE A QUARTER SECOND
 
-            //LERP THE HEALTH BARS BACK TO FULL instead of instantly
+    //GET RID OF UNSUED PACKAGES like post processing, cinemachine, ect.
+    //FIX WHY THE MOUSE IS RIGHT ABOVE THE PLAYER WHEN RESTARTING AND NOT MOVING
+    //probably because the mouse inputs are disabled when the level first starts
 
-    ///SHOP
-    /// maybe make the shop reset back to the guns tab when switching users
-    /// MAKE EMOJI MANS LEGS AND ARMS YELLOW
-    /// FIX SKINS ITEM CARDS ALIGHNMENT
+    //CAMERA add a look bellow when falling and maybe when going up as well
+    //fine tune camera follow better
 
-    /// FIX GRENADE LAUNCHER NOT WORKING WITH GEM CRATES
+    //PLayer
+    // stop gun from flashing when dieing and fix gun not falling far enough,
+    //it stops falling way too soon
+    //MAYBE MAKE AN IDLE ANIMATION
+    //FIX SLIGHT ARM ROTATION LAG WHEN FLIPPING WHEN LOCK AIMING IS ON
+    
+    //Moving Platform
+    ///MAKE THE MOVING PLATFORM ADD VELOCITY TO PASSANGERS AND OBJECTS VS PARENTING THEM, 
+    /// ITS CAUSING A TON OF ISSUES, like with shells or when the game exits and player is
+    /// still on it
+
+    ///Make the checkpoints and finish level back to box colliders maybe
     
     ///####AUTO SCREEN RESOLUTION CHANGING####
     //Make screen auto update resolutions about every second for different moniters
@@ -389,12 +411,10 @@ public class InputRebindingButton : MonoBehaviour
     /// Make sure level loading manager black background resizes when screen resolution changed
 
     ////####SPRINTING####
-    ///Try out making player air movement as fast as when sprinting
     /// Maybe make player walk particles emmision higher when sprinting
-    ////MAKE SURE ARM STAYS STRAIGT WHEN BODY ROTATES WHEN AIM LOCK IS ON
-    /// ///MAKE EYES LOOK UP WHEN PRESSING UP IN AIM LOCK MODE
     
     ////####INPUT AND VIRTUAL CURSOR####
+    /// CHEK IF PREVIOUS OVERRIDE NAME IS WORKING RIGHT
     /// //OPTIMIZE INPUT SETTINGS BY DISABLING BUTTONS EHRN OUT OF VIEW
     /// MAKE KEYBOARD MODE SAVE PERMINATLY
     ////ADD CURSOR WARPING TO KEYBOARD INPUT CHANGE ASWELL LIKE IN ONCONTROLLERCHANGE

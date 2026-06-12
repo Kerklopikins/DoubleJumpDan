@@ -6,6 +6,7 @@ public class PoolParticle : MonoBehaviour, IPoolable
     [SerializeField] float lifeTime;
 
     float _lifeTime;
+    TransformProperties properties;
     
     void Update()
     {
@@ -17,7 +18,7 @@ public class PoolParticle : MonoBehaviour, IPoolable
 
     public void OnObjectReuse(object data)
     {
-        TransformProperties properties = (TransformProperties)data;
+        properties = (TransformProperties)data;
         transform.position = properties.position;
         transform.localScale = properties.scale;
         transform.rotation = properties.rotation;

@@ -18,6 +18,7 @@ public class GrenadeLauncher : MonoBehaviour
     [SerializeField] float reloadTime = 0.3f;
     [SerializeField] float maxReloadAngle = 30;
     
+    ProjectileProperties projectileProperties;
     float _fireRate;
     float _shotForce;
     int direction = 1;
@@ -44,6 +45,9 @@ public class GrenadeLauncher : MonoBehaviour
         gunInfo.Initialize();
 
         player.OnPlayerRespawn += ForceReload;
+        player.OnPlayerKilled += PlayerKilledOrLevelFinished;
+        LevelManager.Instance.OnLevelFinished += PlayerKilledOrLevelFinished;
+
         collisionMask = (1 << LayerMask.NameToLayer("Collisions")) | (1 << LayerMask.NameToLayer("Enemies"));
 
         PoolManager.Instance.CreatePool(grenadeDestroyedEffect.name, grenadeDestroyedEffect.gameObject, (int)gunInfo.startingAmmo / 2);        
@@ -107,8 +111,6 @@ public class GrenadeLauncher : MonoBehaviour
             if(gameInputManager.ShootButtonUp() && _fireRate <= 0 && gunInfo.currentAmmo > 0 && !reloading)
             {                
                 gunInfo.reloadTimer = gunInfo.startReloadTimer;
-
-                ProjectileProperties projectileProperties = new ProjectileProperties();
                 
                 projectileProperties.speed = grenade.force * player.transform.localScale.x * _shotForce;
                 projectileProperties.damage = gunInfo.damage;
@@ -138,7 +140,15 @@ public class GrenadeLauncher : MonoBehaviour
             if(gunInfo.currentAmmo < gunInfo.maxAmmo && gunInfo.reloadTimer <= 0)
                 StartCoroutine(AnimateReload());
     }
-    public void ForceReload()
+
+    void PlayerKilledOrLevelFinished()
+    {
+        shotForce.SetActive(false);
+        projectileTrajectory.DisableTrajectoryLine();
+        _shotForce = 0;
+    }
+
+    void ForceReload()
     {
         if(reloading)
         {
@@ -146,7 +156,10 @@ public class GrenadeLauncher : MonoBehaviour
             gunInfo.Reload();
             reloading = false;
         }
+
+        transform.localPosition = startingPosition;
     }
+    
     IEnumerator AnimateReload()
     {
         reloading = true;
@@ -158,6 +171,9 @@ public class GrenadeLauncher : MonoBehaviour
 
         while(percent < 1)
         {
+            if(player.dead || LevelManager.Instance.FinishedLevel())
+                break;
+
             percent += Time.deltaTime * reloadSpeed;
             float interpolation = (-Mathf.Pow(percent, 2) + percent) * 4;
 
@@ -167,15 +183,19 @@ public class GrenadeLauncher : MonoBehaviour
             yield return null;
         }
 
-        transform.localEulerAngles = initialRot;
-        gunInfo.Reload();
-        reloading = false;
-
-        yield return null;
+        if(!player.dead && !LevelManager.Instance.FinishedLevel())
+        {
+            transform.localEulerAngles = initialRot;
+            gunInfo.Reload();
+            reloading = false;
+        }
     }
 
     void LateUpdate()
     {
+        if(player.dead || LevelManager.Instance.FinishedLevel())
+            return;
+
         transform.localPosition = Vector3.SmoothDamp(transform.localPosition, startingPosition, ref recoilSmoothDampVelocity, recoilMoveSettleTime);
     }
     

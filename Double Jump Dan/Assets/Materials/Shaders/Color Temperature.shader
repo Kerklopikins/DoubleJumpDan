@@ -1,4 +1,4 @@
-Shader "DJD/ColorTemperature"
+Shader "DJD/Color Temperature"
 {
     Properties
     {

@@ -28,20 +28,27 @@ public class GameManager : MonoBehaviour
     [HideInInspector] public bool useDPad = false;
     [HideInInspector] public bool lockAiming = false;
     [HideInInspector] public string inputBindings = "";
+    [HideInInspector] public bool motionBlur = true;
     [HideInInspector] public bool postProcessing = true;
     [HideInInspector] public bool distortionEffects = true;
     [HideInInspector] public bool weatherEffects = true;
     string folderPath;
     public static bool died;
     bool inMainMenu;
+    bool inSplashScreen;
     MainMenuManager mainMenuManager;
 
     void Awake()
     {
         Instance = this;
         folderPath = Application.persistentDataPath;
+        
+        //Splash Screen
+        if(SceneManager.GetActiveScene().buildIndex == 0)
+            inSplashScreen = true;
 
-        if(SceneManager.GetActiveScene().name == "Main Menu")
+        //Main Menu
+        if(SceneManager.GetActiveScene().buildIndex == 1)
         {
             inMainMenu = true;
             mainMenuManager = GameObject.FindWithTag("Main Menu").GetComponent<MainMenuManager>();
@@ -55,7 +62,9 @@ public class GameManager : MonoBehaviour
         else
         {
             LoadData();
-            LoadUserData();
+
+            if(!inSplashScreen)
+                LoadUserData();
         }        
     }
 
@@ -66,7 +75,7 @@ public class GameManager : MonoBehaviour
     
     void Update()
     {
-        if(users.Count > 0)
+        if(users.Count > 0 && !inSplashScreen)
             currentUser.totalPlaytime += Time.unscaledDeltaTime;
     }
     
@@ -140,6 +149,7 @@ public class GameManager : MonoBehaviour
         gameData.useDPad = useDPad;
         gameData.lockAiming = lockAiming;
         gameData.inputBindings = inputBindings;
+        gameData.motionBlur = motionBlur;
         gameData.postProcessing = postProcessing;
         gameData.distortionEffects = distortionEffects;
         gameData.weatherEffects = weatherEffects;
@@ -179,6 +189,7 @@ public class GameManager : MonoBehaviour
             useDPad = gameData.useDPad;
             lockAiming = gameData.lockAiming;
             inputBindings = gameData.inputBindings;
+            motionBlur = gameData.motionBlur;
             postProcessing = gameData.postProcessing;
             distortionEffects = gameData.distortionEffects;
             weatherEffects = gameData.weatherEffects;
@@ -360,7 +371,7 @@ public class GameManager : MonoBehaviour
     }
 }
 
-[System.Serializable]
+[Serializable]
 public class GameData
 {
     public User currentUser;
@@ -379,12 +390,13 @@ public class GameData
     public bool useDPad;
     public bool lockAiming;
     public string inputBindings;
+    public bool motionBlur;
     public bool postProcessing;
     public bool distortionEffects;
     public bool weatherEffects;
 }
 
-[System.Serializable]
+[Serializable]
 public class User
 {
     public int userID;

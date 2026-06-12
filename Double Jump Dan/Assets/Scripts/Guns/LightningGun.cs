@@ -11,12 +11,16 @@ public class LightningGun : MonoBehaviour
     [SerializeField] float barrelLength;
     [SerializeField] int boltsToSpawn;
     [SerializeField] int length;
+    [SerializeField] Sprite startSegment;
+    [SerializeField] Sprite endSegment;
     [SerializeField] GameObject bolt;
     [SerializeField] float boltDuration;
     [SerializeField] float crazyness;
+    [SerializeField] float lengthDivisor = 9.65f;
     [SerializeField] LayerMask collisionMask;
     [SerializeField] AudioClip shootSound;
     [SerializeField] AudioClip reloadSound;
+    [SerializeField] float hitTimer;
     [SerializeField] GameObject lightningSparks;
     [SerializeField] SpriteRenderer glowSprite;
     [SerializeField] float shakeDuration;
@@ -32,9 +36,10 @@ public class LightningGun : MonoBehaviour
     GunInfo gunInfo;
     bool reloading;
     RaycastHit2D hit;
-    Collider2D lastHit;
     Vector3 startPosition;
     GameInputManager gameInputManager;
+    float _hitTimer;
+    TransformProperties hitEffectProperties;
 
     void Start()
     {
@@ -47,7 +52,9 @@ public class LightningGun : MonoBehaviour
         gunInfo.Initialize();
 
         player.OnPlayerRespawn += ForceReload;
-
+        player.OnPlayerKilled += PlayerKilledOrLevelFinished;
+        LevelManager.Instance.OnLevelFinished += PlayerKilledOrLevelFinished;
+        
         for(int i = 0; i < boltsToSpawn; i++)
         {
             if(i == 0)
@@ -58,6 +65,7 @@ public class LightningGun : MonoBehaviour
                 newBoltsParents.Add(_bolt.transform.Find("Next Lightning Parent"));
                 _bolt.transform.localScale = new Vector3(length / boltsToSpawn, 1, 1);
                 bolts.Add(_bolt.transform);
+                _bolt.GetComponent<SpriteRenderer>().sprite = startSegment;
             }
             else
             {
@@ -67,18 +75,21 @@ public class LightningGun : MonoBehaviour
                 newBoltsParents.Add(_bolt.transform.Find("Next Lightning Parent"));
                 _bolt.transform.localScale = new Vector3(length / boltsToSpawn, 1, 1);
                 bolts.Add(_bolt.transform);
+
+                if(i == boltsToSpawn - 1)
+                    _bolt.GetComponent<SpriteRenderer>().sprite = endSegment;
             }
         }
-
+        
         timer = boltDuration;
-
+        
         lightningSpawnPoint.gameObject.SetActive(false);
         PoolManager.Instance.CreatePool(lightningSparks.name, lightningSparks, (int)gunInfo.startingAmmo + (int)gunInfo.startingAmmo / 2);
     }
 
     void Update()
     {
-        if(!readyToShoot)
+        if(!readyToShoot && !player.dead)
             _fireRate -= Time.deltaTime;
 
         if(gunInfo.reloadTimer > 0)
@@ -114,7 +125,7 @@ public class LightningGun : MonoBehaviour
             
             hit = Physics2D.Raycast(spawnPosition, transform.right * player.transform.localScale.x, length, collisionMask);
             lightningSpawnPoint.transform.position = spawnPosition;
-
+            
             if(gunInfo.canShoot)
             {
                 if(gameInputManager.ShootButton() && gunInfo.currentAmmo > 0 && !reloading)
@@ -122,7 +133,6 @@ public class LightningGun : MonoBehaviour
                     if(!shot)
                     {
                         gunInfo.reloadTimer = gunInfo.startReloadTimer;
-                        lastHit = null;
                         
                         gunInfo.Shoot(1);
                         StopCoroutine(Vibrate());
@@ -146,9 +156,9 @@ public class LightningGun : MonoBehaviour
                     for(int i = 0; i < bolts.Count; i++)
                     {
                         if(hit)
-                            bolts[i].transform.localScale = new Vector3(hit.distance / boltsToSpawn, 1, 1);
+                            bolts[i].transform.localScale = new Vector3(hit.distance / lengthDivisor, 1, 1);
                         else
-                            bolts[i].transform.localScale = new Vector3(length / boltsToSpawn, 1, 1);
+                            bolts[i].transform.localScale = new Vector3(length / lengthDivisor, 1, 1);
 
                         if(i > 0)
                             bolts[i].transform.position = newBoltsParents[i - 1].transform.position;
@@ -174,27 +184,41 @@ public class LightningGun : MonoBehaviour
         if(lightningSpawnPoint.gameObject.activeSelf == true)
         {
             if(hit.collider != null)
-            {
-                if(hit.collider != lastHit)
-                {                        
-                    TransformProperties properties = new TransformProperties();
-                    properties.position = hit.point;
-                    properties.scale = Vector3.one;
-                    properties.rotation = Quaternion.identity;
+            {                  
+                if(_hitTimer > 0)
+                {
+                    _hitTimer -= Time.deltaTime;
+                }
+                else
+                {
+                    hitEffectProperties.position = hit.point;
+                    hitEffectProperties.scale = Vector3.one;
+                    hitEffectProperties.rotation = Quaternion.identity;
 
-                    PoolManager.Instance.ReuseObject(lightningSparks.name, properties);
+                    PoolManager.Instance.ReuseObject(lightningSparks.name, hitEffectProperties);
 
                     if(hit.transform.gameObject.layer == LayerMask.NameToLayer("Enemies"))
                         hit.collider.GetComponent<Health>().TakeDamage(gunInfo.damage);
-                }
 
-                lastHit = hit.collider;
+                    _hitTimer = hitTimer;
+                } 
             }
-            else
-                lastHit = null;
+        }
+        else
+        {
+            _hitTimer = 0;
         }
     }
-    public void ForceReload()
+
+    void PlayerKilledOrLevelFinished()
+    {
+        _fireRate = 0;
+        readyToShoot = true;
+        shot = false;
+        lightningSpawnPoint.gameObject.SetActive(false);    
+    }
+
+    void ForceReload()
     {
         if(reloading)
         {
@@ -202,6 +226,8 @@ public class LightningGun : MonoBehaviour
             gunInfo.Reload();
             reloading = false;
         }
+
+        transform.localPosition = startPosition;
     }
 
     IEnumerator Vibrate()
@@ -210,6 +236,9 @@ public class LightningGun : MonoBehaviour
 
         while(timer < shakeDuration)
         {
+            if(player.dead || LevelManager.Instance.FinishedLevel())
+                break;
+
             timer += Time.deltaTime;
 
             Vector3 offset = Random.insideUnitCircle * shakeAmount;
@@ -220,7 +249,8 @@ public class LightningGun : MonoBehaviour
             yield return null;
         }
 
-        transform.localPosition = startPosition;
+        if(!player.dead && !LevelManager.Instance.FinishedLevel())
+            transform.localPosition = startPosition;
     }
 
     IEnumerator AnimateReload()
@@ -234,6 +264,9 @@ public class LightningGun : MonoBehaviour
        
         while(percent < 1)
         {
+            if(player.dead || LevelManager.Instance.FinishedLevel())
+                break;
+
             percent += Time.deltaTime * reloadSpeed;
             float interpolation = (-Mathf.Pow(percent, 2) + percent) * 4;
 
@@ -243,11 +276,12 @@ public class LightningGun : MonoBehaviour
             yield return null;
         }
 
-        transform.localEulerAngles = initialRot;
-        gunInfo.Reload();
-        reloading = false;
-
-        yield return null;
+        if(!player.dead && !LevelManager.Instance.FinishedLevel())
+        {
+            transform.localEulerAngles = initialRot;
+            gunInfo.Reload();
+            reloading = false;
+        }
     }
 
     #if UNITY_EDITOR
@@ -266,7 +300,7 @@ public class LightningGun : MonoBehaviour
         RaycastHit2D wallHit;
         Ray2D wallRay = new Ray2D((Vector2)firePoint.position, gunDirection);
         wallHit = Physics2D.Raycast(wallRay.origin, wallRay.direction, barrelLength, 1 << LayerMask.NameToLayer("Collisions"));
-
+        
 		Gizmos.color = new Color(1, 0, 0, 1);
 
 		Gizmos.DrawWireSphere(firePoint.position, 0.25f);
@@ -274,6 +308,11 @@ public class LightningGun : MonoBehaviour
         Vector2 spawnPosition = wallHit ? wallHit.point : (Vector2)firePoint.position + (Vector2)(gunDirection * barrelLength);
 
         Gizmos.DrawWireSphere(spawnPosition, 0.25f);
+
+        // Gizmos.color = Color.blue;
+        // RaycastHit2D hit;
+        // hit = Physics2D.Raycast(spawnPosition, transform.right * player.transform.localScale.x, length, collisionMask);
+        // Gizmos.DrawLine(spawnPosition, hit ? hit.point : transform.right * player.transform.localScale.x * 10);
     }
     #endif
 }

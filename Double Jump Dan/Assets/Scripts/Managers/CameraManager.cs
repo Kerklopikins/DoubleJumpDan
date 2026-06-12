@@ -6,19 +6,35 @@ public class CameraManager : MonoBehaviour
     public static CameraManager Instance { get; private set; }
 
     [Header("Camera Follow")]
-    [SerializeField] Vector2 smoothing;
+    [SerializeField] float followSpeed;
+    [SerializeField] float followSmoothTime;
+    [SerializeField] bool enableLookahead;
+    [SerializeField] float lookaheadDistance;
+    [SerializeField] float lookaheadSpeed;
+    [SerializeField] float lookaheadSmoothTime;
+    [SerializeField] float lookaheadDeadzone;
+
+    Vector3 currentVelocity;
+    float lookaheadVelocity;
+    float currentLookaheadOffset;
+    float targetLookaheadOffset;
+    
+    Vector2 previousTargetPosition;
+    Vector2 targetVelocity;
 
     bool following;
+    Transform target;
     Player player;
     BoxCollider2D bounds;
-    Vector3 _min, _max;
+    Vector3 boundsMin, boundsMax;
     float cameraSize;
     Camera _camera;
     Vector3 position;
     const float maxAngle = 10f;
     IEnumerator currentShakeCoroutine;
     Transform parent;
-
+    GameInputManager gameInputManager;
+    
     void Awake()
     {
         Instance = this;
@@ -27,36 +43,61 @@ public class CameraManager : MonoBehaviour
     void Start()
     {
         _camera = GetComponent<Camera>();
-        
+        gameInputManager = GameInputManager.Instance;
+
         player = LevelManager.Instance.player;
-        player.OnPlayerRespawn += LerpToPlayerSpawnPoint;
-        
+        player.OnPlayerRespawn += OnPlayerRespawn;
+
+        target = player.transform;
+
         bounds = LevelManager.Instance.levelBounds;
-        _min = bounds.bounds.min;
-        _max = bounds.bounds.max;
+        boundsMin = bounds.bounds.min;
+        boundsMax = bounds.bounds.max;
         parent = transform.parent;
         
-        SnapCamera(LevelManager.Instance.currentSpawnPoint);
+        previousTargetPosition = LevelManager.Instance.currentSpawnPoint;
+        SnapCameraToPosition(LevelManager.Instance.currentSpawnPoint);
     }
 
     void FixedUpdate()
     {
-        position = parent.position;
         following = player.canFollow;
-        
-        if(following)
-        {
-            if(Mathf.Abs(position.x - player.transform.position.x) > 0)
-                position.x = Mathf.Lerp(position.x, player.transform.position.x, smoothing.x * Time.deltaTime);
 
-            if(Mathf.Abs(position.y - player.transform.position.y) > 0)
-                position.y = Mathf.Lerp(position.y, player.transform.position.y, smoothing.y * Time.deltaTime);
+        if(!following)
+            return;
+
+        targetVelocity = ((Vector2)target.position - previousTargetPosition) / Time.deltaTime;
+        previousTargetPosition = (Vector2)target.position;
+
+        if(enableLookahead)
+        {
+            if(Mathf.Abs(targetVelocity.x) > lookaheadDeadzone && gameInputManager.HorizontalMoveInput() != 0)
+            {
+                //CAMERA add a look bellow when falling and maybe when going up as well
+                targetLookaheadOffset = Mathf.Lerp(targetLookaheadOffset, targetVelocity.normalized.x * lookaheadDistance, lookaheadSpeed * Time.deltaTime);
+                //print()
+            }
+            else
+            {
+                targetLookaheadOffset = 0;        
+                targetLookaheadOffset = Mathf.Lerp(targetLookaheadOffset, 0, lookaheadSpeed * Time.deltaTime);
+            }
+
+            currentLookaheadOffset = Mathf.SmoothDamp(currentLookaheadOffset, targetLookaheadOffset, ref lookaheadVelocity, lookaheadSmoothTime);
+        }
+        else
+        {
+            currentLookaheadOffset = 0;
+            targetLookaheadOffset = 0;
         }
 
-        SnapCamera(position);
+        Vector3 smoothedPosition = Vector3.SmoothDamp(parent.position, new Vector3(target.position.x + currentLookaheadOffset, target.position.y, -20), ref currentVelocity, followSmoothTime / followSpeed);
+            
+        smoothedPosition.z = -20;
+        MoveAndClampCamera(smoothedPosition);
     }
 
-    public void LerpToPlayerSpawnPoint()
+    public void OnPlayerRespawn()
     {
         StartCoroutine(LerpToPlayerSpawnPointCo(LevelManager.Instance.currentSpawnPoint));
     }
@@ -75,28 +116,49 @@ public class CameraManager : MonoBehaviour
             float smoothT = 1 - Mathf.Pow(1 - t, 4);
 
             position = Vector3.Lerp(startPosition, new Vector3(targetPosition.x, targetPosition.y, startPosition.z), smoothT);
-            SnapCamera(position);
+            MoveAndClampCamera(position);
 
             yield return null;
         }
+
+        currentLookaheadOffset = 0;
+        targetLookaheadOffset  = 0;
+        currentVelocity = Vector2.zero;
+        lookaheadVelocity = 0;
+
+        previousTargetPosition = target.position;
     }
 
     public void SnapToPlayerPosition()
     {
-        SnapCamera(player.transform.position);
+        SnapCameraToPosition(target.position);
     }
 
-    public void SnapCamera(Vector2 _position)
+    public void MoveAndClampCamera(Vector2 _position)
     {
         cameraSize = _camera.orthographicSize * ((float)Screen.width / Screen.height);
 
         position.x = _position.x;
         position.y = _position.y;
 
-        position.x = Mathf.Clamp(position.x, _min.x + cameraSize, _max.x - cameraSize);
-        position.y = Mathf.Clamp(position.y, _min.y + _camera.orthographicSize, _max.y - _camera.orthographicSize);
+        position.x = Mathf.Clamp(position.x, boundsMin.x + cameraSize, boundsMax.x - cameraSize);
+        position.y = Mathf.Clamp(position.y, boundsMin.y + _camera.orthographicSize, boundsMax.y - _camera.orthographicSize);
 
         parent.position = new Vector3(position.x, position.y, -20);
+        previousTargetPosition = target.position;
+    }
+
+    void SnapCameraToPosition(Vector2 _position)
+    {
+        MoveAndClampCamera(_position);
+
+        currentLookaheadOffset = 0;
+        targetLookaheadOffset = 0;
+        currentVelocity = Vector2.zero;
+        lookaheadVelocity = 0;
+
+        parent.position = new Vector3(position.x, position.y, -20);
+        previousTargetPosition = target.position;
     }
 
     public void Shake(Properties properties)
@@ -129,7 +191,7 @@ public class CameraManager : MonoBehaviour
 
         do
         {
-            if (movePercent >= 1 || completionPercent == 0)
+            if(movePercent >= 1 || completionPercent == 0)
             {
                 float dampingFactor = DampingCurve(completionPercent, properties.dampingPercent);
                 float noiseAngle = (Random.value - 0.5f) * Mathf.PI;
@@ -156,7 +218,7 @@ public class CameraManager : MonoBehaviour
             transform.localRotation = Quaternion.Slerp(previousRotation, targetRotation, movePercent);
 
             yield return null;
-        } 
+        }
         while(moveDistance > 0);
 
         transform.localPosition = Vector3.zero;
@@ -170,6 +232,20 @@ public class CameraManager : MonoBehaviour
         float b = 1 - Mathf.Pow(x, a);
         return b * b * b;
     }
+
+    #if UNITY_EDITOR
+    void OnDrawGizmosSelected()
+    {
+        // Draw the lookahead target position
+        if(enableLookahead && Application.isPlaying && target != null)
+        {
+            Gizmos.color = new Color(0f, 1f, 0.5f, 0.8f);
+            Vector3 lookaheadWorld = new Vector3(target.position.x + currentLookaheadOffset, target.position.y, 0f);
+            Gizmos.DrawWireSphere(lookaheadWorld, 0.25f);
+            Gizmos.DrawLine(target.position, lookaheadWorld);
+        }
+    }
+#endif
 
     [System.Serializable]
     public class Properties

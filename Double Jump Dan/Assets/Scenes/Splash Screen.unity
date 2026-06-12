@@ -2739,6 +2739,7 @@ GameObject:
   - component: {fileID: 1911666418}
   - component: {fileID: 1911666417}
   - component: {fileID: 1911666422}
+  - component: {fileID: 1911666423}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -2846,6 +2847,67 @@ MonoBehaviour:
   objectsToDisable:
   - {fileID: 204700624}
   - {fileID: 982050794}
+--- !u!114 &1911666423
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1911666416}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 41ad27c536d1c7743bdc26bab855d39b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  cursorAcceleration: 0
+  cursorDeceleration: 0
+  currentUser:
+    userID: 0
+    userName: 
+    userColorIndex: 0
+    gems: 0
+    ownedHats: 57040000
+    ownedGuns: 57040000
+    ownedSkins: 57040000
+    ownedUpgrades: 
+    hatID: 1111
+    gunID: 1111
+    skinID: 1111
+    equippedUpgrades: 
+    customSkinData:
+    - 0
+    - 0
+    - 0.85
+    - 0
+    - 0
+    - 0.5
+    - 0
+    levelsCompleted: 1
+    hash: 
+    totalEnemiesKilled: 0
+    totalDeaths: 0
+    totalGemsCollected: 0
+    totalPlaytime: 0
+    totalJumps: 0
+  users: []
+  sfxVolume: 1
+  musicVolume: 1
+  screenResolution: -1
+  frameRate: -1
+  vSync: 1
+  cameraShake: 1
+  showPerformanceData: 0
+  aimSensitivity: 0.5
+  cursorSensitivity: 0.5
+  controllerVibration: 1
+  swapJoysticks: 0
+  useDPad: 0
+  lockAiming: 0
+  inputBindings: 
+  motionBlur: 1
+  postProcessing: 1
+  distortionEffects: 1
+  weatherEffects: 1
 --- !u!1 &1951497054
 GameObject:
   m_ObjectHideFlags: 0

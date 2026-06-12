@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEditor;
 using UnityEngine.Tilemaps;
 using UnityEditor.SceneManagement;
+using UnityEngine.SceneManagement;
 
 public class MagicalTiledMapFixer : EditorWindow
 {
@@ -13,15 +14,22 @@ public class MagicalTiledMapFixer : EditorWindow
     TilemapRenderer other;
     TilemapRenderer spikes;
     TilemapRenderer dirt;
-    
+    bool notInNormalLevel;
+
     [MenuItem("Window/Magical Tiled Map Fixer")]
     public static void ShowWindow()
     {
-        EditorWindow.GetWindow(typeof(MagicalTiledMapFixer));
+        GetWindow(typeof(MagicalTiledMapFixer));
     }
 
-    void OnGUI()
+    void Awake()
     {
+        if(SceneManager.GetActiveScene().name == "Main Menu" || SceneManager.GetActiveScene().name == "Splash Screen")
+        {
+            notInNormalLevel = true;
+            return;
+        }
+
         grid = GameObject.Find("Grid");
         background = grid.transform.Find("Background").GetComponent<TilemapRenderer>();
         otherBackground = grid.transform.Find("Other Background").GetComponent<TilemapRenderer>();
@@ -30,9 +38,18 @@ public class MagicalTiledMapFixer : EditorWindow
         other = grid.transform.Find("Other").GetComponent<TilemapRenderer>();
         spikes = grid.transform.Find("Spikes").GetComponent<TilemapRenderer>();
         dirt = grid.transform.Find("out").GetComponent<TilemapRenderer>();
+    }
 
+    void OnGUI()
+    {
         GUILayout.Label("Welcome to the Magical Tiled Map Fixer tool!", EditorStyles.boldLabel);
         EditorGUILayout.HelpBox("All this tool does is set up the map with the correct properties.", MessageType.Info);
+
+        if(notInNormalLevel)
+        {
+            EditorGUILayout.HelpBox("Go to an actual level please.", MessageType.Warning);
+            return;
+        }
 
         if(GUILayout.Button("Fix Tiled Map!"))
         {

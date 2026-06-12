@@ -7,9 +7,11 @@ public class PoolDestroyedEffect: MonoBehaviour, IPoolable
     [SerializeField] Sprite[] animationSprites;
     [SerializeField] float animationSpeed;
 
+    TransformProperties properties;
+    
     public void OnObjectReuse(object data)
     {
-        TransformProperties properties = (TransformProperties)data;
+        properties = (TransformProperties)data;
         transform.position = properties.position;
         transform.localScale = properties.scale;
         transform.rotation = properties.rotation;

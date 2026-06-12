@@ -17,7 +17,7 @@ public class Gem : MonoBehaviour
 	void Start()
 	{
         centralizedGem = LevelManager.Instance.centralizedGem;
-        spriteRenderer.sprite = LevelManager.Instance.doubleGems ? LevelManager.Instance.gemSprites[1] : LevelManager.Instance.gemSprites[0];
+        spriteRenderer.sprite = GameManager.Instance.currentUser.equippedUpgrades.Contains(8902) ? LevelManager.Instance.gemSprites[1] : LevelManager.Instance.gemSprites[0];
         
         startPosition = transform.position;
     }

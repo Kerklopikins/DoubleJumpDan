@@ -125,8 +125,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0.5}
   m_AnchorMax: {x: 1, y: 0.5}
-  m_AnchoredPosition: {x: -170.065, y: -307.77}
-  m_SizeDelta: {x: -370.13, y: 58.21}
+  m_AnchoredPosition: {x: 7.5, y: -307.77}
+  m_SizeDelta: {x: -15, y: 58.21}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &1202523519553681896
 CanvasRenderer:
@@ -547,7 +547,7 @@ MonoBehaviour:
       type: 3}
     m_PressedSprite: {fileID: 21300032, guid: fd62903050e1ca349bba8b53f64cbbda, type: 3}
     m_SelectedSprite: {fileID: 21300032, guid: fd62903050e1ca349bba8b53f64cbbda, type: 3}
-    m_DisabledSprite: {fileID: 21300088, guid: fd62903050e1ca349bba8b53f64cbbda, type: 3}
+    m_DisabledSprite: {fileID: 21300028, guid: fd62903050e1ca349bba8b53f64cbbda, type: 3}
   m_AnimationTriggers:
     m_NormalTrigger: Normal
     m_HighlightedTrigger: Highlighted
@@ -822,7 +822,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Spawn Hat
+  m_Text: Change Hat
 --- !u!1 &2381902385413002380
 GameObject:
   m_ObjectHideFlags: 0
@@ -1100,7 +1100,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 521937800942067247}
         m_TargetAssemblyTypeName: DevControls, Assembly-CSharp
-        m_MethodName: SpawnGun
+        m_MethodName: ChangeGun
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -2844,7 +2844,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 521937800942067247}
         m_TargetAssemblyTypeName: DevControls, Assembly-CSharp
-        m_MethodName: SpawnHat
+        m_MethodName: ChangeHat
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -3188,7 +3188,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 760.00006, y: -80}
+  m_AnchoredPosition: {x: 760, y: -80}
   m_SizeDelta: {x: 248, y: 72}
   m_Pivot: {x: 1, y: 0}
 --- !u!222 &1229165448584512346
@@ -3262,7 +3262,7 @@ MonoBehaviour:
       type: 3}
     m_PressedSprite: {fileID: 21300032, guid: fd62903050e1ca349bba8b53f64cbbda, type: 3}
     m_SelectedSprite: {fileID: 21300032, guid: fd62903050e1ca349bba8b53f64cbbda, type: 3}
-    m_DisabledSprite: {fileID: 21300088, guid: fd62903050e1ca349bba8b53f64cbbda, type: 3}
+    m_DisabledSprite: {fileID: 21300028, guid: fd62903050e1ca349bba8b53f64cbbda, type: 3}
   m_AnimationTriggers:
     m_NormalTrigger: Normal
     m_HighlightedTrigger: Highlighted
@@ -3990,7 +3990,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 1}
   m_AnchoredPosition: {x: 15, y: 53.170006}
-  m_SizeDelta: {x: 440, y: -136.34001}
+  m_SizeDelta: {x: 540, y: -136.34001}
   m_Pivot: {x: 0, y: 0.5}
 --- !u!222 &8856920743771919859
 CanvasRenderer:
@@ -4013,7 +4013,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0.9960785, g: 0.9960785, b: 0, a: 1}
+  m_Color: {r: 0, g: 1, b: 1, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -4022,7 +4022,7 @@ MonoBehaviour:
       m_Calls: []
   m_FontData:
     m_Font: {fileID: 10102, guid: 0000000000000000e000000000000000, type: 0}
-    m_FontSize: 25
+    m_FontSize: 22
     m_FontStyle: 1
     m_BestFit: 0
     m_MinSize: 1
@@ -4033,7 +4033,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: '<size=30>Commands</size> (not case sensitive)
+  m_Text: '<color=#FFFE00><size=30>- Commands -</size> (not case sensitive)</color>
 
     Timescale
 
@@ -4052,36 +4052,45 @@ MonoBehaviour:
 
     Gravity <size=20>default 1</size>
 
-    Invincble
-    <size=20>bool</size>
+    Resize
 
-    LoadScene <size=20>int</size>
+    <color=#FFFE00>(Green
+    Commands can be voice activated)</color>
 
-    Heal
+    <color=#55FF00>LoadScene <size=20>int</size></color>
 
-    Gameover
+    <color=#55FF00>Invincble
+    <size=20>(True / False)</size></color>
 
-    KillAll
+    <color=#55FF00>Heal</color>
 
-    Day
+    <color=#55FF00>Gameover</color>
 
-    Sunset
+    <color=#55FF00>KillAll</color>
 
-    Night
+    <color=#55FF00>ChangeGun</color>
 
-    Sunrise
+    <color=#55FF00>ChangeHat</color>
 
-    Overcast
+    <color=#55FF00>ChangeSkin</color>
 
-    DustEnabled
-    <size=20>bool</size>
+    <color=#55FF00>Daytime</color>
 
-    SnowEnabled <size=20>bool</size>
+    <color=#55FF00>Sunset</color>
 
-    CloudsEnabled
-    <size=20>bool</size>
+    <color=#55FF00>Night</color>
 
-    Resize'
+    <color=#55FF00>Sunrise</color>
+
+    <color=#55FF00>Overcast</color>
+
+    <color=#55FF00>Dust
+    <size=20>(On / Off)</size></color>
+
+    <color=#55FF00>Snow <size=20>(On / Off)</size></color>
+
+    <color=#55FF00>Clouds
+    <size=20>(On / Off)</size></color>'
 --- !u!114 &9197964882623369625
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4677,6 +4686,10 @@ MonoBehaviour:
   - {fileID: 1266560747065500062}
   - {fileID: 2420103633082518763}
   - {fileID: 2545364461971353755}
+  finishLevelButtons:
+  - {fileID: 4236384946027899388}
+  - {fileID: 4416952262390180719}
+  - {fileID: 5984515869530179281}
   gameOverAnimator: {fileID: 4352839915792694845}
   gameOverSound: {fileID: 8300000, guid: f9053865168361244a6e111f5d0c799d, type: 3}
   levelNameText: {fileID: 5612119813595578126}
@@ -4712,6 +4725,7 @@ MonoBehaviour:
   - {fileID: 8468481865513492490}
   - {fileID: 2892143496019173780}
   fpsTracker: {fileID: 5053226157781651256}
+  motionBlurToggle: {fileID: 0}
   postProcessingToggle: {fileID: 0}
   distortionEffectsToggle: {fileID: 0}
   weatherEffectsToggle: {fileID: 0}
@@ -6819,7 +6833,7 @@ MonoBehaviour:
       type: 3}
     m_PressedSprite: {fileID: 21300032, guid: fd62903050e1ca349bba8b53f64cbbda, type: 3}
     m_SelectedSprite: {fileID: 21300032, guid: fd62903050e1ca349bba8b53f64cbbda, type: 3}
-    m_DisabledSprite: {fileID: 21300088, guid: fd62903050e1ca349bba8b53f64cbbda, type: 3}
+    m_DisabledSprite: {fileID: 21300028, guid: fd62903050e1ca349bba8b53f64cbbda, type: 3}
   m_AnimationTriggers:
     m_NormalTrigger: Normal
     m_HighlightedTrigger: Highlighted
@@ -6939,4 +6953,4 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Spawn Gun
+  m_Text: Change Gun

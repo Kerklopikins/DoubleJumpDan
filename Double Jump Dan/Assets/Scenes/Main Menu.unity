@@ -5614,37 +5614,6 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
---- !u!1 &797386745
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 797386746}
-  m_Layer: 0
-  m_Name: GameObject
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &797386746
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 797386745}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 8.761983, y: -8.658704, z: 444.77945}
-  m_LocalScale: {x: 1, y: 18, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &968682464 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 139159419725554057, guid: 56b835ea5d7372b4c83acff46d7b00ad,
@@ -6069,13 +6038,15 @@ MonoBehaviour:
   whiteFadeSprite: {fileID: 0}
   greenCircleSprite: {fileID: 0}
   respawnBackgroundSprites: []
-  useColorTemperature: 1
   colorTemperatureMaterial: {fileID: 2100000, guid: 7c5e85dcc5f88ea47840aa5eb4ee2ecf,
     type: 2}
   exposure: 0.32
   tintColor: {r: 1, g: 0.7875625, b: 0.41037738, a: 1}
   grayscaleMaterial: {fileID: 2100000, guid: f50dbae2f6b952f46b8a05657940d91c, type: 2}
   grayscaleAmount: 0
+  motionBlurMaterial: {fileID: 0}
+  intensity: 0.05
+  sampleCount: 8
 --- !u!114 &1365733954
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6307,7 +6278,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ec44d842953a49e42990ca8cc167e092, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  timeOfDay: 5
+  timeOfDay: 0
   world: 2
   weatherType: 0
   cloudEmissionOverTime: 0.3
@@ -7048,4 +7019,3 @@ SceneRoots:
   - {fileID: 1881409658}
   - {fileID: 1524688280}
   - {fileID: 2752499798879569100}
-  - {fileID: 797386746}

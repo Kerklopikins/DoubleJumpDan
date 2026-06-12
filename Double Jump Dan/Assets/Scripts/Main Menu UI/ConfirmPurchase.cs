@@ -13,10 +13,12 @@ public class ConfirmPurchase : MonoBehaviour
 
     public ShopItem shopItem { get; set; }
     GameManager gameManager;
+    ShopManager shopManager;
 
     void Start()
     {
         gameManager = GameManager.Instance;
+        shopManager = ShopManager.Instance;
     }
 
 	public void Open(Image _itemImage, string confirmPurchaseString, bool premiumItem, bool isUpgrade, bool isCustomSkin)
@@ -59,13 +61,13 @@ public class ConfirmPurchase : MonoBehaviour
         if(shopItem.item.itemType == Item.ItemType.Upgrade)
 			gameManager.currentUser.ownedUpgrades.Add(shopItem.item.itemID);
 		
-        ShopManager.Instance.RefreshGemsText();
+        shopManager.RefreshGemsText();
 
         if(shopItem.item.itemType != Item.ItemType.Upgrade)
-            ShopManager.Instance.EquipItem(shopItem);
+            shopManager.EquipItem(shopItem);
         else
-            ShopManager.Instance.EquipUpgrade(shopItem, true);
+            shopManager.EquipUpgrade(shopItem, true);
             
-        ShopManager.Instance.SaveShopData();
+        shopManager.SaveShopData();
 	}
 }

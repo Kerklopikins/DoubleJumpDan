@@ -285,7 +285,7 @@ public class GameInputManager : MonoBehaviour
         }
     }
 
-    public float GetHorizontalInput()
+    public float HorizontalMoveInput()
     {
         if(ControllerConnected())
         {
@@ -307,7 +307,7 @@ public class GameInputManager : MonoBehaviour
         }
     }
 
-    public float GetVerticalInput()
+    public float VerticalMoveInput()
     {
         if(ControllerConnected())
         {
@@ -494,7 +494,7 @@ public class GameInputManager : MonoBehaviour
             return false;
     }
 
-    public Vector3 GetRealMousePosition()
+    public Vector3 RealMousePosition()
     {
         return _camera.ScreenToWorldPoint(Mouse.current.position.ReadValue());
     }

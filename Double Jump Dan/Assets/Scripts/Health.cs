@@ -5,7 +5,7 @@ using UnityEngine;
 public class Health : MonoBehaviour
 {
     [Header("Main Stuff")]
-    public bool nonEnemy = false;
+    [SerializeField] bool nonEnemy = false;
     public int health;
     [SerializeField] bool invincible;
     [SerializeField] GameObject healthBar;
@@ -43,7 +43,10 @@ public class Health : MonoBehaviour
     bool dead;
     Camera _camera;
     LevelManager levelManager;
-
+    int zFlingScaleDirection;
+    Vector3 zFlingEndScale;
+    TransformProperties transformProperties;
+    
     void Start()
     {
         levelManager = LevelManager.Instance;
@@ -51,10 +54,16 @@ public class Health : MonoBehaviour
         startingHealth = health;
         _camera = levelManager.mainCamera;
 
-        if(GetComponentInParent<ObjectOpitimizer>() != null)
+        zFlingScaleDirection = Random.Range(0, 2);
+        
+        switch(zFlingScaleDirection)
         {
-            objectOpitimizer = GetComponentInParent<ObjectOpitimizer>();
-            return;
+            case 0:
+            zFlingEndScale = Vector3.one;
+            break;
+            case 1:
+            zFlingEndScale = new Vector2(1.75f, 1.75f);
+            break;
         }
 
         if(GetComponent<ObjectOpitimizer>() != null)
@@ -80,11 +89,11 @@ public class Health : MonoBehaviour
     }
 
     void OnTriggerStay2D(Collider2D other)
-    {
+    {      
         if(invincible)
             return;
 
-        if(other.gameObject.layer == LayerMask.NameToLayer("Projectiles"))
+        if(other.gameObject.layer == LayerMask.NameToLayer("Projectiles") && other.GetComponent<GiveDamage>() != null)
         {
             GiveDamage giveDamage = other.GetComponent<GiveDamage>();
             TakeDamage(giveDamage.damageToGive);
@@ -162,7 +171,7 @@ public class Health : MonoBehaviour
         {
             ScreenEffectsManager.Instance.HitStop(0.125f, 0.25f);
             GameManager.Instance.currentUser.totalEnemiesKilled += 1;
-            StartCoroutine(FlingAnimation(gameObject));
+            StartCoroutine(FlingAnimation());
         }
     }
 
@@ -216,7 +225,6 @@ public class Health : MonoBehaviour
     {
         for(int i = 0; i < gemsToGive; i++)
         {
-            TransformProperties transformProperties = new TransformProperties();
             transformProperties.position = originalPosition;
             transformProperties.scale = Vector3.zero;
             transformProperties.rotation = Quaternion.identity;
@@ -311,13 +319,13 @@ public class Health : MonoBehaviour
     #endregion
 
     #region EnemyFling
-    IEnumerator FlingAnimation(GameObject enemy)
+    IEnumerator FlingAnimation()
     {
-        float direction = UnityEngine.Random.value > 0.5f ? 1 : -1;
-        Vector3 startPosition = enemy.transform.position;
-        float flingHeight = UnityEngine.Random.Range(7, 10);
+        float direction = Random.value > 0.5f ? 1 : -1;
+        Vector3 startPosition = transform.position;
+        float flingHeight = Random.Range(7, 10);
 
-        Vector3 flingEnd = startPosition + new Vector3(direction * UnityEngine.Random.Range(8, 12), -10, 0);
+        Vector3 flingEnd = startPosition + new Vector3(direction * Random.Range(8, 12), -10, 0);
         
         float flingDuration = 1.5f;
         float elapsed = 0;
@@ -325,6 +333,7 @@ public class Health : MonoBehaviour
         float previousY = 0, previousY2 = 0;
         float previousX = 0, previousX2 = 0;
         float previousDeltaTime = 0, previousDeltaTime2 = 0;
+        Vector2 startScale = transform.localScale;
 
         while(elapsed < flingDuration)
         {
@@ -335,28 +344,32 @@ public class Health : MonoBehaviour
             float arcY = (1 - Mathf.Pow(t * 2 - 1, 2)) * flingHeight;
 
             Vector3 position = Vector3.Lerp(startPosition, flingEnd, easedT);
-            position.y = startPosition.y + arcY + Mathf.Lerp(0, flingEnd.y - startPosition.y, t * t);
-            
+
+            //OLD
+            //position.y = startPosition.y + arcY + Mathf.Lerp(0, flingEnd.y - startPosition.y, t * t);
+            position.y = startPosition.y + arcY + Mathf.Lerp(0, flingEnd.y - startPosition.y, easedT);
+            transform.localScale = Vector2.Lerp(startScale, new Vector2(zFlingEndScale.x * startScale.x, zFlingEndScale.y), easedT);
+
             previousY2 = previousY;
             previousX2 = previousX;
             previousDeltaTime2 = previousDeltaTime;
 
-            previousY = enemy.transform.position.y;
-            previousX = enemy.transform.position.x;
+            previousY = transform.position.y;
+            previousX = transform.position.x;
             previousDeltaTime = Time.deltaTime;
 
-            enemy.transform.position = position;
-            enemy.transform.Rotate(0, 0, direction * 500 * Time.deltaTime);
+            transform.position = position;
+            transform.Rotate(0, 0, -direction * 500 * Time.deltaTime);
 
             yield return null;
         }
 
-        float velocityY1 = Time.deltaTime > 0 ? (enemy.transform.position.y - previousY) / Time.deltaTime : 0;
+        float velocityY1 = Time.deltaTime > 0 ? (transform.position.y - previousY) / Time.deltaTime : 0;
         float velocityY2 = previousDeltaTime2 > 0 ? (previousY - previousY2) / previousDeltaTime2 : 0;
         
         float initialVelocityY = (velocityY1 + velocityY2) / 2;
 
-        float velocityX1 = Time.deltaTime > 0 ? (enemy.transform.position.x - previousX) / Time.deltaTime : 0;
+        float velocityX1 = Time.deltaTime > 0 ? (transform.position.x - previousX) / Time.deltaTime : 0;
         float velocityX2 = previousDeltaTime2 > 0 ? (previousX - previousX2) / previousDeltaTime2 : 0;
         float initialVelocityX = (velocityX1 + velocityX2) / 2;
 
@@ -364,7 +377,7 @@ public class Health : MonoBehaviour
         float fallElapsed = 0;
         float fallDuration = 4f;
 
-        Vector3 landedPosition = enemy.transform.position;
+        Vector3 landedPosition = transform.position;
 
         while(fallElapsed < fallDuration)
         {
@@ -372,10 +385,10 @@ public class Health : MonoBehaviour
             float yOffset = initialVelocityY * fallElapsed + 0.5f * gravity * fallElapsed * fallElapsed;
             float xOffset = initialVelocityX * fallElapsed;
             
-            enemy.transform.position = new Vector3(landedPosition.x + xOffset, landedPosition.y + yOffset, landedPosition.z);
-            enemy.transform.Rotate(0, 0, direction * 500 * Time.deltaTime);
+            transform.position = new Vector3(landedPosition.x + xOffset, landedPosition.y + yOffset, landedPosition.z);
+            transform.Rotate(0, 0, -direction * 500 * Time.deltaTime);
 
-            if(enemy.transform.position.y < _camera.transform.position.y - _camera.orthographicSize * 2)
+            if(transform.position.y < _camera.transform.position.y - _camera.orthographicSize * 2)
                 fallDuration = 0;
 
             yield return null;

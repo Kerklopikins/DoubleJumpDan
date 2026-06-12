@@ -10,13 +10,16 @@ public class MagicalGameObjectNameFixer : EditorWindow
     [MenuItem("Window/Magical GameObject Name Fixer")]
     public static void ShowWindow()
     {
-        EditorWindow.GetWindow(typeof(MagicalGameObjectNameFixer));
+        GetWindow(typeof(MagicalGameObjectNameFixer));
     }
 
+    void Awake()
+    {
+        gameObjects = FindObjectsByType<GameObject>(FindObjectsSortMode.None);
+    }
+    
     void OnGUI()
     {
-        gameObjects = Object.FindObjectsByType<GameObject>(FindObjectsSortMode.None);
-
         GUILayout.Label("Welcome to the Magical Game Object Name Fixer tool!", EditorStyles.boldLabel);
         EditorGUILayout.HelpBox("All this tool does is get rid of the irritating '(number)' at the end of all duplicated enabled game objects in Unity 5x.", MessageType.Info);
 

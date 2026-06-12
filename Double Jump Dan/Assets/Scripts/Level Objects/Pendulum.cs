@@ -33,6 +33,7 @@ public class Pendulum : MonoBehaviour
         spikeCollider.size = new Vector2(spikeCollider.size.x, middleSegmant.size.y + 2);
         spikeCollider.offset = new Vector2(0, -middleSegmant.size.y / 2 - 1);
     }
+    
     void Update()
     {
         float t = Mathf.Sin(Time.time * speed + phaseOffset) * 0.5f + 0.5f;

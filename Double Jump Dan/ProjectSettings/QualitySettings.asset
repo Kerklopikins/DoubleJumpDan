@@ -7,7 +7,7 @@ QualitySettings:
   m_CurrentQuality: 0
   m_QualitySettings:
   - serializedVersion: 3
-    name: Defualt
+    name: Default
     pixelLightCount: 0
     shadows: 0
     shadowResolution: 0

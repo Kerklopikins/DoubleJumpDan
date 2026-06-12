@@ -1,6 +1,7 @@
 ﻿using UnityEditor;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEditor.SceneManagement;
 
 public enum _fontStyle { Normal, Bold, Italic, BoldAndItalic }
 
@@ -21,7 +22,12 @@ public class MagicalTextChanger : EditorWindow
     [MenuItem("Window/Magical Text Changer")]
     public static void ShowWindow()
     {
-        EditorWindow.GetWindow(typeof(MagicalTextChanger));
+        GetWindow(typeof(MagicalTextChanger));
+    }
+
+    void Awake()
+    {
+        
     }
 
     void OnGUI()
@@ -85,6 +91,10 @@ public class MagicalTextChanger : EditorWindow
 
                 if(changeRaycast)
                     texts[i].raycastTarget = raycastTarget;
+
+                Undo.RecordObject(texts[i], "Text Change");
+                EditorUtility.SetDirty(texts[i]);
+                EditorSceneManager.MarkSceneDirty(texts[i].gameObject.scene);
             }
         }
     }

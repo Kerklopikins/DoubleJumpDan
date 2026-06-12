@@ -23,7 +23,9 @@ public class Projectile : MonoBehaviour, IPoolable
     Rigidbody2D rb2D;
     string destroyedEffectPool;
     GiveDamage giveDamage;
-
+    ProjectileProperties projectileProperties;
+    TransformProperties transformProperties;
+    
     void Awake()
     {
         _collider2D = GetComponent<Collider2D>();
@@ -35,7 +37,7 @@ public class Projectile : MonoBehaviour, IPoolable
     {
         giveDamage.hit = false;
         
-        ProjectileProperties projectileProperties = (ProjectileProperties)data;
+        projectileProperties = (ProjectileProperties)data;
 
         giveDamage.damageToGive = projectileProperties.damage;
         lifeTime = projectileProperties.lifeTime;
@@ -128,7 +130,6 @@ public class Projectile : MonoBehaviour, IPoolable
         if(destroyedSounds.Length > 0)
             AudioManager.Instance.PlaySound2D(destroyedSounds[Random.Range(0, destroyedSounds.Length)]);
         
-        TransformProperties transformProperties = new TransformProperties();
         transformProperties.position = transform.position;
         transformProperties.scale = new Vector3(-transform.lossyScale.x, 1, 1);
         transformProperties.rotation = transform.rotation;

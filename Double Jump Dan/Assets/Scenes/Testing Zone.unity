@@ -3690,6 +3690,31 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2401183972487348870, guid: ba46cb58fbee9a14a8520708f9d53979,
         type: 3}
+      propertyPath: exposure
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2401183972487348870, guid: ba46cb58fbee9a14a8520708f9d53979,
+        type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2401183972487348870, guid: ba46cb58fbee9a14a8520708f9d53979,
+        type: 3}
+      propertyPath: tintColor.b
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2401183972487348870, guid: ba46cb58fbee9a14a8520708f9d53979,
+        type: 3}
+      propertyPath: tintColor.g
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2401183972487348870, guid: ba46cb58fbee9a14a8520708f9d53979,
+        type: 3}
+      propertyPath: tintColor.r
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2401183972487348870, guid: ba46cb58fbee9a14a8520708f9d53979,
+        type: 3}
       propertyPath: useColorTemperature
       value: 0
       objectReference: {fileID: 0}

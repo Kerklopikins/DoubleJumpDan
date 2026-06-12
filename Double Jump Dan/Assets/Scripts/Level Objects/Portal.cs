@@ -67,7 +67,7 @@ public class Portal : MonoBehaviour
             if(!player.CanHandleInput())
                 return;
 
-            if(gameInputManager.GetVerticalInput() > gameInputManager.VerticalInputSensitivity && inPortal && !initiated)
+            if(gameInputManager.VerticalMoveInput() > gameInputManager.VerticalInputSensitivity && inPortal && !initiated)
                 Teleport();
         }
         else
@@ -89,7 +89,7 @@ public class Portal : MonoBehaviour
         if(properties.strength > 0)
             CameraManager.Instance.Shake(properties);
 
-        cameraManager.SnapCamera(cameraManager.transform.position);
+        cameraManager.MoveAndClampCamera(cameraManager.transform.position);
     }
 
     Vector3 SnapVector(Vector3 v)

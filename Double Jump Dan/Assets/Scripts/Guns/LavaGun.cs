@@ -32,6 +32,8 @@ public class LavaGun : MonoBehaviour
         gunInfo.Initialize();
 
         player.OnPlayerRespawn += ForceReload;
+        player.OnPlayerKilled += PlayerKilledOrLevelFinished;
+        LevelManager.Instance.OnLevelFinished += PlayerKilledOrLevelFinished;
     }
 
     void Update()
@@ -72,17 +74,26 @@ public class LavaGun : MonoBehaviour
                 }
             }
             else
+            {   
                 lavaEmission.rateOverTime = new ParticleSystem.MinMaxCurve(0);
+            }
         }
         else
+        {
             lavaEmission.rateOverTime = new ParticleSystem.MinMaxCurve(0);
-        
+        }
 
         if(gameInputManager.ReloadButtonDown() && !reloading)
             if(gunInfo.currentAmmo < gunInfo.maxAmmo && gunInfo.reloadTimer <= 0)
                 StartCoroutine(AnimateReload());
     }
-    public void ForceReload()
+
+    void PlayerKilledOrLevelFinished()
+    {
+        lavaEmission.rateOverTime = new ParticleSystem.MinMaxCurve(0);
+    }
+
+    void ForceReload()
     {
         if(reloading)
         {
@@ -96,13 +107,16 @@ public class LavaGun : MonoBehaviour
     {
         reloading = true;
         AudioManager.Instance.PlaySound2D(reloadSound);
-
+        
         float reloadSpeed = 1 / reloadTime;
         float percent = 0;
         Vector3 initialRot = new Vector3(0, 0, -90);
 
         while(percent < 1)
         {
+            if(player.dead || LevelManager.Instance.FinishedLevel())
+                break;
+
             percent += Time.deltaTime * reloadSpeed;
             float interpolation = (-Mathf.Pow(percent, 2) + percent) * 4;
 
@@ -112,11 +126,12 @@ public class LavaGun : MonoBehaviour
             yield return null;
         }
 
-        transform.localEulerAngles = initialRot;
-        gunInfo.Reload();
-        reloading = false;
-
-        yield return null;
+        if(!player.dead && !LevelManager.Instance.FinishedLevel())
+        {
+            transform.parent.localEulerAngles = initialRot;
+            gunInfo.Reload();
+            reloading = false;
+        }
     }
 
     void OnParticleCollision(GameObject other)

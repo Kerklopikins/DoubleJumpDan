@@ -15,6 +15,7 @@ public class GameHUD: MonoBehaviour
     public AudioClip pauseSound;
     [SerializeField] Text pausedText;
     [SerializeField] Button[] pauseMenuButtons;
+    [SerializeField] Button[] finishLevelButtons;
 
     [Header("Game Over")]
     [SerializeField] Animator gameOverAnimator;
@@ -330,6 +331,7 @@ public class GameHUD: MonoBehaviour
         canPause = true;
         canToggleSettings = true;
     }
+
     IEnumerator DelayResumeCo()
     {
         canPause = false;
@@ -424,6 +426,9 @@ public class GameHUD: MonoBehaviour
 
             for(int i = 0; i < pauseMenuButtons.Length; i++)
                 pauseMenuButtons[i].interactable = false;
+
+            for(int i = 0; i < finishLevelButtons.Length; i++)
+                finishLevelButtons[i].interactable = false;
         }
     }
 
@@ -447,6 +452,9 @@ public class GameHUD: MonoBehaviour
 
             for(int i = 0; i < pauseMenuButtons.Length; i++)
                 pauseMenuButtons[i].interactable = false;
+            
+            for(int i = 0; i < finishLevelButtons.Length; i++)
+                finishLevelButtons[i].interactable = false;
         }
     }
 
@@ -461,6 +469,9 @@ public class GameHUD: MonoBehaviour
 
             for(int i = 0; i < pauseMenuButtons.Length; i++)
                 pauseMenuButtons[i].interactable = false;
+
+            for(int i = 0; i < finishLevelButtons.Length; i++)
+                finishLevelButtons[i].interactable = false;
         }
     }
 
@@ -474,6 +485,9 @@ public class GameHUD: MonoBehaviour
             
             for(int i = 0; i < pauseMenuButtons.Length; i++)
                 pauseMenuButtons[i].interactable = false;
+
+            for(int i = 0; i < finishLevelButtons.Length; i++)
+                finishLevelButtons[i].interactable = false;
         }
     }
 

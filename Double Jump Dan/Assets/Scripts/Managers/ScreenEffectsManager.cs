@@ -2,26 +2,31 @@ using UnityEngine;
 using System.Collections;
 using UnityEngine.SceneManagement;
 using System;
+
+[ExecuteAlways]
+[ImageEffectAllowedInSceneView]
 public class ScreenEffectsManager : MonoBehaviour
 {
     public static ScreenEffectsManager Instance;
-
+    
     [SerializeField] SpriteRenderer hurtSprite;
     [SerializeField] SpriteRenderer whiteFadeSprite;
     [SerializeField] SpriteRenderer greenCircleSprite;
     [SerializeField] SpriteRenderer[] respawnBackgroundSprites;
 
     [Header("Color Temperature")]
-    [SerializeField] bool useColorTemperature;
     [SerializeField] Material colorTemperatureMaterial;
-    [Range(0f, 3f)]
-    [SerializeField] float exposure = 1f;
+    [SerializeField, Range(0f, 3f)] float exposure = 1f;
     [SerializeField] Color tintColor = Color.white;
     
     [Header("Grayscale")]
     [SerializeField] Material grayscaleMaterial;
-    [Range(0, 1)]
-    [SerializeField] float grayscaleAmount;
+    [SerializeField, Range(0, 1)] float grayscaleAmount;
+
+    [Header("Motion Blur")]
+    [SerializeField] Material motionBlurMaterial;
+    [SerializeField, Range(0, 1)] float intensity = 0.05f;
+    [SerializeField, Range(2, 64)] int sampleCount = 8;
 
     public bool canAnimateWhiteFade { get; private set; }
     Camera _camera;
@@ -30,17 +35,33 @@ public class ScreenEffectsManager : MonoBehaviour
     bool canAnimateGrayScale = true;
     Player player;
     GameManager gameManager;
-    bool usePostProcessing;
+    bool usePostProcessing = true;
+    bool useMotionBlur = true;
+    Matrix4x4 previousVP;
+    bool firstFrame = true;
+    RenderTexture temp;
+    RenderTexture temp2;
+    RenderTexture currentSource;
 
     void Awake()
     {
-        Instance = this;
+        if(!Application.isPlaying)
+            return;
+        
+        if(Instance == null)
+            Instance = this;
     }
 
     void Start()
     {
-        _camera = GetComponent<Camera>();
+        if(_camera == null)
+            _camera = GetComponent<Camera>();
+        
+        if(!Application.isPlaying)
+            return;
+        
         gameManager = GameManager.Instance;
+        UpdatePostProcessing();
 
         if(SceneManager.GetActiveScene().name == "Main Menu")
             return;
@@ -48,28 +69,8 @@ public class ScreenEffectsManager : MonoBehaviour
         player = LevelManager.Instance.player;
         canAnimateWhiteFade = true;
         player.OnPlayerHealthChange += AnimateHealthCollect;
+        
         ResizeScreenEffects();
-    }
-
-    void Update()
-    {
-        ////////////////////////FIX put in start/////////////////////////
-        /// 
-        /// 
-        /// 
-        /// 
-        /// 
-        /// 
-        /// 
-        /// 
-        /// 
-        /// 
-        /// 
-        /// 
-        /// 
-        /// 
-        /// 
-        UpdatePostProcessing();
     }
 
     public void ResizeScreenEffects()
@@ -180,6 +181,7 @@ public class ScreenEffectsManager : MonoBehaviour
 
         canAnimateHealth = true;
     }
+
     public void TriggerHurtEffect()
     {
         if(canAnimateHurt)
@@ -264,59 +266,63 @@ public class ScreenEffectsManager : MonoBehaviour
             return;
 
         usePostProcessing = gameManager.postProcessing;
+        useMotionBlur = gameManager.motionBlur;
     }
 
     void OnRenderImage(RenderTexture src, RenderTexture dest)
     {
-        if(!usePostProcessing)
+        currentSource = src;
+        
+        if(usePostProcessing && colorTemperatureMaterial != null)
         {
-            Graphics.Blit(src, dest);
-            return;
-        }
-
-        if(!useColorTemperature)
-        {
-            if(grayscaleMaterial != null)
-            {
-                grayscaleMaterial.SetFloat("_Amount", grayscaleAmount);
-                Graphics.Blit(src, dest, grayscaleMaterial);
-            }
-            else
-            {
-                Graphics.Blit(src, dest);
-            }
-
-            return;
-        }
-    
-        RenderTexture temp = RenderTexture.GetTemporary(src.width, src.height);
-        RenderTexture currentSource = src;
-
-        if(colorTemperatureMaterial != null)
-        {
-            //colorTemperatureMaterial.SetFloat("_Temperature", colorTemperature);
+            temp = RenderTexture.GetTemporary(src.width, src.height);
+            
             colorTemperatureMaterial.SetFloat("_Exposure", exposure);
             colorTemperatureMaterial.SetColor("_TintColor", tintColor);
 
-            Graphics.Blit(currentSource, temp, colorTemperatureMaterial);
-            currentSource = temp;
-        }
-        else
-        {
-            Graphics.Blit(src, temp);
-            currentSource = temp;
+             Graphics.Blit(currentSource, temp, colorTemperatureMaterial);
+             currentSource = temp;
         }
 
-        if(grayscaleMaterial != null)
+        if(useMotionBlur && motionBlurMaterial != null)
+        {
+            temp2 = RenderTexture.GetTemporary(src.width, src.height);
+            
+            Matrix4x4 view = _camera.worldToCameraMatrix;
+            Matrix4x4 proj = GL.GetGPUProjectionMatrix(_camera.projectionMatrix, true);
+            Matrix4x4 currentVP = proj * view;
+
+            if(firstFrame)
+            {
+                previousVP = currentVP;
+                firstFrame = false;
+            }
+
+            motionBlurMaterial.SetMatrix("_PreviousVP", previousVP);
+            motionBlurMaterial.SetMatrix("_CurrentVPInverse", currentVP.inverse);
+            motionBlurMaterial.SetFloat ("_Intensity", intensity);
+            motionBlurMaterial.SetInt   ("_SampleCount", sampleCount);
+
+            Graphics.Blit(currentSource, temp2, motionBlurMaterial);
+            currentSource = temp2;
+
+            previousVP = currentVP;   
+        }
+
+        if(usePostProcessing && grayscaleMaterial != null)
         {
             grayscaleMaterial.SetFloat("_Amount", grayscaleAmount);
             Graphics.Blit(currentSource, dest, grayscaleMaterial);
         }
         else
         {
-            Graphics.Blit(currentSource, dest);
+            Graphics.Blit(currentSource, dest);   
         }
-        
-        RenderTexture.ReleaseTemporary(temp);
+
+        if(usePostProcessing)
+            RenderTexture.ReleaseTemporary(temp);
+
+        if(useMotionBlur)
+            RenderTexture.ReleaseTemporary(temp2);
     }
 }

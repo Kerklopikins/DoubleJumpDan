@@ -46,6 +46,11 @@ public class Gun : MonoBehaviour
     ProjectileTrajectory projectileTrajectory;
     string destroyedEffectPool;
     GameInputManager gameInputManager;
+    ProjectileProperties projectileProperties;
+    TransformProperties raycastHitEffectProperties;
+    RicochetProperties ricochetProperties;
+    TransformProperties shellProperties;
+
     void Start()
     {
         startingPosition = transform.localPosition;
@@ -65,6 +70,8 @@ public class Gun : MonoBehaviour
         gunInfo.Initialize();
 
         player.OnPlayerRespawn += ForceReload;
+        player.OnPlayerKilled += PlayerKilledOrLevelFinished;
+        LevelManager.Instance.OnLevelFinished += PlayerKilledOrLevelFinished;
 
         collisionMask = (1 << LayerMask.NameToLayer("Collisions")) | (1 << LayerMask.NameToLayer("Enemies"));
         int destroyedEffectPoolAmount;
@@ -102,11 +109,9 @@ public class Gun : MonoBehaviour
         if(player.CanHandleInput())
             HandleInput();
 
-        ////////////////////////////////////ADDED
         if(gunInfo.reloadTimer > 0)
             gunInfo.reloadTimer -= Time.deltaTime;
 
-        ////////////////////////////////////ADDED
         if(gunInfo.currentAmmo <= 0 && gunInfo.reloadTimer <= 0 && !reloading)
             StartCoroutine(AnimateReload());
 
@@ -115,26 +120,28 @@ public class Gun : MonoBehaviour
 
     void LateUpdate()
     {
+        if(player.dead || LevelManager.Instance.FinishedLevel())
+            return;
+
         transform.localPosition = Vector3.SmoothDamp(transform.localPosition, startingPosition, ref recoilSmoothDampVelocity, recoilMoveSettleTime);
     }
 
-    ////////////////////////////////////ADDED
-    public void ForceReload()
+    void ForceReload()
     {
-        for(int i = 0; i < projectileFirePoints.Length; i++)
-        {
-            projectileFirePoints[i].localScale = new Vector3(0, 1, 1);
-        }
-
-        if(showTrajectory)
-            projectileTrajectory.EnableTrajectoryLine((Vector2)projectileFirePoints[0].position + (Vector2)GunDirection(0) * barrelLength, speed, 1);
-
         if(reloading)
         {
             transform.localEulerAngles = new Vector3(0, 0, -90);
             gunInfo.Reload();
             reloading = false;
         }
+
+        transform.localPosition = startingPosition;
+    }
+
+    void PlayerKilledOrLevelFinished()
+    {
+        if(showTrajectory)
+            projectileTrajectory.DisableTrajectoryLine();
     }
 
     Vector3 GunDirection(int firePointIndex)
@@ -151,7 +158,7 @@ public class Gun : MonoBehaviour
     {
         if(gunInfo.canShoot)
         {
-            if(showTrajectory && !reloading)
+            if(showTrajectory && !reloading && !player.dead && !LevelManager.Instance.FinishedLevel())
                 projectileTrajectory.EnableTrajectoryLine((Vector2)projectileFirePoints[0].position + (Vector2)GunDirection(0) * barrelLength, speed, 1);
 
             if(gunInfo.fireMode == GunInfo.FireMode.Single)
@@ -209,7 +216,6 @@ public class Gun : MonoBehaviour
         if(canFireProjectile && _fireRate <= 0)
         {
             gunInfo.initiatedBurst = true;
-                ///////////////////////ADDED
             gunInfo.reloadTimer = gunInfo.startReloadTimer;
 
             if(gunAnimator != null)
@@ -267,9 +273,7 @@ public class Gun : MonoBehaviour
                 else if(projectileType == ProjectileType.GameObjectBased)
                 {
                     if(!ricochet)
-                    {
-                        ProjectileProperties projectileProperties = new ProjectileProperties();
-                    
+                    {                    
                         projectileProperties.speed = speed * player.transform.localScale.x;
                         projectileProperties.damage = gunInfo.damage;
                         projectileProperties.lifeTime = lifeTime;;
@@ -302,9 +306,7 @@ public class Gun : MonoBehaviour
                         PoolManager.Instance.ReuseObject(gameObject.name, projectileProperties);
                     }
                     else
-                    {
-                        RicochetProperties ricochetProperties = new RicochetProperties();
-                    
+                    {                    
                         ricochetProperties.speed = speed * player.transform.localScale.x;
                         ricochetProperties.damage = gunInfo.damage;
                         ricochetProperties.lifeTime = lifeTime;;
@@ -340,22 +342,21 @@ public class Gun : MonoBehaviour
 
     void RaycastHitEffect(Vector2 hitPoint)
     {
-        TransformProperties properties = new TransformProperties();
-        properties.position = hitPoint;
-        properties.scale = new Vector3(-transform.lossyScale.x, 1, 1);
-        properties.rotation = transform.rotation;
+        raycastHitEffectProperties.position = hitPoint;
+        raycastHitEffectProperties.scale = new Vector3(-transform.lossyScale.x, 1, 1);
+        raycastHitEffectProperties.rotation = transform.rotation;
 
-        PoolManager.Instance.ReuseObject(destroyedEffectPool, properties);
+        PoolManager.Instance.ReuseObject(destroyedEffectPool, raycastHitEffectProperties);
     }
     
     void EjectShell()
     {
-        TransformProperties properties = new TransformProperties();
-        properties.position = shellEjectionPoint.position;
-        properties.rotation = shellEjectionPoint.rotation;
+        shellProperties.position = shellEjectionPoint.position;
+        shellProperties.rotation = shellEjectionPoint.rotation;
 
-        PoolManager.Instance.ReuseObject(shell.name, properties);
+        PoolManager.Instance.ReuseObject(shell.name, shellProperties);
     }
+    
     public void ActivateMuzzleFlash()
     {
 		if(useSmokeParticles)
@@ -402,6 +403,9 @@ public class Gun : MonoBehaviour
 
         while(percent < 1)
         {
+            if(player.dead || LevelManager.Instance.FinishedLevel())
+                break;
+
             percent += Time.deltaTime * reloadSpeed;
             float interpolation = (-Mathf.Pow(percent, 2) + percent) * 4;
 
@@ -411,11 +415,12 @@ public class Gun : MonoBehaviour
             yield return null;
         }
 
-        transform.localEulerAngles = initialRot;
-        gunInfo.Reload();
-        reloading = false;
-
-        yield return null;
+        if(!player.dead && !LevelManager.Instance.FinishedLevel())
+        {
+            transform.localEulerAngles = initialRot;
+            gunInfo.Reload();
+            reloading = false;
+        }
     }
 
     IEnumerator DeactivateBullet()

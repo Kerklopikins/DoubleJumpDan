@@ -84,7 +84,7 @@ public class CrorgnAI : MonoBehaviour
                 //if(hit)
                     //Debug.DrawLine(ray.origin, hit.point, Color.red);
 
-                if(hit && hit.transform.gameObject.layer == LayerMask.NameToLayer("Player"))
+                if(hit && hit.transform.gameObject.layer == LayerMask.NameToLayer("Player") && !LevelManager.Instance.FinishedLevel())
                 {
                     _shootStartDelay -= Time.deltaTime;
 

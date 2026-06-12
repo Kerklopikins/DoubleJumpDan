@@ -78,7 +78,7 @@ SpriteRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 1004492393
-  m_SortingLayer: -1
+  m_SortingLayer: -2
   m_SortingOrder: -4
   m_Sprite: {fileID: 21300732, guid: a84efda117f28ec47ace744a727c2bed, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -111,7 +111,6 @@ MonoBehaviour:
   burstsPerMagazine: 0
   burstCoolDownTime: 0
   aimPointOffset: 1.0625
-  restingAngleOffset: 6.82
   lowRumbleAmount: 0.15
   highRumbleAmount: 0.25
   rumbleDuration: 0.2
@@ -141,7 +140,7 @@ MonoBehaviour:
   destroyedEffect: {fileID: 5778358008569737638, guid: 19a19bd5b2c16b544af551a642ca53a7,
     type: 3}
   speed: 25
-  lifeTime: 5
+  lifeTime: 3
   useRaycastEndPoint: 0
   showTrajectory: 1
   ricochet: 0

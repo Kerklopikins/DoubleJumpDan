@@ -137,7 +137,8 @@ public class D207: MonoBehaviour
             if(gunInfo.currentAmmo < gunInfo.maxAmmo && gunInfo.reloadTimer <= 0)
                 StartCoroutine(AnimateReload());
 	}
-    public void ForceReload()
+    
+    void ForceReload()
     {
         if(reloading)
         {
@@ -145,12 +146,18 @@ public class D207: MonoBehaviour
             gunInfo.Reload();
             reloading = false;
         }
+
+        transform.localPosition = startingPosition;
     }
 
     void LateUpdate()
     {
+        if(player.dead || LevelManager.Instance.FinishedLevel())
+            return;
+
         transform.localPosition = Vector3.SmoothDamp(transform.localPosition, startingPosition, ref recoilSmoothDampVelocity, recoilMoveSettleTime);
     }
+
     IEnumerator AnimateReload()
     {
         reloading = true;
@@ -162,6 +169,9 @@ public class D207: MonoBehaviour
        
         while(percent < 1)
         {
+            if(player.dead || LevelManager.Instance.FinishedLevel())
+                break;
+
             percent += Time.deltaTime * reloadSpeed;
             float interpolation = (-Mathf.Pow(percent, 2) + percent) * 4;
 
@@ -171,11 +181,12 @@ public class D207: MonoBehaviour
             yield return null;
         }
 
-        transform.localEulerAngles = initialRot;
-        gunInfo.Reload();
-        reloading = false;
-
-        yield return null;
+        if(!player.dead && !LevelManager.Instance.FinishedLevel())
+        {
+            transform.localEulerAngles = initialRot;
+            gunInfo.Reload();
+            reloading = false;      
+        }
     }
 
     #if UNITY_EDITOR

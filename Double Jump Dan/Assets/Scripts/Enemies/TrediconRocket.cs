@@ -22,7 +22,7 @@ public class TrediconRocket: MonoBehaviour, IPoolable
     string destroyedEffectPool;
     GiveDamage giveDamage;
     bool hit;
-
+    TransformProperties transformProperties;
     void Awake()
     {
         _collider2D = GetComponent<Collider2D>();
@@ -106,7 +106,6 @@ public class TrediconRocket: MonoBehaviour, IPoolable
             if(destroyedSound != null)
                 AudioManager.Instance.PlaySound2D(destroyedSound);
 
-            TransformProperties transformProperties = new TransformProperties();
             transformProperties.position = transform.position;
             transformProperties.scale = Vector3.one;
             transformProperties.rotation = Quaternion.identity;

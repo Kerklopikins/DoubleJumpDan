@@ -49,11 +49,14 @@ public class ItemManager : MonoBehaviour
 		gunGameObject.transform.localPosition = gun.transform.localPosition;
 		gunGameObject.transform.localScale = CorrectedItemScale(gunGameObject.transform);
 		gunGameObject.name = gun.gameObject.name.Replace("(Clone)", string.Empty);
-		player.spriteMaterials.Add(gunGameObject.GetComponent<SpriteRenderer>());
+		//player.spriteMaterials.Add(gunGameObject.GetComponent<SpriteRenderer>());
+		player.gunSpriteRenderer = gunGameObject.GetComponent<SpriteRenderer>();
 		GunInfo gunInfo = gunGameObject.GetComponent<GunInfo>();
 		player.aimPoint.localPosition = new Vector3(gunInfo.aimPointOffset, player.aimPoint.localPosition.y, 0);
 		StatsHUD.Instance.SubscribeToGun(gunInfo);
 		GameHUD.Instance.SubscribeToGun(gunInfo);
+		player.gunTransform = gunGameObject.transform;
+		player.gunStartPosition = gunGameObject.transform.localPosition;
 	}
 
 	public void InstantiateHat(Item hat)
